@@ -3,7 +3,7 @@ COMPOSE = ./docker-compose.yml
 
 all : 
 	@echo "Starting all containers..."
-	@sudo docker compose -f $(COMPOSE) up 
+	@sudo docker compose -f $(COMPOSE) up -d
 	@echo "All containers started successfully!"
 
 down:
