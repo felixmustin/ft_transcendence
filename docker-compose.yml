@@ -12,12 +12,13 @@ services:
     #   - /app/node_modules
     networks:
       - network
+    restart: on-failure
 
   frontend:
     depends_on:
       - pg
       - backend
-    container_name: "fronted"
+    container_name: "frontend"
     build: ./frontend/
     ports:
       - "3000:3000"
@@ -26,6 +27,8 @@ services:
     #   - /app/node_modules
     networks:
       - network
+    restart: on-failure
+    
     
   pg:
     image: postgres:14.1-alpine
