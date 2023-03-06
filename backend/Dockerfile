@@ -13,6 +13,7 @@ RUN npm ci
 # Copy application sources (.ts, .tsx, js)
 COPY src/ src/
 
+RUN npm install -g npm@9.6.0
 # Build application (produces dist/ folder)
 RUN npm run build
 

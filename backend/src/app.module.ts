@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { users } from './user.entity';
+// import { PongModule } from './pong/pong.module';
 
 @Module({
   imports: [DatabaseModule, TypeOrmModule.forFeature([users])],

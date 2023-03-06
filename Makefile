@@ -45,6 +45,9 @@ refresh :
 	@echo begin to refresh container content ;
 	@docker cp -qa ./frontend/public frontend:/app;
 	@docker cp -qa ./frontend/src frontend:/app;
+	# @cp -r backend/src backend/dist;
+	# @docker cp -qa ./backend/dist backend:/app;
+	# @rm -rf backend/dist;
 	@echo container content refreshed;
 
 save:

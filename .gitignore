@@ -1,3 +1,4 @@
 **/**.env
 **/**.log
 **/**.o
+**/**node_modules

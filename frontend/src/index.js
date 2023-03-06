@@ -1,5 +1,8 @@
-import React from 'react';
+// import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './index.css';
+import React, { useState, useEffect } from 'react';
+import ./login.js
 
 function Square(props) {
 	return (
@@ -124,25 +127,117 @@ function Square(props) {
   
   // ========================================
   
-  const root = ReactDOM.createRoot(document.getElementById("root"));
-  root.render(<Game />);
   
   function calculateWinner(squares) {
 	const lines = [
-	  [0, 1, 2],
-	  [3, 4, 5],
-	  [6, 7, 8],
-	  [0, 3, 6],
+		[0, 1, 2],
+		[3, 4, 5],
+		[6, 7, 8],
+		[0, 3, 6],
 	  [1, 4, 7],
 	  [2, 5, 8],
 	  [0, 4, 8],
 	  [2, 4, 6]
 	];
 	for (let i = 0; i < lines.length; i++) {
-	  const [a, b, c] = lines[i];
-	  if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-		return squares[a];
-	  }
+		const [a, b, c] = lines[i];
+		if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+			return squares[a];
+		}
 	}
 	return null;
+}
+
+function Game_Board() {
+  const [leftPaddleY, setLeftPaddleY] = useState(160);
+  const [rightPaddleY, setRightPaddleY] = useState(160);
+
+  useEffect(() => {
+    // Add event listeners for keydown and keyup events
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    // Remove event listeners when the component is unmounted
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  // Handle keydown events
+  function handleKeyDown(event) {
+    switch (event.key) {
+      case "w":
+        setLeftPaddleY(y => y - 10);
+        break;
+      case "s":
+        setLeftPaddleY(y => y + 10);
+        break;
+      case "ArrowUp":
+        setRightPaddleY(y => y - 10);
+        break;
+      case "ArrowDown":
+        setRightPaddleY(y => y + 10);
+        break;
+      default:
+        break;
+    }
   }
+
+  // Handle keyup events
+  function handleKeyUp(event) {
+    switch (event.key) {
+      case "w":
+        setLeftPaddleY(y => y + 10);
+        break;
+      case "s":
+        setLeftPaddleY(y => y - 10);
+        break;
+      case "ArrowUp":
+        setRightPaddleY(y => y + 10);
+        break;
+      case "ArrowDown":
+        setRightPaddleY(y => y - 10);
+        break;
+      default:
+        break;
+    }
+  }
+
+  return (
+    <div className="game-board">
+      <div className="paddle" id="left-paddle" style={{ top: leftPaddleY }} />
+      <div className="paddle" id="right-paddle" style={{ top: rightPaddleY }} />
+	  <div className='ball'/>
+    </div>
+  );
+}
+
+  
+
+class GamePong extends React.Component {
+	constructor (props){
+		super(props);
+		this.state = {
+			score : "placeholder"
+		};
+	}
+	render () {
+		return (
+			<div className="game">
+		  <div className="game-board">
+			<Game_Board
+			//   squares={current.squares}
+			//   onClick={i => this.handleClick(i)}
+			/>
+		  </div>
+		  <div className="status">
+			<div>{this.state.score}</div>
+		  </div>
+		</div>
+		);
+	}
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<Game />);

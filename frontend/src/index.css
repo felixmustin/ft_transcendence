@@ -49,3 +49,70 @@ body {
 	margin-left: 20px;
   }
   
+  /* Set up the game board */
+.game-board {
+	width: 600px;
+	height: 400px;
+	background-color: black;
+	position: relative;
+  }
+  
+  /* Style the paddles */
+  .paddle {
+	width: 20px;
+	height: 80px;
+	background-color: white;
+	position: absolute;
+  }
+  
+  /* Style the left paddle */
+  #left-paddle {
+	left: 20px;
+	top: 160px;
+  }
+  
+  /* Style the right paddle */
+  #right-paddle {
+	right: 20px;
+	top: 160px;
+  }
+  
+  /* Style the ball */
+  .ball {
+	width: 20px;
+	height: 20px;
+	background-color: rgba(255, 255, 0, 0.775);
+	position: absolute;
+	top: 190px;
+	left: 290px;
+	border-radius: 50%;
+  }
+  
+  /* Animate the ball */
+  @keyframes move-ball {
+	from {
+	  transform: translate(-290px, 0);
+	}
+	to {
+	  transform: translate(-290px, 0px);
+	}
+	25% {
+		transform: translate(0px, -190px);
+	}
+	50% {
+	  transform: translate(290px, 0px);
+	}
+	75% {
+	  transform: translate(0px, 190px);
+	}
+  }
+  
+  
+  .ball {
+	animation-name: move-ball;
+	animation-duration: 5s;
+	animation-iteration-count: infinite;
+	animation-direction: normal;
+	animation-timing-function: linear;
+  }
+  
