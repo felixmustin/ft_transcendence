@@ -2,7 +2,7 @@
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import React, { useState, useEffect } from 'react';
-import ./login.js
+import './login.js';
 
 function Square(props) {
 	return (
