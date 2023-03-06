@@ -1,11 +1,11 @@
-CREATE TABLE "users"
+CREATE TABLE "User"
 (
     id SERIAL,
-    firstname text,
-    lastname text
+    username text,
+    password text
     -- CONSTRAINT employees_pkey PRIMARY KEY (id)
 );
 
-INSERT INTO users(firstname, lastname) VALUES
+INSERT INTO User(username, password) VALUES
  ('Felix', 'Mustin'),
  ('Monsieur', 'Cool');

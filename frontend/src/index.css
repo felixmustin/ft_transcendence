@@ -1,118 +1,51 @@
 body {
-	font: 14px "Century Gothic", Futura, sans-serif;
-	margin: 20px;
+	background-color: #f2f2f2;
   }
   
-  ol, ul {
-	padding-left: 30px;
-  }
-  
-  .board-row:after {
-	clear: both;
-	content: "";
-	display: table;
-  }
-  
-  .status {
-	margin-bottom: 10px;
-  }
-  
-  .square {
-	background: #fff;
-	border: 1px solid #999;
-	float: left;
-	font-size: 24px;
-	font-weight: bold;
-	line-height: 34px;
-	height: 34px;
-	margin-right: -1px;
-	margin-top: -1px;
-	padding: 0;
-	text-align: center;
-	width: 34px;
-  }
-  
-  .square:focus {
-	outline: none;
-  }
-  
-  .kbd-navigation .square:focus {
-	background: #ddd;
-  }
-  
-  .game {
+  .container {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
   }
   
-  .game-info {
-	margin-left: 20px;
+  .login-form {
+	background-color: #ffffff;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+	padding: 30px;
+	border-radius: 10px;
+	text-align: center;
   }
   
-  /* Set up the game board */
-.game-board {
-	width: 600px;
-	height: 400px;
-	background-color: black;
-	position: relative;
+  .login-form h2 {
+	margin-bottom: 30px;
+	font-size: 28px;
+	font-weight: bold;
+	color: #333333;
   }
   
-  /* Style the paddles */
-  .paddle {
-	width: 20px;
-	height: 80px;
-	background-color: white;
-	position: absolute;
+  .login-form input {
+	width: 100%;
+	padding: 10px;
+	border: 2px solid #dddddd;
+	border-radius: 5px;
+	margin-bottom: 20px;
+	font-size: 16px;
   }
   
-  /* Style the left paddle */
-  #left-paddle {
-	left: 20px;
-	top: 160px;
+  .login-form button {
+	width: 100%;
+	padding: 10px;
+	background-color: #333333;
+	color: #ffffff;
+	border: none;
+	border-radius: 5px;
+	font-size: 16px;
+	cursor: pointer;
   }
   
-  /* Style the right paddle */
-  #right-paddle {
-	right: 20px;
-	top: 160px;
-  }
-  
-  /* Style the ball */
-  .ball {
-	width: 20px;
-	height: 20px;
-	background-color: rgba(255, 255, 0, 0.775);
-	position: absolute;
-	top: 190px;
-	left: 290px;
-	border-radius: 50%;
-  }
-  
-  /* Animate the ball */
-  @keyframes move-ball {
-	from {
-	  transform: translate(-290px, 0);
-	}
-	to {
-	  transform: translate(-290px, 0px);
-	}
-	25% {
-		transform: translate(0px, -190px);
-	}
-	50% {
-	  transform: translate(290px, 0px);
-	}
-	75% {
-	  transform: translate(0px, 190px);
-	}
-  }
-  
-  
-  .ball {
-	animation-name: move-ball;
-	animation-duration: 5s;
-	animation-iteration-count: infinite;
-	animation-direction: normal;
-	animation-timing-function: linear;
+  .login-form button:hover {
+	background-color: #555555;
   }
   
