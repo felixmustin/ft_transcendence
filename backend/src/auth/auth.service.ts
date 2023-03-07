@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 // import { User } from '../user/user.entity';
@@ -12,9 +12,9 @@ export class AuthService {
     const { username, wordpass } = loginUserDto;
     const user = await this.userService.findUserByUsername(username);
     if (user && user.wordpass === wordpass) {
-      return 'Authenticated';
+      return ('Authenticated');
     }
     else
-        return ('Wrong username : ' + loginUserDto.username);
+        throw new UnauthorizedException('Invalid username or password');
   }
 }

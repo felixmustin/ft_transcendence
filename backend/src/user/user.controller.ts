@@ -30,7 +30,6 @@ export class UserController {
     newUser.lastname = createUserDto.lastname;
     newUser.username = createUserDto.username;
     newUser.wordpass = createUserDto.wordpass;
-
     return this.userService.createUser(newUser);
   }
 }
