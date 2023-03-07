@@ -45,7 +45,6 @@ refresh :
 	@echo begin to refresh container content ;
 	@docker cp -a ./frontend/public frontend:/app;
 	@docker cp -a ./frontend/src frontend:/app;
-	@docker cp -a ./frontend/node_modules frontend:/app;
 	@echo container content refreshed;
 
 save:
