@@ -1,6 +1,5 @@
 CREATE USER myUsername WITH PASSWORD 'myPassword';
 
-
 CREATE TABLE public.Users
 (
     id SERIAL,

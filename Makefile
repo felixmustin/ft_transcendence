@@ -43,9 +43,9 @@ re: down clean all
 
 refresh :
 	@echo begin to refresh container content ;
-	@docker cp -qa ./frontend/public frontend:/app;
-	@docker cp -qa ./frontend/src frontend:/app;
-	@docker cp -qa ./frontend/node_modules frontend:/app;
+	@docker cp -a ./frontend/public frontend:/app;
+	@docker cp -a ./frontend/src frontend:/app;
+	@docker cp -a ./frontend/node_modules frontend:/app;
 	@echo container content refreshed;
 
 save:

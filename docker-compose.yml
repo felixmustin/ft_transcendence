@@ -41,9 +41,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB_NAME}
     ports:
       - "5432:5432"
-
     # volumes:
-      # - ./database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
       #- ./pg/db_data:/var/lib/postgresql/data
     networks:
       - network

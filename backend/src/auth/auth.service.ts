@@ -14,6 +14,7 @@ export class AuthService {
     if (user && user.wordpass === wordpass) {
       return 'Authenticated';
     }
-    throw new Error('Invalid username or password');
+    else
+        return ('Wrong username : ' + loginUserDto.username);
   }
 }
