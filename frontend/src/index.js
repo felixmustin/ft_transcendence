@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import GamePong from './pong.js';
+import formtostr from './formtostr.js';
 console.log(GamePong);
 
 
@@ -37,17 +38,14 @@ function Login() {
     event.preventDefault(); // prevent the form from submitting normally
 
     const form = document.getElementById('login-form');
-    const formData = new FormData(form);
-    let formDataText = "";
-    formData.forEach((value, key) => formDataText += key + "=" + value + "&");
-    formDataText = formDataText.substring(0, formDataText.length - 1);
+    const formDataText = formtostr(form);
 
     const url = 'http://127.0.0.1:3001/auth/login'; // replace with your own URL
     
     fetch(url, {
       method: 'POST',
       headers: new Headers({'content-type': 'application/x-www-form-urlencoded'}),
-      body: str
+      body: formDataText
     })
     .then(response => {
       if (response.ok) {

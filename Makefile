@@ -39,7 +39,7 @@ clean :
 		echo "No volumes to remove"; \
 	fi
 
-re: down clean all
+re: down all
 
 refresh :
 	@echo begin to refresh container content ;
