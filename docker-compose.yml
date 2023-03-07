@@ -31,8 +31,9 @@ services:
     
     
   pg:
-    image: postgres:14.1-alpine
+    # image: postgres:14.1-alpine
     container_name: "postgres"
+    build: ./database/
     restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -40,9 +41,22 @@ services:
       POSTGRES_DB: ${POSTGRES_DB_NAME}
     ports:
       - "5432:5432"
-    volumes:
-      - ./database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
-      # - ./pg/db_data:/var/lib/postgresql/data
+
+    # volumes:
+      # - ./database-seed.sql:/docker-entrypoint-initdb.d/database-seed.sql
+      #- ./pg/db_data:/var/lib/postgresql/data
+    networks:
+      - network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
     networks:
       - network
 
