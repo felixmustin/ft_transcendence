@@ -38,11 +38,16 @@ function Login() {
 
     const form = document.getElementById('login-form');
     const formData = new FormData(form);
+    let formDataText = "";
+    formData.forEach((value, key) => formDataText += key + "=" + value + "&");
+    formDataText = formDataText.substring(0, formDataText.length - 1);
+
     const url = 'http://127.0.0.1:3001/auth/login'; // replace with your own URL
     
     fetch(url, {
       method: 'POST',
-      body: formData
+      headers: new Headers({'content-type': 'application/x-www-form-urlencoded'}),
+      body: str
     })
     .then(response => {
       if (response.ok) {
