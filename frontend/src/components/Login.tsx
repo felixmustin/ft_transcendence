@@ -72,9 +72,9 @@ function Login() {
       <button type="submit">Submit</button>
       <p>
                     Don't have an account?{" "}
-                    <span className='link' onClick={gotoSignUpPage}>
+                    <button className='link' onClick={gotoSignUpPage}>
                         Sign up
-                    </span>
+                    </button>
                 </p>
     </form>
 

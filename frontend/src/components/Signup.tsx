@@ -100,9 +100,9 @@ function Signup() {
                 <button className='signupBtn' >SIGN UP</button>
                 <p>
                     Already have an account?{" "}
-                    <span className='link' onClick={gotoLoginPage}>
+                    <button className='link' onClick={gotoLoginPage}>
                         Login
-                    </span>
+                    </button>
                 </p>
             </form>
         </div>
