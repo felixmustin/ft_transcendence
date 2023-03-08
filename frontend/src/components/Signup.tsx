@@ -45,7 +45,7 @@ function Signup() {
     };
 
     
-    const gotoLoginPage = () => navigate("/");
+    const gotoLoginPage = () => navigate("/login");
 
     return (
         <div className='signup__container'>

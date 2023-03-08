@@ -35,8 +35,10 @@ function Login() {
 
       const data = await response.json();
 
-      navigate("/home");
-      console.log('Response:', data);
+      if (response.ok){
+        navigate("/home");
+        console.log('Response:', data);
+      }
     } catch (error) {
       alert('Login successful');
     }
