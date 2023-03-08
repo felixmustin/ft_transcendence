@@ -1,7 +1,9 @@
 COMPOSE = ./docker-compose.yml
+VOLUME_FOLDER= /Users/$(USER)/docker_volume
 
 
-all : 
+
+all : $(VOLUME_FOLDER)
 	@echo "Starting all containers..."
 	@docker compose -f $(COMPOSE) up -d
 	@echo "All containers started successfully!"
@@ -38,6 +40,9 @@ clean :
 	else \
 		echo "No volumes to remove"; \
 	fi
+
+$(VOLUME_FOLDER):
+	@mkdir -p $@
 
 re-front:
 	docker stop frontend

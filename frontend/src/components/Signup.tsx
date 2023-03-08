@@ -97,7 +97,7 @@ function Signup() {
                     value={formValues.wordpass}
                     onChange={handleInputChange}
                 />
-                <button className='signupBtn' >SIGN UP</button>
+                <button className='signupBtn' onClick={gotoLoginPage} >SIGN UP</button>
                 <p>
                     Already have an account?{" "}
                     <button className='link' onClick={gotoLoginPage}>

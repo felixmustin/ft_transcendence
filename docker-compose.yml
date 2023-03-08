@@ -41,8 +41,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB_NAME}
     ports:
       - "5432:5432"
-    # volumes:
-      #- ./pg/db_data:/var/lib/postgresql/data
+    volumes:
+      - pg-db:/var/lib/postgresql/data
     networks:
       - network
 
@@ -60,3 +60,12 @@ services:
 
 networks:
   network:
+
+volumes:
+  pg-db:
+    driver: local
+    name: pg-db
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/$USER/docker_volume
