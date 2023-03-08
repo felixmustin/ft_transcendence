@@ -1,17 +1,17 @@
-FROM node:12
+FROM node:latest
 
 RUN apt-get update -y && apt-get install vim -y
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json .
 
-RUN npm install
+RUN npm i
 
 COPY . .
 
-RUN npm run build
+## EXPOSE [Port you mentioned in the vite.config file]
 
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+CMD ["npm", "run", "dev"]

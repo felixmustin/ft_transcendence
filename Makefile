@@ -39,7 +39,21 @@ clean :
 		echo "No volumes to remove"; \
 	fi
 
-re: down all
+re-front:
+	docker stop frontend
+	docker rm frontend
+	docker rmi trans-frontend
+	make all
+
+re-back:
+	docker stop backend
+	docker rm backend
+	docker rmi trans-backend
+	make all
+
+re-full: refront reback
+
+re: down clean all
 
 refresh :
 	@echo begin to refresh container content ;

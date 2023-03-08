@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, Param, ParseIntPipe } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
+// import { CreateUserDto } from './dto/create-user.dto';
+// import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -21,15 +21,5 @@ export class UserController {
   @Get()
   async allUsers(): Promise<User[]> {
     return this.userService.allUsers();
-  }
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const newUser = new User();
-    newUser.firstname = createUserDto.firstname;
-    newUser.lastname = createUserDto.lastname;
-    newUser.username = createUserDto.username;
-    newUser.wordpass = createUserDto.wordpass;
-    return this.userService.createUser(newUser);
   }
 }
