@@ -13,7 +13,7 @@ function Home() {
   ];
   return (
     <div>
-      <Banner title="Welcome to my website!" buttons={buttons} />
+      <Banner title="Welcome to Pong tournament!" buttons={buttons} />
       {/* <Router> */}
       <Routes>
         <Route element={<GamePong/>}/>

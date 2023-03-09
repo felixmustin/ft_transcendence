@@ -91,28 +91,36 @@ body {
   /* Animate the ball */
   @keyframes move-ball {
 	from {
-	  transform: translate(-290px, 0);
+	  transform: translate(${ballPosition.x}px, ${ballPosition.y}px);
 	}
 	to {
-	  transform: translate(-290px, 0px);
-	}
-	25% {
-		transform: translate(0px, -190px);
-	}
-	50% {
-	  transform: translate(290px, 0px);
-	}
-	75% {
-	  transform: translate(0px, 190px);
+	  transform: translate(${nextballPosition.x}px, ${nextballPosition.y}px);
 	}
   }
   
   
   .ball {
 	animation-name: move-ball;
-	animation-duration: 5s;
+	animation-duration: 1s;
 	animation-iteration-count: infinite;
 	animation-direction: normal;
 	animation-timing-function: linear;
   }
+  
+  .status-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+  
+  .score-container {
+	margin-bottom: 20px;
+  }
+  
+  .game-board-container {
+	display: flex;
+	justify-content: center;
+  }
+  
+ 
   
