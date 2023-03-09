@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-
+import './form.css';
 
 interface FormValues {
   username: string;
@@ -48,7 +48,7 @@ function Login() {
 
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="form-container" onSubmit={handleSubmit}>
       <label>
         Username:
         <input

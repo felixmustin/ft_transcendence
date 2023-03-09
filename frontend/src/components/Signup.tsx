@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import './form.css';
 
 interface FormValues {
     email: string;
@@ -48,7 +49,7 @@ function Signup() {
     const gotoLoginPage = () => navigate("/login");
 
     return (
-        <div className='signup__container'>
+        <div className='form-container'>
             <h2>Sign up </h2>
             <form className='signup__form' onSubmit={handleSubmit}>
                 <label htmlFor='email'>Email Address</label>
