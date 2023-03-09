@@ -14,17 +14,17 @@ export class PongService {
   calculateBallX(leftPaddleY: number, rightPaddleY: number, ballpositionx: number, ballpositiony: number, nextballpositionx: number, nextballpositiony: number): number {
     let ballx = 0;
 	if (ballpositionx > nextballpositionx){
-		ballx = nextballpositionx - this.ballSpeed - this.ballRadius;
+		ballx = nextballpositionx - this.ballSpeed;
 	}
 	else{
-		ballx = nextballpositionx + this.ballSpeed - this.ballRadius;
+		ballx = nextballpositionx + this.ballSpeed;
 	}
 	let ballFinalX = ballx;
-	//calculate bounce
-	if (ballx > this.boardWidth - this.paddlespace - this.paddlewidth && ballx < this.boardWidth - this.paddlespace && nextballpositiony > rightPaddleY - (this.paddleheight / 2) && nextballpositiony < rightPaddleY + ( this.paddleheight / 2)){
+	//calculate bounce right
+	if (ballx > this.boardWidth - this.paddlespace - this.paddlewidth - this.ballRadius && ballx < this.boardWidth - this.paddlespace - this.ballRadius && nextballpositiony > rightPaddleY && nextballpositiony < rightPaddleY +  this.paddleheight){
 		ballFinalX -= (this.ballSpeed * 2);
-	}
-	else if (ballx < this.paddlespace + this.paddlewidth && ballx > this.paddlespace && nextballpositiony > leftPaddleY - (this.paddleheight / 2) && nextballpositiony < leftPaddleY + ( this.paddleheight / 2)){
+	} // bounce left
+	else if (ballx < this.paddlespace + this.paddlewidth && ballx > this.paddlespace && nextballpositiony > leftPaddleY && nextballpositiony < leftPaddleY + this.paddleheight){
 		ballFinalX += (this.ballSpeed * 2);
 	} 
     return ballFinalX;
@@ -33,17 +33,17 @@ export class PongService {
   calculateBallY(ballPosition: number, nextballposition: number): number {
 	let ballY = 0;
     if (ballPosition > nextballposition){
-		ballY = nextballposition - this.ballSpeed - this.ballRadius;
+		ballY = nextballposition - this.ballSpeed;
 	}
 	else{
-		ballY = nextballposition + this.ballSpeed - this.ballRadius;
+		ballY = nextballposition + this.ballSpeed;
 	}
 	let ballFinalY = ballY;
-	//calculate bounce
+	//calculate bounce down
 	if (ballY > this.boardHeight - this.ballRadius){
     	ballFinalY -= (this.ballSpeed * 2);
-	}
-	else if (ballY < 0 + this.ballRadius){
+	} // bounce up 
+	else if (ballY < 0){
 		ballFinalY += (this.ballSpeed * 2);
 	}
     return ballFinalY;
