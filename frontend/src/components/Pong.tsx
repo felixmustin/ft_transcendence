@@ -10,39 +10,80 @@ function Game_Board() {
   const [ballPosition, setBallPosition] = useState({ x: 290, y: 190 });
   const [nextballPosition, setNextBallPosition] = useState({x: 300, y:200});
 
+//   useEffect(() => {
+// 	// Add event listeners for keydown and keyup events
+// 	document.addEventListener("keydown", handleKeyDown);
+// 	document.addEventListener("keyup", handleKeyUp);
+// 	// try to communicate with the backen
+// 	const interval = setInterval(() => {
+// 		fetch('http://127.0.0.1:3001/pong/pong', {
+// 		  method: 'POST',
+// 		  headers: {
+// 			'Content-Type': 'application/json'
+// 		  },
+// 		  body: JSON.stringify({
+// 			leftPaddleY,
+// 			rightPaddleY,
+// 			ballPosition,
+// 			nextballPosition
+// 		  })
+// 		})
+// 		.then(response => response.json())
+// 		.then(data => {
+// 			setBallPosition({x: nextballPosition.x, y:nextballPosition.y}),
+// 			setNextBallPosition({ x: data.x, y: data.y });
+// 		})
+// 		.catch(error => console.error(error));
+// 	  }, 100);
+
+// 	// Remove event listeners when the component is unmounted
+// 	return () => {
+// 		clearInterval(interval);
+// 		document.removeEventListener("keydown", handleKeyDown);
+// 		document.removeEventListener("keyup", handleKeyUp);
+// 	};
+//   });
+
+  // for paddle move
   useEffect(() => {
 	// Add event listeners for keydown and keyup events
 	document.addEventListener("keydown", handleKeyDown);
 	document.addEventListener("keyup", handleKeyUp);
-	// try to communicate with the backen
-	const interval = setInterval(() => {
-		fetch('http://127.0.0.1:3001/pong/pong', {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json'
-		  },
-		  body: JSON.stringify({
-			leftPaddleY,
-			rightPaddleY,
-			ballPosition,
-			nextballPosition
-		  })
-		})
-		.then(response => response.json())
-		.then(data => {
-			setBallPosition({x: nextballPosition.x, y:nextballPosition.y}),
-			setNextBallPosition({ x: data.x, y: data.y });
-		})
-		.catch(error => console.error(error));
-	  }, 1000);
-
+  
 	// Remove event listeners when the component is unmounted
 	return () => {
-		clearInterval(interval);
-		document.removeEventListener("keydown", handleKeyDown);
-		document.removeEventListener("keyup", handleKeyUp);
+	  document.removeEventListener("keydown", handleKeyDown);
+	  document.removeEventListener("keyup", handleKeyUp);
 	};
-  });
+  }, []);
+
+  // for ball movement
+  useEffect(() => {
+	// try to communicate with the backend
+	const interval = setInterval(() => {
+	  fetch('http://127.0.0.1:3001/pong/pong', {
+		method: 'POST',
+		headers: {
+		  'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+		  leftPaddleY,
+		  rightPaddleY,
+		  ballPosition,
+		  nextballPosition
+		})
+	  })
+	  .then(response => response.json())
+	  .then(data => {
+		setBallPosition({x: nextballPosition.x, y:nextballPosition.y});
+		setNextBallPosition({ x: data.x, y: data.y });
+	  })
+	  .catch(error => console.error(error));
+	}, 100);
+
+	return () => clearInterval(interval);
+}, [leftPaddleY, rightPaddleY, ballPosition, nextballPosition]);
+
   // Handle keydown events
   function handleKeyDown(event) {
 	switch (event.key) {
