@@ -1,0 +1,126 @@
+body {
+	font: 14px "Century Gothic", Futura, sans-serif;
+	margin: 20px;
+  }
+  
+  ol, ul {
+	padding-left: 30px;
+  }
+  
+  .board-row:after {
+	clear: both;
+	content: "";
+	display: table;
+  }
+  
+  .status {
+	margin-bottom: 10px;
+  }
+  
+  .square {
+	background: #fff;
+	border: 1px solid #999;
+	float: left;
+	font-size: 24px;
+	font-weight: bold;
+	line-height: 34px;
+	height: 34px;
+	margin-right: -1px;
+	margin-top: -1px;
+	padding: 0;
+	text-align: center;
+	width: 34px;
+  }
+  
+  .square:focus {
+	outline: none;
+  }
+  
+  .kbd-navigation .square:focus {
+	background: #ddd;
+  }
+  
+  .game {
+	display: flex;
+	flex-direction: row;
+  }
+  
+  .game-info {
+	margin-left: 20px;
+  }
+  
+  /* Set up the game board */
+.game-board {
+	width: 600px;
+	height: 400px;
+	background-color: black;
+	position: relative;
+  }
+  
+  /* Style the paddles */
+  .paddle {
+	width: 20px;
+	height: 80px;
+	background-color: white;
+	position: absolute;
+  }
+  
+  /* Style the left paddle */
+  #left-paddle {
+	left: 20px;
+	top: 160px;
+  }
+  
+  /* Style the right paddle */
+  #right-paddle {
+	right: 20px;
+	top: 160px;
+  }
+  
+  /* Style the ball */
+  .ball {
+	width: 20px;
+	height: 20px;
+	background-color: rgba(255, 255, 0, 0.775);
+	position: absolute;
+	top: 190px;
+	left: 290px;
+	border-radius: 50%;
+  }
+  
+  /* Animate the ball */
+  @keyframes move-ball {
+	from {
+	  transform: translate(${ballPosition.x}px, ${ballPosition.y}px);
+	}
+	to {
+	  transform: translate(${nextballPosition.x}px, ${nextballPosition.y}px);
+	}
+  }
+  
+  
+  .ball {
+	animation-name: move-ball;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-direction: normal;
+	animation-timing-function: linear;
+  }
+  
+  .status-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+  
+  .score-container {
+	margin-bottom: 20px;
+  }
+  
+  .game-board-container {
+	display: flex;
+	justify-content: center;
+  }
+  
+ 
+  

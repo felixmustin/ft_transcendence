@@ -13,7 +13,7 @@ down:
 	@docker compose -f $(COMPOSE) down
 	@echo "All containers stopped successfully!"
 
-clean :
+clean : down
 	@echo "Cleaning up containers, images, networks and volumes..."
 	-@if [ "$$(docker ps -q)" ]; then \
 		docker stop $$(docker ps -aq); \

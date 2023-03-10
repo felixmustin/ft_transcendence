@@ -20,5 +20,6 @@ export class AuthController {
     const token = await this.authService.signupUser(createUserDto);
     return { token };
   }
+  
 
 }

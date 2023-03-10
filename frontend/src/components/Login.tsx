@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-
+import './form.css';
 
 interface FormValues {
   username: string;
   wordpass: string;
 }
 
-function Login() {
+function Login({ setToken }) {
   const [formValues, setFormValues] = useState<FormValues>({
     username: '',
     wordpass: '',
@@ -20,35 +20,31 @@ function Login() {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    // console.log('Submit button clicked');
-    // console.log(JSON.stringify(formValues));
     event.preventDefault();
 
-    try {
-      const response = await fetch('http://localhost:3001/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formValues),
-      });
-
-      const data = await response.json();
-
-      if (response.ok){
+    const response = await fetch('http://localhost:3001/auth/login', {
+      method: 'POST',
+      headers: {
+      'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formValues),
+    }).then(res => res.json()
+    ).then(response => {
+      if (response.statusCode >= 400) {
+        alert("Creation failed");
+        }
+      else {
+        setToken(response.token.id);
         navigate("/home");
-        console.log('Response:', data);
-      }
-    } catch (error) {
-      alert('Login successful');
-    }
+      } 
+      });
   };
 
-  const gotoSignUpPage = () => navigate("/register");
+  const gotoSignUpPage = () => navigate("/signup");
 
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="form-container" onSubmit={handleSubmit}>
       <label>
         Username:
         <input
