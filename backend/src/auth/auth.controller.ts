@@ -1,7 +1,8 @@
-import { Controller, Post, Body, HttpException, HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, UsePipes, ValidationPipe, Param, ParseIntPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +21,12 @@ export class AuthController {
     const token = await this.authService.signupUser(createUserDto);
     return { token };
   }
-  
+
+  @Post('signup/profile/:id')
+  @UsePipes(ValidationPipe)
+  async signupProfile(@Param('id', ParseIntPipe) id: number, @Body() createUserProfileDto: CreateUserProfileDto) {
+    const token = await this.authService.signupUserProfile(id, createUserProfileDto);
+    return { token };
+  }
 
 }

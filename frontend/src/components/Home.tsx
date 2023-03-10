@@ -14,7 +14,7 @@ function Home({ getToken }) {
     // {text: 'signup', link: '/signup'},
     // {text: 'login', link: '/login'},
     {text: 'profile', link: '/profile'},
-    {text: 'disconnect', link: '/disconnect'}
+    {text: 'disconnect', link: '/disconnect'},
   ];
 
   const [error, setError] = useState(null);

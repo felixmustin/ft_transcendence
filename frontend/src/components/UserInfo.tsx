@@ -25,7 +25,7 @@ function UserInfo({getToken}) {
       const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         let userObj = getToken();
-        const url = 'http://localhost:3001/user/' + userObj + '/profile'
+        const url = 'http://localhost:3001/auth/signup/profile/' + userObj
         const response = await fetch(url, {
           method: 'POST',
           headers: {

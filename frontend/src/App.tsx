@@ -34,7 +34,7 @@ function App() {
         <Route path='/signup' element={<Signup setToken={setToken} />} />
         <Route path='/userinfo' element={<UserInfo getToken={getToken} />} />
         <Route path='/profile' element={<Profile getToken={getToken} />} />
-        <Route path='/disconnect' element={<Disconnect deleteToken={deleteToken} />} />
+        <Route path='/disconnect' element={<Disconnect deleteToken={deleteToken} getToken={getToken} />} />
       </Routes>
     </BrowserRouter>
   )
