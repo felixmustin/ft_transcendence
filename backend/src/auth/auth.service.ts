@@ -2,18 +2,18 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { UserService } from '../user/user.service';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { User } from '../user/user.entity';
+import { User } from '../entities/user.entity';
 
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService) {}
 
-  async loginUser(loginUserDto: LoginUserDto): Promise<string> {
+  async loginUser(loginUserDto: LoginUserDto) {
     const { username, wordpass } = loginUserDto;
     const user = await this.userService.findUserByUsername(username);
     if (user && user.wordpass === wordpass) {
-      return ('Authenticated');
+      return (user);
     }
     else
         throw new UnauthorizedException('Invalid username or password');
@@ -24,15 +24,11 @@ export class AuthService {
         throw new BadRequestException('Username in use');
     }
     // const encryptedPassword = await this.encryptPassword(createUserDto.wordpass);
-    
     const newUser = new User();
-    newUser.email = createUserDto.email;
     newUser.username = createUserDto.username;
-    newUser.firstname = createUserDto.firstname;
-    newUser.lastname = createUserDto.lastname;
     newUser.wordpass = createUserDto.wordpass; // encryptedPassword
     const user = await this.userService.createUser(newUser);
-    return (user.id);
+    return (user);
   }
 
   private async isUsernameAvailable(email: string): Promise<boolean> {
@@ -40,5 +36,4 @@ export class AuthService {
     if (user) { return false; }
     return true;
   }
-
 }
