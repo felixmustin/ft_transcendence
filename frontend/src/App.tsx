@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Login from "./components/Login"
 import Home from "./components/Home"
 import Signup from "./components/Signup"
+import Npinheir from "./components/npinheir/Npinheir"
 import UserInfo from "./components/UserInfo"
 import GamePong from './components/Pong'
 import Profile from './components/Profile'
@@ -24,7 +25,7 @@ function deleteToken() {
 }
 
 function App() {
-  //const token = getToken();
+  // const token = getToken();
   return (
     <BrowserRouter>
       <Routes>
@@ -35,6 +36,7 @@ function App() {
         <Route path='/userinfo' element={<UserInfo getToken={getToken} />} />
         <Route path='/profile' element={<Profile getToken={getToken} />} />
         <Route path='/disconnect' element={<Disconnect deleteToken={deleteToken} getToken={getToken} />} />
+        <Route path='/npinheir' element={<Npinheir />} />
       </Routes>
     </BrowserRouter>
   )
