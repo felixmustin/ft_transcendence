@@ -22,13 +22,14 @@ function Home({ getToken }) {
   const [user, setUser] = useState([]);
   const navigate = useNavigate();
 
-  let userObj = getToken();
-  if (!userObj)
+  let userToken = getToken();
+  if (!userToken)
     navigate('/');
   else
     useEffect(() => {
-        let url = 'http://localhost:3001/user/' + userObj
-        fetch(url)
+        let url = 'http://localhost:3001/user/id/'
+        let auth = 'Bearer ' + userToken.access_token;
+        fetch(url, {method: 'GET', headers: {'Authorization': auth}})
           .then(res => res.json())
           .then(
             (result) => {

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/entities/profile.entity';
 import { Repository } from 'typeorm';
@@ -23,12 +23,9 @@ export class UserService {
     return newUser;
   }
 
-  async createUserProfile(user: User, profile: Profile): Promise<User> {
-    const newProfile = await this.userProfileRepository.create(profile);
-    const savedProfile = await this.userProfileRepository.save(newProfile);
-    user.profile = savedProfile;
-    // this.userRepository.save(user);
-    return this.userRepository.save(user);;
+  async createUserProfile(profile: Profile): Promise<Profile> {
+    const savedProfile = await this.userProfileRepository.save(profile);
+    return savedProfile;
   }
 
   async findUserById(id: number): Promise<User> {
@@ -37,8 +34,11 @@ export class UserService {
   }
 
   async findUserProfileById(id: number): Promise<Profile> {
-    // const user = this.findUserById(id)
-    const userProfile = await this.userProfileRepository.findOne({ where: { id } });
+    const user = await this.userRepository.createQueryBuilder("user")
+    .leftJoinAndSelect("user.profile", "profile")
+    .where("user.id = :id", { id: id })
+    .getOne();
+    const userProfile = user.profile;
     return userProfile;
   }
 
@@ -47,9 +47,12 @@ export class UserService {
     return user;
   }
 
-  async remove(user: User): Promise<User> {
-    const userProfile = await this.userProfileRepository.findOne({ where: { id: user.id } });
-    this.userProfileRepository.remove(userProfile)
+  async remove(id: number): Promise<User> {
+    const user = await this.userRepository.createQueryBuilder("user")
+    .leftJoinAndSelect("user.profile", "profile")
+    .where("user.id = :id", { id: id })
+    .getOne();
+    this.userProfileRepository.remove(user.profile)
     return await this.userRepository.remove(user);
   }
 

@@ -33,14 +33,14 @@ function Signup({ setToken }) {
           if (response.statusCode >= 400) {
             alert("Creation failed");
           } else {
-            setToken(response.token.id);
+            setToken(response.token);
             navigate("/userinfo");
           }
         });
     };
 
     
-    const gotoLoginPage = () => navigate("/login");
+    const gotoLoginPage = () => navigate("/");
 
     return (
         <div className='form-container'>

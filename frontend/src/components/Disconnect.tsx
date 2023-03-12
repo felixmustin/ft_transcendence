@@ -6,7 +6,7 @@ function Disconnect({ deleteToken, getToken }) {
 
   const navigate = useNavigate();
   
-  let userObj = getToken();
+  let userToken = getToken();
 
   const disconnect = () => {
     deleteToken();
@@ -14,9 +14,11 @@ function Disconnect({ deleteToken, getToken }) {
   };
 
   const deleteAcc = () => {
-    let url = 'http://localhost:3001/user/' + userObj
+    let url = 'http://localhost:3001/user/delete/'
+    let auth = 'Bearer ' + userToken.access_token;
     fetch(url, {
       method: 'DELETE',
+      headers: {'Authorization': auth}
     }).then(res => res.json()
     ).then(response => {
       if (response.statusCode >= 400) {

@@ -35,7 +35,7 @@ function Login({ setToken }) {
         alert("Creation failed");
         }
       else {
-        setToken(response.token.id);
+        setToken(response.token);
         navigate("/home");
       } 
       });

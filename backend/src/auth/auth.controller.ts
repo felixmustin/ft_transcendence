@@ -1,8 +1,10 @@
-import { Controller, Post, Body, HttpException, HttpStatus, UsePipes, ValidationPipe, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, HttpException, UnauthorizedException, UsePipes, ValidationPipe, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from '../user/dto/login-user.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from './jwt-auth.guards';
 
 @Controller('auth')
 export class AuthController {
@@ -10,8 +12,8 @@ export class AuthController {
 
   @Post('login')
   @UsePipes(ValidationPipe)
-  async login(@Body() loginUserDto: LoginUserDto) {
-    const token = await this.authService.loginUser(loginUserDto);
+  async login(@Body() body: LoginUserDto) {
+    const token = await this.authService.loginUser(body.username, body.wordpass);
     return { token };
   }
 
@@ -22,11 +24,11 @@ export class AuthController {
     return { token };
   }
 
-  @Post('signup/profile/:id')
+  @Post('signup/profile')
+  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  async signupProfile(@Param('id', ParseIntPipe) id: number, @Body() createUserProfileDto: CreateUserProfileDto) {
-    const token = await this.authService.signupUserProfile(id, createUserProfileDto);
-    return { token };
+  async signupProfile(@Request() req, @Body() createUserProfileDto: CreateUserProfileDto) {
+    await this.authService.signupUserProfile(req.user.id, createUserProfileDto);
   }
 
 }
