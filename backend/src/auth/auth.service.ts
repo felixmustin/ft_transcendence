@@ -8,7 +8,7 @@ import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 import { User } from '../entities/user.entity';
 import { Profile } from '../entities/profile.entity';
 import { JwtService } from '@nestjs/jwt';
-import axios from 'axios';
+// import axios from 'axios';
 
 export interface JwtPayload {
   id: number

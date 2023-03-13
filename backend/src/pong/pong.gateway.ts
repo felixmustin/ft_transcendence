@@ -3,24 +3,29 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnG
 import { PongService } from './pong.service';
 import { Server } from 'socket.io';
 
+
 let paddleleftposition = 160;
 let paddlerightposition = 160;
 let ballpositionx = 290;
 let ballpositiony = 190;
 let nextballpositionx = 300;
 let nextballpositiony = 200;
+let intervalid;
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway( { cors: true })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-	constructor(private readonly pongService: PongService) {}
+	constructor(private readonly pongService: PongService) {
+	}
 	// 3 required but still have to look what it is 
 	handleConnection(client: any, ...args: any[]) {
+		console.log("user connected");		
 	}
 	handleDisconnect(client: any) {
-		
+		console.log("user disconnected");
+		clearInterval(intervalid);
 	}
 	afterInit(server: any) {
-		
+		console.log("loading connection after init socket");
 	}
 	// server
 	@WebSocketServer() server: Server;
@@ -29,26 +34,47 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('playPong')
 	async playPong(client: any, data: any) {
 		// const { leftPaddleY, rightPaddleY, ballPosition, nextballPosition } = data;
-
+		console.log('hello from play pong ');
 		// Do calculations to update ball position based on paddles positions
-		const ballX = this.pongService.calculateBallX(paddleleftposition, paddlerightposition, ballpositionx, ballpositiony, nextballpositionx, nextballpositiony);
-		const ballY = this.pongService.calculateBallY(ballpositiony, nextballpositiony);
-		if (ballX < 0 || ballX > 590){
-			this.server.emit('ballOut');
-			return {x: 295, y: 195};
-		}
-		this.server.emit('updateState', { leftPaddleY: paddleleftposition, rightPaddleY: paddlerightposition, ballpositionx: ballX, ballpositiony: ballY });
-		return { x: ballX, y: ballY };
+		intervalid = setInterval( () => {
+			console.log('emiting');
+			const ballX = this.pongService.calculateBallX(paddleleftposition, paddlerightposition, ballpositionx, ballpositiony, nextballpositionx, nextballpositiony);
+			const ballY = this.pongService.calculateBallY(ballpositiony, nextballpositiony);
+			ballpositionx = nextballpositionx;
+			ballpositiony = nextballpositiony;
+			nextballpositionx = ballX;
+			nextballpositiony = ballY;
+			const data = { 
+				leftPaddleY: paddleleftposition,
+				rightPaddleY: paddlerightposition, 
+				ballPosition: {x: ballX, y: ballY},
+			};
+			this.server.emit('updateState', JSON.stringify(data));
+			if (ballX < 0 || ballX > 590){
+				this.server.emit('ballOut');
+				ballpositionx = 290;
+				ballpositiony = 190;
+				nextballpositionx = 300;
+				nextballpositiony = 200;
+			}
+		}, 100);
+		// this.server.emit('updateState', { leftPaddleY: paddleleftposition, rightPaddleY: paddlerightposition, ballpositionx: ballX, ballpositiony: ballY });
+	}
+	@SubscribeMessage('stopPong')
+	async stopPong(client: any, data: any){
+		console.log('stop pong');
+		clearInterval(intervalid);
 	}
 	@SubscribeMessage('updatePaddleL')
 	async updateleftpaddle(client:any, data: any){
-		const {leftPaddleY} = data;
+		console.log('update padddle received');
+		const leftPaddleY = parseInt(data);
 
 		paddleleftposition = leftPaddleY;
 	}
 	@SubscribeMessage('updatePaddleR')
 	async updaterightpaddle(client:any, data: any){
-		const {rightPaddleY} = data;
+		const rightPaddleY = parseInt(data);
 
 		paddlerightposition = rightPaddleY;
 	}
