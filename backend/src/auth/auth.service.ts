@@ -8,6 +8,7 @@ import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 import { User } from '../entities/user.entity';
 import { Profile } from '../entities/profile.entity';
 import { JwtService } from '@nestjs/jwt';
+import axios from 'axios';
 
 export interface JwtPayload {
   id: number
@@ -16,11 +17,15 @@ export interface JwtPayload {
 
 @Injectable()
 export class AuthService {
+  
   constructor(
-    private readonly userService: UserService,
+    private userService: UserService,
     @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService) {
   }
+
+  private readonly client_id = 'u-s4t2ud-a8ab94043b51e2f7e520f7f5c251c46d28c61cd4c12f3fa4e0812aae34d4956f';
+  private readonly redirect_uri = 'http://localhost:3001/auth/42/callback';
 
   async loginUser(username: string, wordpass: string) {
    const user = await this.validateUser(username, wordpass)
@@ -76,5 +81,9 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       // twoFaEnabled : user.twoFaEnabled
     }
+  }
+
+  async signInWith42() {
+    
   }
 }
