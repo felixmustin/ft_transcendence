@@ -14,7 +14,7 @@ function Disconnect({ deleteToken, getToken }) {
   };
 
   const deleteAcc = () => {
-    let url = 'http://localhost:3001/user/' + userObj
+    let url = 'http://127.0.0.1:3001/user/' + userObj
     fetch(url, {
       method: 'DELETE',
     }).then(res => res.json()

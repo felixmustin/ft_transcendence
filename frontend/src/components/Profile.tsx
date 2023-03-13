@@ -14,7 +14,7 @@ const [user, setUser] = useState([]);
     navigate('/');
   else
     useEffect(() => {
-        let url = 'http://localhost:3001/user/' + userObj + '/profile'
+        let url = 'http://127.0.0.1:3001/user/' + userObj + '/profile'
         fetch(url)
           .then(res => res.json())
           .then(

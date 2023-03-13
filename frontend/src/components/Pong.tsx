@@ -1,48 +1,15 @@
-// import React from 'react';
 import ReactDOM from 'react-dom/client';
 import React, { useState, useEffect } from 'react';
 import './pong.css';
 import Banner from './Banner';
+import io, {Socket} from 'socket.io-client';
 
 function Game_Board() {
   const [leftPaddleY, setLeftPaddleY] = useState(160);
   const [rightPaddleY, setRightPaddleY] = useState(160);
   const [ballPosition, setBallPosition] = useState({ x: 290, y: 190 });
   const [nextballPosition, setNextBallPosition] = useState({x: 300, y:200});
-
-//   useEffect(() => {
-// 	// Add event listeners for keydown and keyup events
-// 	document.addEventListener("keydown", handleKeyDown);
-// 	document.addEventListener("keyup", handleKeyUp);
-// 	// try to communicate with the backen
-// 	const interval = setInterval(() => {
-// 		fetch('http://127.0.0.1:3001/pong/pong', {
-// 		  method: 'POST',
-// 		  headers: {
-// 			'Content-Type': 'application/json'
-// 		  },
-// 		  body: JSON.stringify({
-// 			leftPaddleY,
-// 			rightPaddleY,
-// 			ballPosition,
-// 			nextballPosition
-// 		  })
-// 		})
-// 		.then(response => response.json())
-// 		.then(data => {
-// 			setBallPosition({x: nextballPosition.x, y:nextballPosition.y}),
-// 			setNextBallPosition({ x: data.x, y: data.y });
-// 		})
-// 		.catch(error => console.error(error));
-// 	  }, 100);
-
-// 	// Remove event listeners when the component is unmounted
-// 	return () => {
-// 		clearInterval(interval);
-// 		document.removeEventListener("keydown", handleKeyDown);
-// 		document.removeEventListener("keyup", handleKeyUp);
-// 	};
-//   });
+  const [socket, setSocket] = useState<Socket>(io('ws://127.0.0.1:3001/pong'));
 
   // for paddle move
   useEffect(() => {
@@ -59,45 +26,48 @@ function Game_Board() {
 
   // for ball movement
   useEffect(() => {
-	// try to communicate with the backend
-	const interval = setInterval(() => {
-	  fetch('http://127.0.0.1:3001/pong/pong', {
-		method: 'POST',
-		headers: {
-		  'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-		  leftPaddleY,
-		  rightPaddleY,
-		  ballPosition,
-		  nextballPosition
-		})
-	  })
-	  .then(response => response.json())
-	  .then(data => {
-		setBallPosition({x: nextballPosition.x, y:nextballPosition.y});
-		setNextBallPosition({ x: data.x, y: data.y });
-	  })
-	  .catch(error => console.error(error));
-	}, 100);
+	// establish connection
+	// const newsocket = io('ws://127.0.0.1:3001/pong');
 
-	return () => clearInterval(interval);
-}, [leftPaddleY, rightPaddleY, ballPosition, nextballPosition]);
+	// setSocket(newsocket);
+
+	// emit start message
+	const interval = setInterval(() =>{
+		socket.emit('playPong');
+	}, 1000);
+
+	// listen to update
+	socket.on('updateState', ({ leftPaddleY, rightPaddleY, ballPositionx, ballPositiony }) => {
+		setLeftPaddleY(leftPaddleY);
+		setRightPaddleY(rightPaddleY);
+		setBallPosition({ x: nextballPosition.x, y: nextballPosition.y });
+		setNextBallPosition({ x: ballPositionx, y: ballPositiony });
+	  });
+
+		return () => {
+			socket.off('updateState');
+			socket.disconnect();
+		  };
+		}, []);
 
   // Handle keydown events
   function handleKeyDown(event) {
 	switch (event.key) {
 	  case "w":
-		setLeftPaddleY(y => y - 10);
+		socket.emit('updatePaddleL', { leftPaddleY: leftPaddleY - 10 });
+		// setLeftPaddleY(y => y - 10);
 		break;
 	  case "s":
-		setLeftPaddleY(y => y + 10);
+		socket.emit('updatePaddleL', { leftPaddleY: leftPaddleY + 10 });
+		// setLeftPaddleY(y => y + 10);
 		break;
 	  case "ArrowUp":
-		setRightPaddleY(y => y - 10);
+		socket.emit('updatePaddleR', { leftPaddleY: rightPaddleY - 10 });
+		// setRightPaddleY(y => y - 10);
 		break;
 	  case "ArrowDown":
-		setRightPaddleY(y => y + 10);
+		socket.emit('updatePaddleR', { leftPaddleY: rightPaddleY + 10 });
+		// setRightPaddleY(y => y + 10);
 		break;
 	  default:
 		break;
@@ -108,16 +78,16 @@ function Game_Board() {
   function handleKeyUp(event) {
 	switch (event.key) {
 	  case "w":
-		setLeftPaddleY(y => y + 10);
+		// setLeftPaddleY(y => y + 10);
 		break;
 	  case "s":
-		setLeftPaddleY(y => y - 10);
+		// setLeftPaddleY(y => y - 10);
 		break;
 	  case "ArrowUp":
-		setRightPaddleY(y => y + 10);
+		// setRightPaddleY(y => y + 10);
 		break;
 	  case "ArrowDown":
-		setRightPaddleY(y => y - 10);
+		// setRightPaddleY(y => y - 10);
 		break;
 	  default:
 		break;

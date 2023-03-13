@@ -27,7 +27,7 @@ function Home({ getToken }) {
     navigate('/');
   else
     useEffect(() => {
-        let url = 'http://localhost:3001/user/' + userObj
+        let url = 'http://127.0.0.1:3001/user/' + userObj
         fetch(url)
           .then(res => res.json())
           .then(

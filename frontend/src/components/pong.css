@@ -61,7 +61,7 @@ body {
   .paddle {
 	width: 20px;
 	height: 80px;
-	background-color: white;
+	background-color: blue;
 	position: absolute;
   }
   
