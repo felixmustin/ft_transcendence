@@ -12,7 +12,7 @@ export class User {
   @Column()
   wordpass: string;
 
-  @OneToOne(() => Profile)
+  @OneToOne(() => Profile, { cascade: true })
   @JoinColumn({ name: 'profileid' })
   profile: Profile;
 }

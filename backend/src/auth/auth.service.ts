@@ -7,23 +7,33 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 import { User } from '../entities/user.entity';
 import { Profile } from '../entities/profile.entity';
+import { JwtService } from '@nestjs/jwt';
 
+export interface JwtPayload {
+  id: number
+	// isTwoFaAuthenticated : boolean
+}
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    @InjectRepository(User) private userRepository: Repository<User>,) {
+    @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService) {
   }
 
-  async loginUser(loginUserDto: LoginUserDto) {
-    const { username, wordpass } = loginUserDto;
+  async loginUser(username: string, wordpass: string) {
+   const user = await this.validateUser(username, wordpass)
+  return (this.generateAccessToken(user));
+  }
+
+  async validateUser(username: string, wordpass: string) {
     const user = await this.userService.findUserByUsername(username);
     if (user && user.wordpass === wordpass) {
-      return (user);
+      return user;
     }
     else
-        throw new UnauthorizedException('Invalid username or password');
+        return null;
   }
 
   async signupUser(createUserDto: CreateUserDto) {
@@ -35,8 +45,9 @@ export class AuthService {
     newUser.username = createUserDto.username;
     newUser.wordpass = createUserDto.wordpass; // encryptedPassword
     const user = await this.userService.createUser(newUser);
-    return (user);
+    return this.generateAccessToken(user);
   }
+  
 
   async signupUserProfile(id: number, createUserProfileDto: CreateUserProfileDto) {
     const user = await this.userRepository.findOneBy({ id })
@@ -47,8 +58,9 @@ export class AuthService {
     newProfile.firstname = createUserProfileDto.firstname;
     newProfile.lastname = createUserProfileDto.lastname;
     newProfile.age = createUserProfileDto.age;
-    const userSaved = await this.userService.createUserProfile(user, newProfile);
-    return (userSaved);
+    const savedProfile = await this.userService.createUserProfile(newProfile);
+    user.profile = savedProfile;
+    await this.userRepository.save(user);
   }
 
   private async isUsernameAvailable(email: string): Promise<boolean> {
@@ -57,4 +69,12 @@ export class AuthService {
     return true;
   }
 
+  async generateAccessToken(user: User/*,isTwoFaAuth = false*/) {
+    const payload = { id: user.id, username: user.username };
+    return {
+      id: user.id,
+      access_token: this.jwtService.sign(payload),
+      // twoFaEnabled : user.twoFaEnabled
+    }
+  }
 }
