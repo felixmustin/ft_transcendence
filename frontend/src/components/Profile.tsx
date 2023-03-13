@@ -9,13 +9,14 @@ const [isLoaded, setIsLoaded] = useState(false);
 const [user, setUser] = useState([]);
   const navigate = useNavigate();
 
-  let userObj = getToken();
-  if (!userObj)
+  let userToken = getToken();
+  if (!userToken)
     navigate('/');
   else
     useEffect(() => {
-        let url = 'http://127.0.0.1:3001/user/' + userObj + '/profile'
-        fetch(url)
+        let url = 'http://localhost:3001/user/profile'
+        let auth = 'Bearer ' + userToken.access_token;
+        fetch(url, {method: 'GET', headers: {'Authorization': auth}})
           .then(res => res.json())
           .then(
             (result) => {

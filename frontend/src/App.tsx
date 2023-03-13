@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Login from "./components/Login"
+import Login from "./pages/Login"
 import Home from "./components/Home"
-import Signup from "./components/Signup"
+import Signup from "./pages/Signup"
 import Npinheir from "./components/npinheir/Npinheir"
 import UserInfo from "./components/UserInfo"
 import GamePong from './components/Pong'

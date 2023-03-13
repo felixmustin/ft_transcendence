@@ -8,7 +8,7 @@ interface FormValues {
     age: number;
   }
 
-function UserInfo({getToken}) {
+function UserInfo({ getToken }) {
     const [formValues, setFormValues] = useState<FormValues>({
         email: '',
         firstname: '',
@@ -24,12 +24,14 @@ function UserInfo({getToken}) {
 
       const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        let userObj = getToken();
-        const url = 'http://127.0.0.1:3001/auth/signup/profile/' + userObj
+        let userToken = getToken();
+        const url = 'http://localhost:3001/auth/signup/profile/'
+        let auth = 'Bearer ' + userToken.access_token;
         const response = await fetch(url, {
           method: 'POST',
           headers: {
           'Content-Type': 'application/json',
+          'Authorization': auth,
           },
           body: JSON.stringify(formValues),
         }).then(response => {
