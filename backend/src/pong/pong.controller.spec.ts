@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PongController } from './pong.controller';
+import { PongController } from './pong.gateway';
 
 describe('PongController', () => {
   let controller: PongController;
