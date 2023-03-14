@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 
 interface FormValues {
@@ -8,7 +9,7 @@ interface FormValues {
     age: number;
   }
 
-function UserInfo({ getToken }) {
+function UserInfo() {
     const [formValues, setFormValues] = useState<FormValues>({
         email: '',
         firstname: '',
@@ -24,10 +25,10 @@ function UserInfo({ getToken }) {
 
       const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        let userToken = getToken();
+        const token = Cookies.get("access_token");
         const url = 'http://localhost:3001/auth/signup/profile/'
-        let auth = 'Bearer ' + userToken.access_token;
-        const response = await fetch(url, {
+        let auth = 'Bearer ' + token;
+        await fetch(url, {
           method: 'POST',
           headers: {
           'Content-Type': 'application/json',

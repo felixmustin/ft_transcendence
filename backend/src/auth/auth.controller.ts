@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Request, HttpException, UnauthorizedException, UsePipes, ValidationPipe, Param, ParseIntPipe, UseGuards, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, HttpException, UnauthorizedException, UsePipes, ValidationPipe, Param, ParseIntPipe, UseGuards, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginUserDto } from '../user/dto/login-user.dto';
+import { Response } from 'express';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './jwt-auth.guards';
 import { FortytwoGuard } from './fortytwo.guards';
 
@@ -13,15 +12,15 @@ export class AuthController {
 
   @Post('login')
   @UsePipes(ValidationPipe)
-  async login(@Body() body: LoginUserDto) {
+  async login(@Body() body: CreateUserDto) {
     const token = await this.authService.loginUser(body.username, body.wordpass);
     return { token };
   }
 
   @Post('signup')
   @UsePipes(ValidationPipe)
-  async signup(@Body() createUserDto: CreateUserDto) {
-    const token = await this.authService.signupUser(createUserDto);
+  async signup(@Body() body: CreateUserDto) {
+    const token = await this.authService.signupUser(body);
     return { token };
   }
 
@@ -33,25 +32,36 @@ export class AuthController {
   }
 
   @Get('42/login')
-  // @UsePipes(ValidationPipe)
-  @UseGuards(AuthGuard('42'))
+  @UseGuards(FortytwoGuard)
   async login42(@Request() req) {
-    console.log(req.user);
     return req.user
   }
 
   @Get('42/callback')
-  // @UsePipes(ValidationPipe)
-  @UseGuards(AuthGuard('42'))
-  async callback(@Request() req) {
-    return {
-      statusCode: 200,
-      message: 'Logged in successfully',
-      user: req.user,
-    };
-    // const token = await this.authService.loginUser(body.username, body.wordpass);
-    // return { token };
+  @UseGuards(FortytwoGuard)
+  async callback(@Request() req, @Res() res: Response) {
+    const user = await this.authService.validate42User(req.user);
+    if (!user)
+    {
+      const newUser = await this.authService.logInWith42(req.user);
+      const token = this.authService.generateAccessToken(newUser)
+      res.cookie('access_token', (await token).access_token)
+      return res.redirect(`http://localhost:3000/usernameinput`);
+    }
+    else
+    {
+      const token = await this.authService.generateAccessToken(user)
+      res.cookie('access_token', (await token).access_token)
+      return res.redirect(`http://localhost:3000/home`);
+    }
   }
 
+  @Post('42/signup')
+  // @UseGuards(AuthGuard('42'))
+  @UseGuards(JwtAuthGuard)
+  async signUp42(@Request() req, @Body() body) {
+    const token = await this.authService.signUpWith42(req.user, body.username)
+    return token;
+  }
 
 }

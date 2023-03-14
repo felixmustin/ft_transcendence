@@ -1,21 +1,23 @@
+import Cookies from 'js-cookie';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import './form.css';
 
-function Disconnect({ deleteToken, getToken }) {
+function Disconnect() {
 
   const navigate = useNavigate();
   
-  let userToken = getToken();
+  const token = Cookies.get("access_token");
 
   const disconnect = () => {
-    deleteToken();
+    Cookies.remove("access_token")
+    // deleteToken();
     navigate('/');
   };
 
   const deleteAcc = () => {
     let url = 'http://localhost:3001/user/delete/'
-    let auth = 'Bearer ' + userToken.access_token;
+    let auth = 'Bearer ' + token;
     fetch(url, {
       method: 'DELETE',
       headers: {'Authorization': auth}

@@ -1,21 +1,22 @@
+import Cookies from 'js-cookie';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import './form.css';
 
-function Profile({ getToken }) {
+function Profile() {
 
 const [error, setError] = useState(null);
 const [isLoaded, setIsLoaded] = useState(false);
 const [user, setUser] = useState([]);
   const navigate = useNavigate();
 
-  let userToken = getToken();
-  if (!userToken)
+  const token = Cookies.get("access_token");
+  if (!token)
     navigate('/');
   else
     useEffect(() => {
         let url = 'http://localhost:3001/user/profile'
-        let auth = 'Bearer ' + userToken.access_token;
+        let auth = 'Bearer ' + token;
         fetch(url, {method: 'GET', headers: {'Authorization': auth}})
           .then(res => res.json())
           .then(

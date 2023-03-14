@@ -3,8 +3,8 @@ CREATE USER myUsername WITH PASSWORD 'myPassword';
 CREATE TABLE public.user_profiles
 (
     id SERIAL PRIMARY KEY,
-    firstname VARCHAR(255) NOT NULL,
-    lastname VARCHAR(255) NOT NULL,
+    firstname VARCHAR(255),
+    lastname VARCHAR(255),
     email VARCHAR(255),
     age INT
 );
@@ -12,8 +12,9 @@ CREATE TABLE public.user_profiles
 CREATE TABLE public.Users
 (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    wordpass VARCHAR(255) NOT NULL,
+    username VARCHAR(255),
+    wordpass VARCHAR(255),
+    user42id INT,
     profileId INT,
     CONSTRAINT fk_profile
     FOREIGN KEY (profileId)

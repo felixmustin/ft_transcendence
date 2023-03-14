@@ -6,9 +6,10 @@ import Profile from './Profile';
 import Disconnect from './Disconnect';
 import React, { useState, useEffect } from 'react';
 import { Routes, BrowserRouter as Router, Route, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 // import { Switch } from 'react-router-dom';
 
-function Home({ getToken }) {
+function Home() {
   const buttons = [
     {text: 'pong', link: '/pong'},
     // {text: 'signup', link: '/signup'},
@@ -22,13 +23,13 @@ function Home({ getToken }) {
   const [user, setUser] = useState([]);
   const navigate = useNavigate();
 
-  let userToken = getToken();
-  if (!userToken)
+  const token = Cookies.get("access_token");
+  if (!token)
     navigate('/');
   else
     useEffect(() => {
         let url = 'http://localhost:3001/user/id/'
-        let auth = 'Bearer ' + userToken.access_token;
+        let auth = 'Bearer ' + token;
         fetch(url, {method: 'GET', headers: {'Authorization': auth}})
           .then(res => res.json())
           .then(

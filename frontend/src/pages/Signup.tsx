@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import loginImg from '../assets/login.jpg';
@@ -7,7 +8,7 @@ interface FormValues {
   wordpass: string;
 }
 
-function Signup({ setToken }) {
+function Signup() {
   const [formValues, setFormValues] = useState<FormValues>({
     username: '',
     wordpass: '',
@@ -33,7 +34,7 @@ function Signup({ setToken }) {
           if (response.statusCode >= 400) {
             alert("Creation failed");
           } else {
-            setToken(response.token);
+            Cookies.set('access_token', response.token.access_token)
             navigate("/userinfo");
           }
         });

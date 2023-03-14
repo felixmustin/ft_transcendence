@@ -1,14 +1,13 @@
-import { Injectable, UnauthorizedException, BadRequestException,HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, BadRequestException,HttpStatus, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
-import { LoginUserDto } from '../user/dto/login-user.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 import { User } from '../entities/user.entity';
 import { Profile } from '../entities/profile.entity';
 import { JwtService } from '@nestjs/jwt';
-import axios from 'axios';
+import * as bcrypt from 'bcrypt';
 
 export interface JwtPayload {
   id: number
@@ -24,9 +23,6 @@ export class AuthService {
     private jwtService: JwtService) {
   }
 
-  private readonly client_id = 'u-s4t2ud-a8ab94043b51e2f7e520f7f5c251c46d28c61cd4c12f3fa4e0812aae34d4956f';
-  private readonly redirect_uri = 'http://localhost:3001/auth/42/callback';
-
   async loginUser(username: string, wordpass: string) {
    const user = await this.validateUser(username, wordpass)
   return (this.generateAccessToken(user));
@@ -34,7 +30,8 @@ export class AuthService {
 
   async validateUser(username: string, wordpass: string) {
     const user = await this.userService.findUserByUsername(username);
-    if (user && user.wordpass === wordpass) {
+    const match = await bcrypt.compare(wordpass, user.wordpass);
+    if (user && match) {
       return user;
     }
     else
@@ -45,15 +42,14 @@ export class AuthService {
     if (! await this.isUsernameAvailable(createUserDto.username)) {
         throw new BadRequestException('Username in use');
     }
-    // const encryptedPassword = await this.encryptPassword(createUserDto.wordpass);
     const newUser = new User();
     newUser.username = createUserDto.username;
-    newUser.wordpass = createUserDto.wordpass; // encryptedPassword
+    const hashedPassword = await this.hashPassword(createUserDto.wordpass);
+    newUser.wordpass = hashedPassword;
     const user = await this.userService.createUser(newUser);
     return this.generateAccessToken(user);
   }
   
-
   async signupUserProfile(id: number, createUserProfileDto: CreateUserProfileDto) {
     const user = await this.userRepository.findOneBy({ id })
     if (!user)
@@ -75,7 +71,7 @@ export class AuthService {
   }
 
   async generateAccessToken(user: User/*,isTwoFaAuth = false*/) {
-    const payload = { id: user.id, username: user.username };
+    const payload = { id: user.id/* , username: user.username  */};
     return {
       id: user.id,
       access_token: this.jwtService.sign(payload),
@@ -83,7 +79,42 @@ export class AuthService {
     }
   }
 
-  async signInWith42() {
-    
+  async hashPassword(wordpass: string) {
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(wordpass, salt);
+    return hash;
   }
+
+  async validate42User(reqUser: any) {
+    const user = await this.userService.find42UserById(reqUser.id);
+    if (user)
+      return user
+    else
+      return null
+  }
+
+  async logInWith42(reqUser: any) {
+      const newUser = new User();
+      newUser.user42id = reqUser.id;
+      const user = await this.userService.createUser(newUser);
+
+      const newProfile = new Profile();
+      newProfile.email = reqUser.email
+      newProfile.firstname = reqUser.firstName
+      newProfile.lastname = reqUser.lastName
+      newProfile.age = reqUser.age;
+      const savedProfile = await this.userService.createUserProfile(newProfile);
+      user.profile = savedProfile;
+      await this.userRepository.save(user);
+      return (user);
+  }
+
+  async signUpWith42(reqUser: any, username: string) {
+    console.log("Bien")
+    console.log(reqUser)
+    const user = await this.userService.findUserById(reqUser.id);
+    user.username = username;
+    await this.userRepository.save(user);
+  }
+  
 }

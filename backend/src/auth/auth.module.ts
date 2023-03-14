@@ -8,11 +8,10 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './jwt.startegy';
-import { HttpModule } from '@nestjs/axios';
 import { FortyTwoStrategy } from './fortytwo.startegy';
 
 @Module({
-  imports: [UserModule, PassportModule, HttpModule, TypeOrmModule.forFeature([User]), JwtModule.register({
+  imports: [UserModule, PassportModule, TypeOrmModule.forFeature([User]), JwtModule.register({
     secret: jwtConstants.secret,
     signOptions: { expiresIn: '20m' },
   }),],
