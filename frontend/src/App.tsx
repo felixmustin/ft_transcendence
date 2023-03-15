@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Login from "./pages/Login"
-import Home from "./components/Home"
+import Home from "./pages/Home"
 import Signup from "./pages/Signup"
 import Npinheir from "./components/npinheir/Npinheir"
 import UserInfo from "./components/UserInfo"
 import GamePong from './components/Pong'
-import Profile from './components/Profile'
+import Profile from './pages/Profile'
 import Disconnect from './components/Disconnect'
 import UsernameInput from './pages/UsernameInput'
 

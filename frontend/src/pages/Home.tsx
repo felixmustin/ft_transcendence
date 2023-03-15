@@ -1,12 +1,15 @@
-import Banner from './Banner';
-import Login from '../pages/Login';
-import Signup from '../pages/Signup';
-import GamePong from './Pong';
+import Banner from '../components/Banner';
+import Login from './Login';
+import Signup from './Signup';
+import GamePong from '../components/Pong';
 import Profile from './Profile';
-import Disconnect from './Disconnect';
+import Disconnect from '../components/Disconnect';
 import React, { useState, useEffect } from 'react';
 import { Routes, BrowserRouter as Router, Route, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import Article from "../components/npinheir/Article"
+import setArticle from "../constants/SetArticle"
+import Navbar from "../components/npinheir/Navbar"
 // import { Switch } from 'react-router-dom';
 
 function Home() {
@@ -50,25 +53,28 @@ function Home() {
         return <div>Loading...</div>;
       } else {
         return (
-          <div>
-          <p>Logged in as {user.username}</p>
-        <div>
-          <Banner title="Welcome to my website!" buttons={buttons} />
-          {/* <Router> */}
-          <Routes>
-            <Route element={<GamePong/>}/>
-            {/* <Route element={<Login/>}/> */}
-            {/* <Route element={<Signup/>}/> */}
-            <Route element={<Profile/>}/>
-            <Route element={<Disconnect/>}/>
-        </Routes>
-        {/* </Router> */}
-        <div>
-          <h1 className="underline">Home</h1>
-          <p>This is the home page.</p>
-        </div>
-        </div>
-        </div>
+			<div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
+			<div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
+			  <div className="xl:max-w-[1280px] w-full">
+				<Navbar />
+			  </div>
+			</div>
+	
+	
+		  <div className="flex justify-evenly">
+			<div className="grid grid-cols-2 w-full">
+			  {setArticle.map((article, index) => (
+				<Article key={index} item={article} />
+			  ))}
+			</div>
+		  </div>
+	
+		  <div className="flex justify-center items-start px-6 sm:px-16">
+			<div className="xl:max-w-[1280px] w-full">
+			  Components
+			</div>
+		  </div>
+		</div>
         );
       }
 

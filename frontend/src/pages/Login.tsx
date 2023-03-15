@@ -72,7 +72,9 @@ function Login() {
 					</div>
 					<button className='w-full my-3 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' type='submit'>Sign In</button>
           <button className='w-full my-3 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={gotoSignUpPage}>Create Account</button>
-          <a href="http://localhost:3001/auth/42/login" className='w-full my-3 py-2 bg-gradient-to-tl from-white via-slate-900 to-white shadow-lg shadow-slate-900/30 hover:shadow-white/30 text-white font-semibold rounded-lg'>Sign in with 42</a>
+          <div className="w-full my-3 py-2 bg-gradient-to-tl from-white via-slate-900 to-white shadow-lg shadow-slate-900/30 hover:shadow-white/30 text-white font-semibold rounded-lg text-center">
+					  <a className='text-white font-semibold hover:text-white' href="http://localhost:3001/auth/42/login">Sign In with 42</a>
+					</div>
 				</form>
 			</div>
 		</div>
