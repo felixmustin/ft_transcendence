@@ -1,5 +1,5 @@
 COMPOSE = ./docker-compose.yml
-VOLUME_FOLDER= /Users/$(USER)/docker_volume/db
+VOLUME_FOLDER= /Users/$(USER)/docker_volume/
 
 
 

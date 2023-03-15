@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Login from "./pages/Login"
 import Home from "./pages/Home"
 import Signup from "./pages/Signup"
-import Npinheir from "./components/npinheir/Npinheir"
+import Social from "./pages/Social"
 import UserInfo from "./components/UserInfo"
 import GamePong from './components/Pong'
 import Profile from './pages/Profile'
@@ -39,7 +39,7 @@ function App() {
         <Route path='/profile' element={<Profile />} />
         <Route path='/disconnect' element={<Disconnect />} />
         <Route path='/userinfo' element={<UserInfo />} />
-        <Route path='/npinheir' element={<Npinheir />} />
+        <Route path='/social' element={<Social />} />
       </Routes>
     </BrowserRouter>
   )
