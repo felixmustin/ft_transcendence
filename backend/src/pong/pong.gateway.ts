@@ -52,8 +52,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.server.emit('updateState', JSON.stringify(data));
 			if (ballX < 0 || ballX > 590){
 				this.server.emit('ballOut');
-				ballpositionx = 290;
-				ballpositiony = 190;
+				// ballpositionx = 290;
+				// ballpositiony = 190;
 				nextballpositionx = 300;
 				nextballpositiony = 200;
 			}

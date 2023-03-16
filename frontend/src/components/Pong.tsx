@@ -86,31 +86,36 @@ componentDidMount() {
   // Handle keydown events
 	handleKeyDown(event) {
 	const { leftPaddleY, rightPaddleY } = this.state;
+	let newvalue;
 	switch (event.key) {
 	  case "w":
 		console.log('paddle up');
-		this.setState({leftPaddleY: leftPaddleY - 10}, () => {
-			this.socket.emit("updatePaddleL", leftPaddleY.toString());
-		  });
+		newvalue = leftPaddleY - 10;
+		// this.setState({leftPaddleY: leftPaddleY - 10}, () => {
+			this.socket.emit("updatePaddleL", newvalue.toString());
+		//   });
 		// setLeftPaddleY(y => y - 10);
 		break;
 	  case "s":
 		console.log('paddle down ');
-		this.setState({ leftPaddleY: leftPaddleY + 10 }, () => {
-			this.socket.emit("updatePaddleL", leftPaddleY.toString());
-		  });
+		newvalue = leftPaddleY + 10;
+		// this.setState({ leftPaddleY: leftPaddleY + 10 }, () => {
+			this.socket.emit("updatePaddleL", newvalue.toString());
+		//   });
 		// setLeftPaddleY(y => y + 10);
 		break;
 	  case "ArrowUp":
-		this.setState({ rightPaddleY: rightPaddleY - 10 }, () => {
-			this.socket.emit("updatePaddleR", rightPaddleY.toString());
-		  });
+		newvalue = rightPaddleY - 10;
+		// this.setState({ rightPaddleY: rightPaddleY - 10 }, () => {
+			this.socket.emit("updatePaddleR", newvalue.toString());
+		//   });
 		// setRightPaddleY(y => y - 10);
 		break;
 	  case "ArrowDown":
-		this.setState({ rightPaddleY: rightPaddleY + 10 }, () => {
-			this.socket.emit("updatePaddleR", rightPaddleY.toString());
-		  });
+		newvalue = rightPaddleY + 10;
+		// this.setState({ rightPaddleY: rightPaddleY + 10 }, () => {
+			this.socket.emit("updatePaddleR", newvalue.toString());
+		//   });
 		// setRightPaddleY(y => y + 10);
 		break;
 	  case "c":

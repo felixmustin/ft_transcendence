@@ -1,5 +1,5 @@
 COMPOSE = ./docker-compose.yml
-VOLUME_FOLDER= /Users/$(USER)/docker_volume/db
+VOLUME_FOLDER= /Users/$(USER)/docker_volume
 
 
 
@@ -13,7 +13,7 @@ down:
 	@docker compose -f $(COMPOSE) down
 	@echo "All containers stopped successfully!"
 
-clean : down
+clean :
 	@echo "Cleaning up containers, images, networks and volumes..."
 	-@if [ "$$(docker ps -q)" ]; then \
 		docker stop $$(docker ps -aq); \

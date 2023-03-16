@@ -5,7 +5,7 @@ export class PongService {
   private boardWidth = 600; // Width of the game board in pixels
   private boardHeight = 400; // Height of the game board in pixels
   private ballRadius = 20; // Radius of the ball in pixels
-  private ballSpeed = 5; // Speed of the ball in pixels per frame
+  private ballSpeed = 10; // Speed of the ball in pixels per frame
   private ballAngle = 45; // Initial angle of the ball in degrees
   private paddlewidth = 20; // paddle width 
   private paddlespace = 20; // space between paddle and bord
