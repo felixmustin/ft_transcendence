@@ -27,13 +27,13 @@ function Home() {
   const navigate = useNavigate();
 
   const token = Cookies.get("access_token");
-  if (!token)
-    navigate('/');
-  else
+  const auth = 'Bearer ' + token;
+
     useEffect(() => {
-        let url = 'http://localhost:3001/user/id/'
-        let auth = 'Bearer ' + token;
-        fetch(url, {method: 'GET', headers: {'Authorization': auth}})
+      if (!token)
+        navigate('/');
+      else {
+        fetch('http://localhost:3001/user/id/', {method: 'GET', headers: {'Authorization': auth}})
           .then(res => res.json())
           .then(
             (result) => {
@@ -45,7 +45,8 @@ function Home() {
               setError(error);
             }
           )
-      }, [])
+      }
+    }, [token, navigate])
 
       if (error) {
         return <div>Error: {error.message}</div>;

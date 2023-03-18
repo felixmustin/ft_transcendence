@@ -33,10 +33,9 @@ function Login() {
     }).then(res => res.json()
     ).then(response => {
       if (response.statusCode >= 400) {
-        alert("Creation failed");
+        alert(response.message);
         }
       else {
-        console.log(response.token.access_token)
         Cookies.set('access_token', response.token.access_token)
         navigate("/home");
       } 

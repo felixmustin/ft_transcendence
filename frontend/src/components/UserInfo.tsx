@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
+
+const defaultAvatar = "../assets/default_avatar.png"
 
 interface FormValues {
     email: string;
@@ -10,6 +12,7 @@ interface FormValues {
   }
 
 function UserInfo() {
+
     const [formValues, setFormValues] = useState<FormValues>({
         email: '',
         firstname: '',
@@ -18,6 +21,14 @@ function UserInfo() {
       });
     const navigate = useNavigate();
 
+    const token = Cookies.get("access_token");
+    const auth = 'Bearer ' + token;
+
+    useEffect(() => {
+      if (!token)
+        navigate('/');
+      }, [token, navigate])
+      
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
         setFormValues(prevState => ({ ...prevState, [name]: value }));
@@ -25,10 +36,8 @@ function UserInfo() {
 
       const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const token = Cookies.get("access_token");
-        const url = 'http://localhost:3001/auth/signup/profile/'
-        let auth = 'Bearer ' + token;
-        await fetch(url, {
+        
+        await fetch('http://localhost:3001/auth/signup/profile/', {
           method: 'POST',
           headers: {
           'Content-Type': 'application/json',

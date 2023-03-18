@@ -6,7 +6,8 @@ CREATE TABLE public.user_profiles
     firstname VARCHAR(255),
     lastname VARCHAR(255),
     email VARCHAR(255),
-    age INT
+    age INT,
+    avatar BYTEA
 );
 
 CREATE TABLE public.Users

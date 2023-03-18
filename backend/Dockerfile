@@ -13,6 +13,9 @@ RUN npm ci
 # Copy application sources (.ts, .tsx, js)
 COPY src/ src/
 
+COPY assets/ assets/
+
+
 # Build application (produces dist/ folder)
 RUN npm run build
 
@@ -30,6 +33,9 @@ RUN npm ci --omit=dev
 
 # Copy production build
 COPY --from=development /app/dist/ ./dist/
+
+COPY --from=development /app/assets/ ./assets/
+
 
 # Expose application port
 EXPOSE 3001

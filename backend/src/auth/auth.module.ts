@@ -7,8 +7,8 @@ import { User } from '../entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
-import { JwtStrategy } from './jwt.startegy';
-import { FortyTwoStrategy } from './fortytwo.startegy';
+import { JwtStrategy } from './strategy/jwt.startegy';
+import { FortyTwoStrategy } from './strategy/fortytwo.startegy';
 
 @Module({
   imports: [UserModule, PassportModule, TypeOrmModule.forFeature([User]), JwtModule.register({

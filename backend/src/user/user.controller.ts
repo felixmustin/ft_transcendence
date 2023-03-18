@@ -1,6 +1,7 @@
-import { Body, Request, Controller, Get, Post, Param,Delete,Patch,HttpStatus, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guards';
+import { Body, Request, Controller, Get, Post, Param,Delete,Patch,HttpStatus, UseGuards, Put, Req, UploadedFile, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { UserService } from './user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 @Controller('user')
@@ -11,12 +12,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getUserById(@Request() req) {
     const user = await this.userService.findUserById(req.user.id);
-    return user;
-  }
-
-  @Get('username/:username')
-  async getUserByUsername(@Param('username') username: string) {
-    const user = await this.userService.findUserByUsername(username);
     return user;
   }
 
@@ -31,6 +26,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async deleteUser(@Request() req) {
     return await this.userService.remove(req.user.id);
+  }
+
+  @Post('profiles/avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  async setAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+    const user = await this.userService.updateAvatar(req.user.id, file.buffer)
+    return user.profile;
   }
 
   // @Patch('users/:id/profile')
