@@ -73,6 +73,18 @@ export class UserService {
     return await this.updateUserProfile(id, profile)
   }
 
+  async turnOn2FA(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    user.is2faenabled = true;
+    await this.userRepository.save(user);
+  }
+
+  async set2FASecret(secret: string, userId: number): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    user.secret2fa = secret;
+    return (await this.userRepository.save(user));
+  }
+
   async remove(id: number): Promise<User> {
     const user = await this.userRepository.createQueryBuilder("user")
     .leftJoinAndSelect("user.profile", "profile")

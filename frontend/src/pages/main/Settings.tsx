@@ -1,7 +1,9 @@
 import React from 'react'
 import Navbar from '../../components/design/Navbar'
 import loginImg from '../../assets/login.jpg'
-import SettingField from '../../components/design/SettingField'
+import Setting2FA from '../../components/settings/Setting2FA'
+import SettingProfilePicture from '../../components/settings/SettingProfilePicture'
+import Cookies from 'js-cookie'
 
 type Props = {}
 
@@ -23,11 +25,10 @@ const Settings = (props: Props) => {
         <div className='bg-violet-700 rounded-lg m-5'>
           <div className='grid grid-cols-2 items-center p-5'>
             <div className='text-center mx-auto'>
-              <img className='rounded-lg w-[125px] h-[125px] mx-auto' src={ loginImg }/>
-              <button className='bg-violet-900 text-white rounded-lg hover:bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 p-2 m-2'>Change Profile Picture</button>
+              <SettingProfilePicture />
             </div>
             <div className='text-center mx-auto'>
-              <SettingField item={{field: 'Username', placeholder: 'Username'}}/>
+              <Setting2FA />
             </div>
           </div>
         </div>

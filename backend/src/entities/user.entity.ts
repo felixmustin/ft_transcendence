@@ -12,6 +12,12 @@ export class User {
   @Column()
   wordpass: string;
 
+  @Column()
+  secret2fa: string;
+
+  @Column({ default: false })
+  is2faenabled: boolean;
+
   @Column({ unique: true })
   user42id: number;
 

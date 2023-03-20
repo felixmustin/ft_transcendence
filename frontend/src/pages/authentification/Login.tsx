@@ -3,6 +3,8 @@ import loginImg from '../../assets/login.jpg'
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
+import TwoFactorAuthentication from '../../components/authentication/TwoFactorAuthentication';
+import Loading from '../../components/utils/Loading';
 
 type Props = {}
 
@@ -19,6 +21,11 @@ const Login = (props: Props) => {
     username: '',
     wordpass: '',
   });
+
+  // Loading management
+  // const [isAuthenticated, setAuthentication] = useState(false);
+  const [isTwoAuthentication, setIsTwoAuthentication] = useState(false);
+  const [token, setToken] = useState('');
 
   // User for navigation
   const navigate = useNavigate();
@@ -53,13 +60,24 @@ const Login = (props: Props) => {
         alert(response.message);
         }
       else {
-        Cookies.set('access_token', response.token.access_token)
-        navigate("/home");
+        console.log(response.token)
+        if (response.token.twoFaEnabled)
+        {
+          setIsTwoAuthentication(true)
+          setToken(response.token.access_token)
+        }
+        else {
+          Cookies.set('access_token', response.token.access_token)
+          navigate("/home");
+        }
       } 
       });
   };
 
 
+  if (isTwoAuthentication)
+    return <TwoFactorAuthentication item={{token: token}}/>
+  else {
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
     <div className='hidden sm:block'>
@@ -93,6 +111,7 @@ const Login = (props: Props) => {
     </div>
   </div>
   )
+}
 }
 
 export default Login

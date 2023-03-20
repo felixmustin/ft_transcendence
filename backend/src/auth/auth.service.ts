@@ -8,6 +8,7 @@ import { User } from '../entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+
 export interface JwtPayload {
   id: number
 	// isTwoFaAuthenticated : boolean
@@ -26,7 +27,8 @@ export class AuthService {
    const user = await this.validateUser(username, wordpass)
    if (!user)
       throw new BadRequestException('Username or password incorrect');
-  return (this.generateAccessToken(user));
+    
+    return (this.generateAccessToken(user));
   }
 
   async validateUser(username: string, wordpass: string) {
@@ -67,12 +69,13 @@ export class AuthService {
     return true;
   }
 
-  async generateAccessToken(user: User/*,isTwoFaAuth = false*/) {
-    const payload = { id: user.id/* , username: user.username  */};
+  async generateAccessToken(user: User/* ,isTwoFaAuth = false */) {
+    const payload = { id: user.id };
     return {
       id: user.id,
       access_token: this.jwtService.sign(payload),
-      // twoFaEnabled : user.twoFaEnabled
+      twoFaEnabled : user.is2faenabled,
+      // isTwoFaAuth,
     }
   }
 
@@ -107,5 +110,6 @@ export class AuthService {
     user.username = username;
     await this.userRepository.save(user);
   }
+
   
 }

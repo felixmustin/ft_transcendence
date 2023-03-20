@@ -30,8 +30,7 @@ const Disconnect = (props: Props) => {
         disconnect();
       } 
       });
-  };
-
+  }
 
   return (
     <div>

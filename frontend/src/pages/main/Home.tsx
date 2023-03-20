@@ -26,7 +26,7 @@ const Home = (props: Props) => {
 
   // Fetch user data and handles loading and error.
   useEffect(() => {
-    if (token) // '!'token
+    if (!token) // '!'token
       navigate('/');
     else {
       fetch('http://localhost:3001/user/id/', {method: 'GET', headers: {'Authorization': auth}})
@@ -45,7 +45,7 @@ const Home = (props: Props) => {
   }, [token, navigate])
 
 
-  if (!error) // error
+  if (error) // error
     return <Error item={ error }/>
   else if (!isLoaded) // '!'isLoaded
     return <Loading />

@@ -4,7 +4,11 @@ import Cookies from 'js-cookie';
 import { useState, useEffect } from 'react';
 import loginImg from '../../assets/login.jpg'
 
-type Props = {}
+type Props = {
+  item: {
+    token: string
+  };
+}
 
 interface FormValues {
   email: string;
@@ -23,13 +27,12 @@ const UserInfo = (props: Props) => {
   });
   const navigate = useNavigate();
 
-  const token = Cookies.get("access_token");
-  const auth = 'Bearer ' + token;
+  const auth = 'Bearer ' + props.item.token;
 
   useEffect(() => {
-    if (token) // '!'token
+    if (!props.item.token)
       navigate('/');
-    }, [token, navigate])
+    }, [props.item.token, navigate])
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = event.target;
@@ -48,7 +51,8 @@ const UserInfo = (props: Props) => {
         body: JSON.stringify(formValues),
       }).then(response => {
           if (response.ok) {
-            navigate("/home");
+            Cookies.set('access_token', props.item.token)
+            navigate('/home');
           } else {
             alert('Creation failed');
           }

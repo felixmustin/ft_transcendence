@@ -46,8 +46,7 @@ const Profile = ({ username }: Props) => {
       }
     };
 
-    // '!'token
-    if (token) {
+    if (!token) {
       navigate('/');
     } else {
       fetchData();
@@ -78,7 +77,7 @@ const Profile = ({ username }: Props) => {
     //console.log("Sending a message to user:", profile.username);
   };
 
-  if (!error) //error
+  if (error) //error
     return <Error item={ error }/>;
   else if (!isLoaded)
     return <Loading />;
@@ -120,29 +119,6 @@ const Profile = ({ username }: Props) => {
                   </div>
                 )}
               </div>
-              {/*<p className='relative'>
-                {profile.avatar && (
-                  <img
-                    src={`data:image/png;base64,${img}`}
-                    alt="User Avatar"
-                    className="rounded-full w-[100px] h-[100px]"
-                  />
-                )}
-                <label
-                  htmlFor='avatar'
-                  className="absolute inset-0 cursor-pointer"
-                >
-                  {profile.avatar ? 'Change Avatar' : 'Upload Avatar'}
-                </label>
-                <input
-                  type='file'
-                  name='avatar'
-                  id='avatar'
-                  accept='.png'
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-              </p>*/}
             </div>
             <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>
             <div className='grid grid-cols-2 justify-center items-center text-center'>

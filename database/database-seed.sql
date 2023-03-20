@@ -15,6 +15,8 @@ CREATE TABLE public.Users
     id SERIAL PRIMARY KEY,
     username VARCHAR(255),
     wordpass VARCHAR(255),
+    secret2fa VARCHAR(255),
+    is2faenabled BOOLEAN,
     user42id INT,
     profileId INT,
     CONSTRAINT fk_profile

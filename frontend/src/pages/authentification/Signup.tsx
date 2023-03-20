@@ -3,6 +3,7 @@ import loginImg from '../../assets/login.jpg'
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
+import UserInfo from '../../components/authentication/UserInfo';
 
 type Props = {}
 
@@ -18,6 +19,9 @@ const Signup = (props: Props) => {
     username: '',
     wordpass: '',
   });
+
+  const [isAuthenticated, setAuthentication] = useState(false);
+  const [token, setToken] = useState('');
 
   // User for navigation
   const navigate = useNavigate();
@@ -51,13 +55,17 @@ const Signup = (props: Props) => {
         if (response.statusCode >= 400) {
           alert("Creation failed");
         } else {
-          Cookies.set('access_token', response.token.access_token)
-          navigate("/userinfo");
+          setAuthentication(true)
+          setToken(response.token.access_token)
+          // Cookies.set('access_token', response.token.access_token)
+          // navigate("/userinfo");
         }
       });
   };
 
 
+  if (isAuthenticated)
+    return <UserInfo item={{token: token}}/>
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
     <div className='hidden sm:block'>
