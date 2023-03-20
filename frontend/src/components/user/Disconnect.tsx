@@ -1,12 +1,12 @@
+import React from 'react'
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
-import './form.css';
 
-function Disconnect() {
+type Props = {}
+
+const Disconnect = (props: Props) => {
 
   const navigate = useNavigate();
-  
   const token = Cookies.get("access_token");
 
   const disconnect = () => {
@@ -31,17 +31,14 @@ function Disconnect() {
       } 
       });
   };
-  
-        return (
-          <div>
-            <button className='link' onClick={disconnect}>
-                        Disconnect
-            </button>
-            <button className='link' onClick={deleteAcc}>
-                        Delete Account
-            </button>
-          </div>
-        );
-      }
 
-export default Disconnect;
+
+  return (
+    <div>
+      <button className='link' onClick={disconnect}>Disconnect</button>
+      <button className='link' onClick={deleteAcc}>Delete Account</button>
+  </div>
+  )
+}
+
+export default Disconnect
