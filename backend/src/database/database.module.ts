@@ -15,7 +15,7 @@ import { User } from '../entities/user.entity';
       entities: [User, Profile],
       synchronize: false,
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Profile]),
   ],
 })
 export class DatabaseModule {}

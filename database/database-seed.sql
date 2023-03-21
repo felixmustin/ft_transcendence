@@ -6,7 +6,8 @@ CREATE TABLE public.user_profiles
     firstname VARCHAR(255),
     lastname VARCHAR(255),
     email VARCHAR(255),
-    age INT
+    age INT,
+    avatar BYTEA
 );
 
 CREATE TABLE public.Users
@@ -14,6 +15,8 @@ CREATE TABLE public.Users
     id SERIAL PRIMARY KEY,
     username VARCHAR(255),
     wordpass VARCHAR(255),
+    secret2fa VARCHAR(255),
+    is2faenabled BOOLEAN,
     user42id INT,
     profileId INT,
     CONSTRAINT fk_profile

@@ -1,14 +1,15 @@
-import { Controller, Get, Post, Body, Request, HttpException, UnauthorizedException, UsePipes, ValidationPipe, Param, ParseIntPipe, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, HttpException, UnauthorizedException, UsePipes, ValidationPipe, Param, ParseIntPipe, UseGuards, Res, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
-import { JwtAuthGuard } from './jwt-auth.guards';
-import { FortytwoGuard } from './fortytwo.guards';
+import { JwtAuthGuard } from './guards/jwt-auth.guards';
+import { FortytwoGuard } from './guards/fortytwo.guards';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
   @Post('login')
   @UsePipes(ValidationPipe)
@@ -57,7 +58,6 @@ export class AuthController {
   }
 
   @Post('42/signup')
-  // @UseGuards(AuthGuard('42'))
   @UseGuards(JwtAuthGuard)
   async signUp42(@Request() req, @Body() body) {
     const token = await this.authService.signUpWith42(req.user, body.username)

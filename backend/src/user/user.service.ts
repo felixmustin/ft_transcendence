@@ -1,16 +1,18 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { readFileSync } from 'fs';
+// import { Avatar } from 'src/entities/avatar.entity';
 import { Profile } from 'src/entities/profile.entity';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-// import { CreateUserProfileDto } from './dto/create-user-profile.dto';
+// import { AvatarService } from './avatar.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Profile) private userProfileRepository: Repository<Profile>,
-
+    // private avatarService: AvatarService,
   ) {}
 
   async allUsers(): Promise<User[]> {
@@ -23,11 +25,17 @@ export class UserService {
     return newUser;
   }
 
-  async createUserProfile(profile: Profile): Promise<Profile> {
-    const savedProfile = await this.userProfileRepository.save(profile);
+  async createUserProfile(email: string, firstname: string, lastname: string, age:number, filepath: string): Promise<Profile> {
+    const newProfile = new Profile();
+    newProfile.email = email;
+    newProfile.firstname = firstname;
+    newProfile.lastname = lastname;
+    newProfile.age = age;
+    newProfile.avatar = readFileSync(filepath);//await this.avatarService.createDefaultAvatar(filepath)
+    const savedProfile = await this.userProfileRepository.save(newProfile);
     return savedProfile;
   }
-
+  
   async findUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
     return user;
@@ -50,6 +58,31 @@ export class UserService {
   async find42UserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { user42id: id } });
     return user;
+  }
+
+  async updateUserProfile(id: number, profile: Profile): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    user.profile = profile
+    return await this.userRepository.save(user);
+  }
+
+  async updateAvatar(id: number, file: Buffer): Promise<User> {
+    const userProfile = await this.findUserProfileById(id)
+    userProfile.avatar = file;
+    const profile = await this.userProfileRepository.save(userProfile);
+    return await this.updateUserProfile(id, profile)
+  }
+
+  async turnOn2FA(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    user.is2faenabled = true;
+    await this.userRepository.save(user);
+  }
+
+  async set2FASecret(secret: string, userId: number): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    user.secret2fa = secret;
+    return (await this.userRepository.save(user));
   }
 
   async remove(id: number): Promise<User> {

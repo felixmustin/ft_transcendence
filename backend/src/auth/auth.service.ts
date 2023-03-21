@@ -5,9 +5,9 @@ import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 import { User } from '../entities/user.entity';
-import { Profile } from '../entities/profile.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+
 
 export interface JwtPayload {
   id: number
@@ -25,15 +25,19 @@ export class AuthService {
 
   async loginUser(username: string, wordpass: string) {
    const user = await this.validateUser(username, wordpass)
-  return (this.generateAccessToken(user));
+   if (!user)
+      throw new BadRequestException('Username or password incorrect');
+    
+    return (this.generateAccessToken(user));
   }
 
   async validateUser(username: string, wordpass: string) {
     const user = await this.userService.findUserByUsername(username);
+    if (!user)
+      return null;
     const match = await bcrypt.compare(wordpass, user.wordpass);
-    if (user && match) {
+    if (match)
       return user;
-    }
     else
         return null;
   }
@@ -54,14 +58,9 @@ export class AuthService {
     const user = await this.userRepository.findOneBy({ id })
     if (!user)
       throw new HttpException('User not found. Cannot create profile', HttpStatus.BAD_REQUEST)
-    const newProfile = new Profile();
-    newProfile.email = createUserProfileDto.email;
-    newProfile.firstname = createUserProfileDto.firstname;
-    newProfile.lastname = createUserProfileDto.lastname;
-    newProfile.age = createUserProfileDto.age;
-    const savedProfile = await this.userService.createUserProfile(newProfile);
-    user.profile = savedProfile;
-    await this.userRepository.save(user);
+    const defaultAvatar = "./assets/default-avatar.png"
+    const savedProfile = await this.userService.createUserProfile(createUserProfileDto.email, createUserProfileDto.firstname, createUserProfileDto.lastname, createUserProfileDto.age, defaultAvatar);
+    await this.userService.updateUserProfile(id, savedProfile)
   }
 
   private async isUsernameAvailable(email: string): Promise<boolean> {
@@ -70,12 +69,13 @@ export class AuthService {
     return true;
   }
 
-  async generateAccessToken(user: User/*,isTwoFaAuth = false*/) {
-    const payload = { id: user.id/* , username: user.username  */};
+  async generateAccessToken(user: User/* ,isTwoFaAuth = false */) {
+    const payload = { id: user.id };
     return {
       id: user.id,
       access_token: this.jwtService.sign(payload),
-      // twoFaEnabled : user.twoFaEnabled
+      twoFaEnabled : user.is2faenabled,
+      // isTwoFaAuth,
     }
   }
 
@@ -97,15 +97,9 @@ export class AuthService {
       const newUser = new User();
       newUser.user42id = reqUser.id;
       const user = await this.userService.createUser(newUser);
-
-      const newProfile = new Profile();
-      newProfile.email = reqUser.email
-      newProfile.firstname = reqUser.firstName
-      newProfile.lastname = reqUser.lastName
-      newProfile.age = reqUser.age;
-      const savedProfile = await this.userService.createUserProfile(newProfile);
-      user.profile = savedProfile;
-      await this.userRepository.save(user);
+      const defaultAvatar = "./assets/default-avatar.png"
+      const savedProfile = await this.userService.createUserProfile(reqUser.email, reqUser.firstName, reqUser.lastName, 0, defaultAvatar);
+      await this.userService.updateUserProfile(user.id, savedProfile)
       return (user);
   }
 
@@ -116,5 +110,6 @@ export class AuthService {
     user.username = username;
     await this.userRepository.save(user);
   }
+
   
 }
