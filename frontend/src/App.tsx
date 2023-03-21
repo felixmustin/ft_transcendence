@@ -17,7 +17,7 @@ function App() {
         <Route path='/signup' element={<Signup />} />
         <Route path='/usernameinput' element={<UsernameInput/>} />
         <Route path='/home' element={<Home />} />
-        <Route path='/profile' element={<Profile username='otheruser'/>} />
+        <Route path='/profile' element={<Profile /*username='otheruser'*/ />} />
         <Route path='/social' element={<Social />} />
         <Route path='/settings' element={<Settings />} />
       </Routes>

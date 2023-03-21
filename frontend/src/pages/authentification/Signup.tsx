@@ -57,8 +57,6 @@ const Signup = (props: Props) => {
         } else {
           setAuthentication(true)
           setToken(response.token.access_token)
-          // Cookies.set('access_token', response.token.access_token)
-          // navigate("/userinfo");
         }
       });
   };

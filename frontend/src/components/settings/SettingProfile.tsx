@@ -1,10 +1,10 @@
 import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { Buffer } from 'buffer';
+import DisplayAvatar from '../utils/DisplayAvatar';
 
 
-const SettingProfilePicture = () => {
+const SettingProfile = () => {
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -71,20 +71,12 @@ const SettingProfilePicture = () => {
     } else if (!isLoaded) {
         return <div>Loading...</div>;
     } else {
-        const img = Buffer.from(profile.avatar.data).toString('base64')
-        return (
-              <p className='relative'>
-                {profile.avatar && (
-                  <img
-                    src={`data:image/png;base64,${img}`}
-                    alt="User Avatar"
-                    className="rounded-full w-[100px] h-[100px]"
-                  />
-                )}
+          return (
+               <div>
+                <DisplayAvatar data={profile}/>
                 <label
                   htmlFor='avatar'
-                  className="absolute inset-0 cursor-pointer"
-                >
+                  className="relative inset-0 cursor-pointer">
                   {profile.avatar ? 'Change Avatar' : 'Upload Avatar'}
                 </label>
                 <input
@@ -95,9 +87,9 @@ const SettingProfilePicture = () => {
                   className="hidden"
                   onChange={handleAvatarChange}
                 />
-              </p>          
+              </div>        
         )
     }
 }
 
-export default SettingProfilePicture
+export default SettingProfile
