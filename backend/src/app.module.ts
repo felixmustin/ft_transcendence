@@ -3,10 +3,11 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { PongModule } from './pong/pong.module';
+import { MessagingModule } from './messaging/messaging.module';
 
 
 @Module({
-  imports: [UserModule, DatabaseModule, AuthModule, PongModule],
+  imports: [UserModule, DatabaseModule, AuthModule, PongModule, MessagingModule],
   controllers: [],
   providers: [],
 })

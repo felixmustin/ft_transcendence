@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Conversation } from 'src/entities/conversation.entity';
+import { Message } from 'src/entities/message.entity';
 import { Profile } from 'src/entities/profile.entity';
 import { User } from '../entities/user.entity';
 
@@ -12,10 +14,10 @@ import { User } from '../entities/user.entity';
       username: 'myUsername',
       password: 'myPassword',
       database: 'myDatabase',
-      entities: [User, Profile],
-      synchronize: false,
+      entities: [User, Profile, Conversation, Message],
+      synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Profile]),
+    TypeOrmModule.forFeature([User, Profile, Conversation, Message]),
   ],
 })
 export class DatabaseModule {}
