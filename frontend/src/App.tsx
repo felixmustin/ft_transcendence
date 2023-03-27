@@ -8,6 +8,7 @@ import Social from './pages/main/Social'
 import UsernameInput from './pages/authentification/UsernameInput'
 import UserInfo from './components/authentication/UserInfo'
 import Settings from './pages/main/Settings'
+import Chat from './pages/main/Chat'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path='/home' element={<Home />} />
         <Route path='/profile' element={<Profile /*username='otheruser'*/ />} />
         <Route path='/social' element={<Social />} />
+        <Route path='/chat' element={<Chat />} />
         <Route path='/settings' element={<Settings />} />
       </Routes>
     </BrowserRouter>
