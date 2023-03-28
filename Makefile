@@ -58,7 +58,7 @@ re-back:
 
 re-full: refront reback
 
-re: down clean all
+re: clean all
 
 refresh :
 	@echo begin to refresh container content ;

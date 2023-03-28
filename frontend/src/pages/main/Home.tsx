@@ -12,6 +12,7 @@ type Props = {}
 
 const Home = (props: Props) => {
 
+  console.log('hello home');
   // Error management
   const [error, setError] = useState(null);
   // Loading management
