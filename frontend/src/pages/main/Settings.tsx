@@ -2,7 +2,7 @@ import React from 'react'
 import Navbar from '../../components/design/Navbar'
 import loginImg from '../../assets/login.jpg'
 import Setting2FA from '../../components/settings/Setting2FA'
-import SettingProfilePicture from '../../components/settings/SettingProfilePicture'
+import SettingProfile from '../../components/settings/SettingProfile'
 import Cookies from 'js-cookie'
 
 type Props = {}
@@ -25,7 +25,7 @@ const Settings = (props: Props) => {
         <div className='bg-violet-700 rounded-lg m-5'>
           <div className='grid grid-cols-2 items-center p-5'>
             <div className='text-center mx-auto'>
-              <SettingProfilePicture />
+              <SettingProfile />
             </div>
             <div className='text-center mx-auto'>
               <Setting2FA />

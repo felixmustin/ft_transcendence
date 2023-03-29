@@ -36,6 +36,12 @@ export class UserController {
     return user.profile;
   }
 
+  @Get('user/:username')
+  async getUserByUsername(@Param('username') username: string) {
+    const user = await this.userService.findUserByUsername(username);
+    return user;
+  }
+
   // @Patch('users/:id/profile')
   // public async updateUser( @Param() param, @Body() body) {
   //     const users = await this.userServices.update(param.ID, body);

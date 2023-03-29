@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie';
 import Loading from '../../components/utils/Loading'
 import Error from '../../components/utils/Error'
+import DisplayAvatar from '../../components/utils/DisplayAvatar'
 
 type Props = {
   username?: string;
@@ -93,7 +94,7 @@ const Profile = ({ username }: Props) => {
         <div className='flex justify-evenly'>
           <div className='bg-violet-900 rounded-lg w-[800px] m-5'>
             <div className='flex justify-evenly items-center p-4'>
-              <img className='rounded-full w-[100px] h-[100px]' src={ loginImg }/>
+            <DisplayAvatar data={profile}/>
               <div className='text-center p-3'>
                 <h2 className='text-white text-3xl underline'>{profile.firstname} TITLE</h2>
                 {username && (
