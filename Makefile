@@ -60,6 +60,10 @@ re-full: refront reback
 
 re: clean all
 
+delete-db:
+	@echo deleting database
+	@rm -rf $(VOLUME_FOLDER)
+
 refresh :
 	@echo begin to refresh container content ;
 	@docker cp -a ./frontend/public frontend:/app;
