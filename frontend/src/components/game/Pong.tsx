@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import React, { useState, useEffect, Component } from 'react';
 import './pong.css';
 import io, {Socket} from 'socket.io-client';
+// import {SocketContext, socket} from '../../context/Socket';
 
 class Right_Paddle extends Component {
 	render(){
@@ -86,7 +87,7 @@ type GameState = {
 	play: boolean;
   };
 
-class GamePong extends React.Component {
+class GamePong extends React.Component<GameState> {
 	private socket: any;
 	constructor (props: any){
 		super(props);
@@ -213,6 +214,7 @@ class GamePong extends React.Component {
 		const {leftPaddleY, rightPaddleY, ballPositionx, ballPositiony, nextballPositionx, nextballPositiony} = this.state;
 		return (
 		<div>
+			{/* <SocketContext.Provider value={socket}> */}
 			<div className="status-container">
 				<Score_Container player1={this.state.player1} player2={this.state.player2} />
 					<div className="game-board-container">
@@ -225,10 +227,11 @@ class GamePong extends React.Component {
 							nextballPositionx={nextballPositionx}
 							nextballPositiony={nextballPositiony}
 							 />
-						</div>
 					</div>
 				</div>
 			</div>
+			{/* </SocketContext.Provider> */}
+		</div>
 		);
 	}
 }

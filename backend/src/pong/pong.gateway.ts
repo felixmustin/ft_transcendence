@@ -2,6 +2,7 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnG
 import { PongService } from './pong.service';
 import { Server } from 'socket.io';
 import {Room} from './room';
+import { Socket } from 'dgram';
 
 @WebSocketGateway( { cors: true })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -64,4 +65,17 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const room = this.pongService.getClientRoom(client);
 		this.maproom.get(room).update_paddle(paddle.paddleY, paddle.player);
 	}
+	// @SubscribeMessage('handshake')
+	// async handshake(client: any, data: any){
+	// 	console.info('handshake received from ' + client.id);
+
+	// 	const reconnected = data.values(this.server.sockets.sockets).includes(client.id);
+
+	// 	if (reconnected) {
+	// 		console.info('this user has reconnected');
+	// 	}
+	// 	else {
+	// 		console.info('new connection');
+	// 	}
+	// }
 }

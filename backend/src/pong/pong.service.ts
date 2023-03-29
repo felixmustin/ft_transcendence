@@ -47,6 +47,8 @@ export class PongService {
 		// If we get here, the client is not in any rooms
 		return null;
 	  }
+
+	// getUidFronSocketId = (id: string) => object.keys(this.server.sockets.sockets).find((uid) => this.server.sockets.sockets[uid] === id);
 //   private boardWidth = 600; // Width of the game board in pixels
 //   private boardHeight = 400; // Height of the game board in pixels
 //   private ballRadius = 10; // Radius of the ball in pixels
