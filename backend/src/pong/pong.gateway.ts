@@ -59,30 +59,41 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	@SubscribeMessage('find_match')
 	async find_match(client: any, data: string) {
-		//matchmaking
-		const score: ScoreProps = {
-			player1: 'player1',
-			player2: 'player2',
-			score1: 0,
-			score2: 0,
-		};
+		//connecting to room
 		const room = this.pongService.looking_room(this.maproom, this.server);
 		client.join(room);
 		this.maproom.get(room).connect(client.id);
-		const datamatch: matchdata = {
-			roomID: room,
-			score: score,
-			player: this.maproom.get(room).players,
-		};
+		console.log('connect to room ' + client.id);
+		// wait for oponent
+		let player = 0;
 		const waitForPlayer2 = new Promise((resolve) => {
 			const roomObj = this.maproom.get(room);
 			if (roomObj.players <= 1) {
+				player = 1;
+				console.log('waiting ' + client.id);
 			  roomObj.room_complete = resolve;
 			} else {
-			  resolve;
+				player = 2;
+				console.log('goingthrough ' + client.id);
+			  	resolve(resolve);
+				console.log('resolved ' + client.id);
 			}
 		  });
-		client.emit('match_found', JSON.stringify(datamatch));
+		await waitForPlayer2;
+		//collect info
+		console.log('after await ' + client.id);
+		const score: ScoreProps = {
+			player1: this.maproom.get(room).idp1,
+			player2: this.maproom.get(room).idp2,
+			score1: 0,
+			score2: 0,
+		};
+		const datamatch: matchdata = {
+			roomID: room,
+			score: score,
+			player: player,
+		};
+		client.emit('match_found', datamatch);
 	}
 	@SubscribeMessage('create_room')
 	async create_room(client: any, data: string) {

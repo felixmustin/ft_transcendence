@@ -32,9 +32,9 @@ type ballProps = {
 	ballPosition: ballPosition,
 	nextballPosition: ballPosition,
 }
-class Ball extends Component <ballProps> {
+class Ball extends Component <ballPosition> {
 	render() {
-		const {ballPosition, nextballPosition} = this.props;
+		const ballPosition = this.props;
 		return (
 			<div className='ball' style={{ 
 				position: 'absolute',
@@ -47,7 +47,6 @@ class Ball extends Component <ballProps> {
 				transitionProperty: "top, left",
 				transitionDuration: "0.1s",
 				transitionTimingFunction: "linear",
-				...{top: nextballPosition.y, left: nextballPosition.x},
 			  }} />
 		);
 	}
@@ -66,7 +65,7 @@ class Game_Board extends Component<Game_BoardProps> {
 	<div className="game-board">
 		<Left_Paddle PaddleY={leftPaddleY} />
         <Right_Paddle PaddleY={rightPaddleY} />
-        <Ball ballPosition={ballPosition} nextballPosition={nextballPosition} />
+        <Ball {...ballPosition} />
 	</div>
   );}
 }

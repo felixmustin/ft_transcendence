@@ -68,10 +68,10 @@ export class GameState{
 			this.nextballpositionx = this.nextballpositionx + this.ballspeedx;
 		}
 		//calculate bounce right
-		if (this.nextballpositionx > this.boardWidth - this.paddlespace - this.paddlewidth - this.ballRadius && this.nextballpositionx < this.boardWidth - this.paddlespace - this.ballRadius && this.nextballpositiony + this.ballRadius > this.paddlerightposition && this.nextballpositiony < this.paddlerightposition +  this.paddleheight){
+		if (this.nextballpositionx > this.boardWidth - this.paddlespace - this.paddlewidth - (this.ballRadius * 2) && this.nextballpositionx < this.boardWidth - this.paddlespace - (this.ballRadius * 2) && this.nextballpositiony + (this.ballRadius * 2) > this.paddlerightposition && this.nextballpositiony < this.paddlerightposition +  this.paddleheight){
 			this.nextballpositionx -= (this.ballspeedx * 2);
 		} // bounce left
-		else if (this.nextballpositionx < this.paddlespace + this.paddlewidth && this.nextballpositionx > this.paddlespace && this.nextballpositiony + this.ballRadius > this.paddleleftposition && this.nextballpositiony < this.paddleleftposition + this.paddleheight){
+		else if (this.nextballpositionx < this.paddlespace + this.paddlewidth && this.nextballpositionx > this.paddlespace && this.nextballpositiony > this.paddleleftposition && this.nextballpositiony < this.paddleleftposition + this.paddleheight){
 			this.nextballpositionx += (this.ballspeedx * 2);
 		} 
 	  }
@@ -86,7 +86,7 @@ export class GameState{
 		}
 		let ballFinalY = this.nextballpositiony;
 		//calculate bounce down
-		if (this.nextballpositiony > this.boardHeight - this.ballRadius){
+		if (this.nextballpositiony > this.boardHeight - (this.ballRadius * 2)){
 			this.nextballpositiony -= (this.ballspeedy * 2);
 		} // bounce up 
 		else if (this.nextballpositiony < 0){
