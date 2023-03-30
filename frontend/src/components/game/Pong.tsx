@@ -131,22 +131,9 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 			play: false,
 		};
 		this.score = this.props.score;
-		console.log('hello from constructor');
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 	}
 	componentDidMount(): void {
-		// this.socket = io("http://127.0.0.1:3001");
-		console.log('hello from component did mount my uid id ' + this.props.uid);
-		// this.socket.on('room', (data: string) => {
-    	// 	const room = JSON.parse(data);
-		// 	console.log('received room ' + room.roomId + " | " + room.player);
-    		// this.setState({
-			// 	roomId: room.roomId,
-			// 	player: room.player,
-			//   }, () => { becoming props
-				// console.log('Updated state:', this.state);
-		// 	  });
-		// });
 		document.addEventListener("keydown", this.handleKeyDown);
     	this.props.socket.on('updateState', (data: string) => {
     		const position: GameState = JSON.parse(data);
@@ -171,7 +158,6 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 		let newvalue;
 		switch (event.key) {
 		  case "w":{
-			console.log('this.props.player' + this.props.player);
 			if (this.props.player == 1 && this.state.play){
 				const data: PaddleMove = {
 					paddleY : this.state.leftPaddleY - 10,

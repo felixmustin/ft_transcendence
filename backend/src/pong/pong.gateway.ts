@@ -27,21 +27,18 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('playPong')
 	async playPong(client: any, data: playpause) {
 		const room = data.roomID;
-		console.log('play');
 		if (this.maproom.get(room)){
 			this.maproom.get(room).play();}
 	}
 	@SubscribeMessage('stopPong')
 	async stopPong(client: any, data: playpause){
 		const room = data.roomID;
-		console.log('pause');
 		if (this.maproom.get(room)){
 			this.maproom.get(room).pause();}
 	}
 	@SubscribeMessage('updatePaddle')
 	async updatepaddle(client:any, data: PaddleMove){
 		// const paddle : PaddleMove = JSON.parse(data);
-		console.log('update paddle received' + data.roomID + ' | ' + data.uid);
 		const room = data.roomID;
 		this.maproom.get(room).update_paddle(data.paddleY, data.uid);
 	}
@@ -54,8 +51,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			users: users,
 		}
   		client.emit('handshake-response', shake);
-
-  		console.log('Handshake received successfully');
 	}
 	@SubscribeMessage('find_match')
 	async find_match(client: any, data: string) {
@@ -63,25 +58,20 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const room = this.pongService.looking_room(this.maproom, this.server);
 		client.join(room);
 		this.maproom.get(room).connect(client.id);
-		console.log('connect to room ' + client.id);
 		// wait for oponent
 		let player = 0;
 		const waitForPlayer2 = new Promise((resolve) => {
 			const roomObj = this.maproom.get(room);
 			if (roomObj.players <= 1) {
 				player = 1;
-				console.log('waiting ' + client.id);
 			  roomObj.room_complete = resolve;
 			} else {
 				player = 2;
-				console.log('goingthrough ' + client.id);
 			  	resolve(resolve);
-				console.log('resolved ' + client.id);
 			}
 		  });
 		await waitForPlayer2;
 		//collect info
-		console.log('after await ' + client.id);
 		const score: ScoreProps = {
 			player1: this.maproom.get(room).idp1,
 			player2: this.maproom.get(room).idp2,
