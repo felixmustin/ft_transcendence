@@ -1,5 +1,6 @@
 import { GameState } from "./GameState";
 import { Server } from 'socket.io';
+import { ScoreProps, GameStateupdate } from "./pong.service";
 
 export class Room {
 	id: string;
@@ -13,6 +14,7 @@ export class Room {
 	score2: number;
 	idp1: string;
 	idp2: string;
+	room_complete: Function;
   
 	constructor(id: string, server: Server) {
 	  this.id = id;
@@ -27,11 +29,12 @@ export class Room {
 
 	connect(id: string){
 		this.players++;
-		if (this.players == 1){
+		if (this.players === 1){
 			this.idp1 = id;
 		}
-		else if (this.players == 2){
+		else if (this.players === 2){
 			this.idp2 = id;
+			this.room_complete();
 		}
 		else {
 			console.log('error connect room');
@@ -62,10 +65,12 @@ export class Room {
 
 	update_game_emit(){
 		this.state.updategame();
-		const data = { 
+		const data : GameStateupdate = { 
 			leftPaddleY: this.state.paddleleftposition,
 			rightPaddleY: this.state.paddlerightposition, 
-			ballPosition: {x: this.state.nextballpositionx, y: this.state.nextballpositiony},
+			ballPosition: {x: this.state.ballpositionx, y: this.state.ballpositiony},
+			nextballPosition: {x: this.state.nextballpositionx, y: this.state.nextballpositiony},
+			play : true,
 		};
 		this.server.to(this.id).emit('updateState', JSON.stringify(data))
 		if (this.state.ballpositionx < 0){
@@ -81,18 +86,21 @@ export class Room {
 	emit_score_reset_ball(){
 		this.state.nextballpositionx = 300;
 		this.state.nextballpositiony = 200;
-		const data = {
-			player1 : this.score1,
-			player2 : this.score2,
+		const data: ScoreProps = {
+			player1 : 'player1',
+			player2 : 'player2',
+			score1 : this.score1,
+			score2 : this.score2,
 		}
 		this.server.to(this.id).emit('score', JSON.stringify(data));
 	}
 
-	update_paddle(paddle : number, player: number){
-		if (player == 1){
+	update_paddle(paddle : number, uid: string){
+		console.log('update paddle uid : ' + uid + ' | ' + this.idp1 + ' | ' + this.idp2);
+		if (uid === this.idp1){
 			this.update_left_paddle(paddle);
 		}
-		else if (player == 2){
+		else if (uid === this.idp2){
 			this.update_right_paddle(paddle);
 		}
 	}
@@ -105,7 +113,7 @@ export class Room {
 	}
 
 	play(){
-		if (this.playpause == false && this.players == 2){
+		if (this.playpause === false && this.players == 2){
 			this.playpause = true;
 			this.intervalid = setInterval( () => {
 				this.update_game_emit()
@@ -114,7 +122,7 @@ export class Room {
 	}
 
 	pause(){
-		if (this.playpause == true){
+		if (this.playpause === true){
 			this.playpause = false;
 			clearInterval(this.intervalid);
 		}

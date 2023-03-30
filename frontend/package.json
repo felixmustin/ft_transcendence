@@ -27,6 +27,7 @@
     "@types/react-anchor-link-smooth-scroll": "^1.0.2",
     "@types/react-dom": "^18.0.10",
     "@types/react-router-dom": "^5.3.3",
+    "@types/uuid": "^9.0.1",
     "@vitejs/plugin-react": "^3.1.0",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.21",

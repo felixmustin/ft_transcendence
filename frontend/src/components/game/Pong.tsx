@@ -1,35 +1,45 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { useState, useEffect, Component } from 'react';
 import './pong.css';
-import io, {Socket} from 'socket.io-client';
-// import {SocketContext, socket} from '../../context/Socket';
+// import io, {Socket} from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
-class Right_Paddle extends Component {
+type ballPosition = {
+	x: number,
+	y: number,
+}
+type paddleProps = {
+	PaddleY : number,
+}
+class Right_Paddle extends Component<paddleProps> {
 	render(){
-		const {rightPaddleY} = this.props;
+		const {PaddleY} = this.props;
 		return (
-			<div className="paddle" id="right-paddle" style={{ top: rightPaddleY }} />
+			<div className="paddle" id="right-paddle" style={{ top: PaddleY }} />
 		);
 	}
 }
 
-class Left_Paddle extends Component {
+class Left_Paddle extends Component<paddleProps> {
 	render() {
-		const {leftPaddleY} = this.props;
+		const {PaddleY} = this.props;
 		return (
-			<div className="paddle" id="left-paddle" style={{ top: leftPaddleY }} />
+			<div className="paddle" id="left-paddle" style={{ top: PaddleY }} />
 		);
 	}
 }
 
-class Ball extends Component {
+type ballProps = {
+	ballPosition: ballPosition,
+	nextballPosition: ballPosition,
+}
+class Ball extends Component <ballProps> {
 	render() {
-		const {ballPositionx, ballPositiony, nextballPositionx, nextballPositiony} = this.props;
+		const {ballPosition, nextballPosition} = this.props;
 		return (
 			<div className='ball' style={{ 
 				position: 'absolute',
-				top: ballPositiony,
-				left: ballPositionx,
+				top: ballPosition.y,
+				left: ballPosition.x,
 				width: '20px',
 				height: '20px',
 				backgroundColor: 'rgba(255, 255, 0, 0.775)',
@@ -37,109 +47,121 @@ class Ball extends Component {
 				transitionProperty: "top, left",
 				transitionDuration: "0.1s",
 				transitionTimingFunction: "linear",
-				...{top: nextballPositiony, left: nextballPositionx},
+				...{top: nextballPosition.y, left: nextballPosition.x},
 			  }} />
 		);
 	}
 }
 
-class Game_Board extends Component {
+type Game_BoardProps = {
+	leftPaddleY: number, 
+	rightPaddleY: number, 
+	ballPosition: ballPosition, 
+	nextballPosition: ballPosition,
+}
+class Game_Board extends Component<Game_BoardProps> {
   	render(){ 
-	const { leftPaddleY, rightPaddleY, ballPositionx, ballPositiony, nextballPositionx, nextballPositiony } = this.props;
+	const { leftPaddleY, rightPaddleY, ballPosition, nextballPosition } = this.props;
 	return (
 	<div className="game-board">
-		<Left_Paddle leftPaddleY={leftPaddleY} />
-        <Right_Paddle rightPaddleY={rightPaddleY} />
-        <Ball ballPositionx={ballPositionx} ballPositiony={ballPositiony} nextballPositionx={nextballPositionx} nextballPositiony={nextballPositiony}/>
+		<Left_Paddle PaddleY={leftPaddleY} />
+        <Right_Paddle PaddleY={rightPaddleY} />
+        <Ball ballPosition={ballPosition} nextballPosition={nextballPosition} />
 	</div>
   );}
 }
 
-class Score_Container extends React.Component{
+export type ScoreProps = {
+	player1: string,
+	player2: string,
+	score1: number,
+	score2: number,
+}
+
+class Score_Container extends React.Component <ScoreProps>{
 	render (){
-		const {player1, player2} = this.props;
+		const {player1, player2, score1, score2} = this.props;
 		return (
 			<div className="score-container">
 					<div style={{ display: 'flex', justifyContent: 'center', whiteSpace: 'pre-line' }}>
-						<p style={{ textAlign: 'center' }}>{"player 1 " + " vs " + "player 2\n\r" + player1 + "|" + player2}</p>
+						<p style={{ textAlign: 'center' }}>{player1 + " " + " vs " + player2 + "\n\r" + score1 + "|" + score2}</p>
 					</div>
 				</div>
 		);
 	}
 }
 
-type GamePongProps = {
-	roomID: string;
-	player: number;
+export type GamePongProps = {
+	roomID: string,
+	score: ScoreProps,
+	uid: string,
+	player: number,
+	socket: Socket,
   };
 
 type GameState = {
-	player1: number;
-	player2: number;
-	roomId: string;
-	player: number;
-	leftPaddleY: number;
-	rightPaddleY: number;
-	ballPositionx: number;
-	ballPositiony: number;
-	nextballPositionx: number;
-	nextballPositiony: number;
-	play: boolean;
+	leftPaddleY: number,
+	rightPaddleY: number,
+	ballPosition: ballPosition,
+	nextballPosition: ballPosition,
+	play: boolean,
   };
 
-class GamePong extends React.Component<GameState> {
-	private socket: any;
+type PaddleMove = {
+	paddleY: number,
+	roomID: string,
+	uid: string,
+}
+
+type playpause = {
+	roomID: string,
+	uid:string,
+	play: boolean,
+}
+
+class GamePong extends React.Component<GamePongProps, GameState> {
+	private score: ScoreProps;
+
 	constructor (props: any){
 		super(props);
 		this.state = {
-			player1 : 0,
-			player2 : 0,
-			roomId : "test",
-			player : 0,
 			leftPaddleY: 160,
   			rightPaddleY: 160,
-  			ballPositionx: 290,
-			ballPositiony: 190,
-  			nextballPositionx: 300,
-			nextballPositiony:200,
+  			ballPosition: {x: 290, y: 190},
+  			nextballPosition: {x: 300, y: 200},
 			play: false,
 		};
-		const clientId = uuidv4();
+		this.score = this.props.score;
 		console.log('hello from constructor');
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 	}
 	componentDidMount(): void {
-		this.socket = io("http://127.0.0.1:3001");
-		console.log('hello from component did mount ');
-		this.socket.on('room', (data: string) => {
-    		const room = JSON.parse(data);
-			console.log('received room ' + room.roomId + " | " + room.player);
-    		this.setState({
-				roomId: room.roomId,
-				player: room.player,
-			  }, () => {
-				console.log('Updated state:', this.state);
-			  });
-		});
+		// this.socket = io("http://127.0.0.1:3001");
+		console.log('hello from component did mount my uid id ' + this.props.uid);
+		// this.socket.on('room', (data: string) => {
+    	// 	const room = JSON.parse(data);
+		// 	console.log('received room ' + room.roomId + " | " + room.player);
+    		// this.setState({
+			// 	roomId: room.roomId,
+			// 	player: room.player,
+			//   }, () => { becoming props
+				// console.log('Updated state:', this.state);
+		// 	  });
+		// });
 		document.addEventListener("keydown", this.handleKeyDown);
-    	this.socket.on('updateState', (data: string) => {
-    		const position = JSON.parse(data);
+    	this.props.socket.on('updateState', (data: string) => {
+    		const position: GameState = JSON.parse(data);
     		this.setState({
     		leftPaddleY: position.leftPaddleY,
     		rightPaddleY: position.rightPaddleY,
-    		ballPositionx: this.state.nextballPositionx,
-			ballPositiony: this.state.nextballPositiony,
-			nextballPositionx: position.ballPosition.x, 
-			nextballPositiony: position.ballPosition.y,
-			play: false,
+    		ballPosition: this.state.nextballPosition,
+			nextballPosition: position.ballPosition, 
+			play: position.play
     		});
     	});
-		this.socket.on('score', (data: string) => {
-			const score = JSON.parse(data);
-			this.setState({
-				player1: score.player1,
-				player2: score.player2,
-			});
+		this.props.socket.on('score', (data: string) => {
+			const score: ScoreProps = JSON.parse(data);
+			this.score = score;
 		});
 	}
 	componentWillUnmount(): void {
@@ -150,59 +172,62 @@ class GamePong extends React.Component<GameState> {
 		let newvalue;
 		switch (event.key) {
 		  case "w":{
-			if (this.state.player == 1){
-				const data = {
+			console.log('this.props.player' + this.props.player);
+			if (this.props.player == 1 && this.state.play){
+				const data: PaddleMove = {
 					paddleY : this.state.leftPaddleY - 10,
-					room : this.state.roomID,
-					player : this.state.player,
+					roomID : this.props.roomID,
+					uid : this.props.uid,
 				};
-				this.socket.emit("updatePaddle", JSON.stringify(data));
+				this.props.socket.emit("updatePaddle", data);
 			}
-			else if (this.state.player == 2){
-				const data = {
+			else if (this.props.player == 2 && this.state.play){
+				const data: PaddleMove = {
 					paddleY : this.state.rightPaddleY - 10,
-					room : this.state.roomID,
-					player : this.state.player,
+					roomID : this.props.roomID,
+					uid : this.props.uid,
 				};
-				this.socket.emit("updatePaddle", JSON.stringify(data));
+				this.props.socket.emit("updatePaddle", data);
 			}
 		}
 			break;
 		  case "s":{
-			if (this.state.player == 1){
-				const data = {
+			if (this.props.player == 1 && this.state.play){
+				const data: PaddleMove = {
 					paddleY : this.state.leftPaddleY + 10,
-					room : this.state.roomID,
-					player : this.state.player,
+					roomID : this.props.roomID,
+					uid : this.props.uid,
 				};
-				this.socket.emit("updatePaddle", JSON.stringify(data));
+				this.props.socket.emit("updatePaddle", data);
 			}
-			else if (this.state.player == 2){
-				const data = {
+			else if (this.props.player == 2 && this.state.play){
+				const data: PaddleMove = {
 					paddleY : this.state.rightPaddleY + 10,
-					room : this.state.roomID,
-					player : this.state.player,
+					roomID : this.props.roomID,
+					uid : this.props.uid,
 				};
-				this.socket.emit("updatePaddle", JSON.stringify(data));
+				this.props.socket.emit("updatePaddle", data);
 			}
 		}
 			break;
 		  case "c":
-			this.setState({play : true}, () =>{
-				const data = {
-					room : this.props.roomID,
-					player : this.props.player,
+			{
+				const data: playpause = {
+					roomID : this.props.roomID,
+					uid : this.props.uid,
+					play: true,
 				};
-				this.socket.emit('playPong', JSON.stringify(data));
-			});
+				this.props.socket.emit('playPong', data);
+			};
 			break;
 		  case "v":
 			this.setState({play : false}, () =>{
-				const data = {
-					room : this.props.roomID,
-					player : this.props.player,
+				const data: playpause = {
+					roomID : this.props.roomID,
+					uid : this.props.uid,
+					play: false,
 				};
-				this.socket.emit('stopPong', JSON.stringify(data));
+				this.props.socket.emit('stopPong', data);
 			});
 			break;
 		  default:
@@ -210,27 +235,16 @@ class GamePong extends React.Component<GameState> {
 		}
 	  }
 	render () {
-		console.log('hello from render');
-		const {leftPaddleY, rightPaddleY, ballPositionx, ballPositiony, nextballPositionx, nextballPositiony} = this.state;
 		return (
 		<div>
-			{/* <SocketContext.Provider value={socket}> */}
 			<div className="status-container">
-				<Score_Container player1={this.state.player1} player2={this.state.player2} />
+				<Score_Container {...this.score} />
 					<div className="game-board-container">
 						<div className="game-board">
-							<Game_Board 
-							leftPaddleY={leftPaddleY}
-							rightPaddleY={rightPaddleY}
-							ballPositionx={ballPositionx}
-							ballPositiony={ballPositiony}
-							nextballPositionx={nextballPositionx}
-							nextballPositiony={nextballPositiony}
-							 />
+							<Game_Board {...this.state}/>
 					</div>
 				</div>
 			</div>
-			{/* </SocketContext.Provider> */}
 		</div>
 		);
 	}

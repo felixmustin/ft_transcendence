@@ -1,9 +1,47 @@
 import { Injectable } from '@nestjs/common';
-import {Room} from './room'
+import {Room} from './room';
+import { Server } from 'socket.io';
+
+export type handshake = {
+	uid : string,
+	users: string[],
+}
+export type ScoreProps = {
+	player1: string,
+	player2: string,
+	score1: number,
+	score2: number,
+}
+export type matchdata = {
+	roomID: string,
+	score: ScoreProps,
+	player: number,
+}
+export type PaddleMove = {
+	paddleY: number,
+	roomID: string,
+	uid: string,
+}
+type ballPosition = {
+	x: number,
+	y: number,
+}
+export type GameStateupdate = {
+	leftPaddleY: number,
+	rightPaddleY: number,
+	ballPosition: ballPosition,
+	nextballPosition: ballPosition,
+	play: boolean,
+};
+export type playpause = {
+	roomID: string,
+	uid:string,
+	play: boolean,
+}
 
 @Injectable()
 export class PongService {
-	looking_room(map: Map<string, Room>, server: any): string {
+	looking_room(map: Map<string, Room>, server: Server): string {
 		for (const [key, value] of map.entries()) {
 		  if (value.players === 1) {
 			return key;
@@ -47,6 +85,10 @@ export class PongService {
 		// If we get here, the client is not in any rooms
 		return null;
 	  }
+
+	wait_player2(room: Room){
+		
+	}
 
 	// getUidFronSocketId = (id: string) => object.keys(this.server.sockets.sockets).find((uid) => this.server.sockets.sockets[uid] === id);
 //   private boardWidth = 600; // Width of the game board in pixels

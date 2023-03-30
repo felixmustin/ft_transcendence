@@ -7,7 +7,7 @@ export interface ISocketContextState {
 	users : string[];
 }
 
-export const defaulSocketContextState: ISocketContextState = {
+export const defaultSocketContextState: ISocketContextState = {
 	socket : undefined, 
 	uid : '',
 	users : [],
@@ -45,7 +45,7 @@ export interface ISocketContextProps {
 }
 
 const SocketContext = createContext<ISocketContextProps>({
-	SocketState: defaulSocketContextState,
+	SocketState: defaultSocketContextState,
 	SocketDispatch: () => {},
 });
 
