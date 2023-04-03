@@ -15,6 +15,7 @@ export class GameState{
 	paddlewidth: number;
 	paddlespace: number;
 	paddleheight: number;
+	paddlezone: number;
 
 
 	constructor() {
@@ -24,14 +25,15 @@ export class GameState{
 		this.ballpositiony = 190;
 		this.nextballpositionx = 300;
 		this.nextballpositiony = 200;
-		this.ballspeedx = 10;
-		this.ballspeedy = 10;
+		this.ballspeedx = 5;
+		this.ballspeedy = 5;
 		this.boardWidth = 600;
 		this.boardHeight = 400;
 		this.ballRadius = 10;
 		this.paddlewidth = 20;
 		this.paddlespace = 20;
 		this.paddleheight = 80;
+		this.paddlezone = this.paddleheight / 5;
 	}
 
 	reset(){
@@ -68,10 +70,10 @@ export class GameState{
 			this.nextballpositionx = this.nextballpositionx + this.ballspeedx;
 		}
 		//calculate bounce right
-		if (this.nextballpositionx > this.boardWidth - this.paddlespace - this.paddlewidth - (this.ballRadius * 2) && this.nextballpositionx < this.boardWidth - this.paddlespace - (this.ballRadius * 2) && this.nextballpositiony + (this.ballRadius * 2) > this.paddlerightposition && this.nextballpositiony < this.paddlerightposition +  this.paddleheight){
+		if (this.bounce_right()){
 			this.nextballpositionx -= (this.ballspeedx * 2);
 		} // bounce left
-		else if (this.nextballpositionx < this.paddlespace + this.paddlewidth && this.nextballpositionx > this.paddlespace && this.nextballpositiony > this.paddleleftposition && this.nextballpositiony < this.paddleleftposition + this.paddleheight){
+		else if (this.bounce_left()){
 			this.nextballpositionx += (this.ballspeedx * 2);
 		} 
 	  }
@@ -100,5 +102,101 @@ export class GameState{
 
 	update_left_paddle(leftPaddleY: number){
 		this.paddleleftposition = leftPaddleY;
+	}
+
+	quicker(){
+		if (this.ballspeedx <= this.ballspeedy){
+			this.ballspeedx++;
+		}
+		else{
+			this.ballspeedy++;
+		}
+	}
+
+	bounce_right(): boolean{
+		if (this.nextballpositionx > this.boardWidth - this.paddlespace - this.paddlewidth - (this.ballRadius * 2) && this.nextballpositionx < this.boardWidth - this.paddlespace - (this.ballRadius * 2) && this.nextballpositiony + (this.ballRadius * 2) > this.paddlerightposition && this.nextballpositiony < this.paddlerightposition +  this.paddleheight){
+			this.quicker();
+			if (this.nextballpositionx < this.paddlerightposition + this.paddlezone){
+				this.more_upward();
+				this.more_upward();
+			}
+			else if (this.nextballpositionx < this.paddlerightposition + (2 * this.paddlezone)){
+				this.more_upward();
+			}
+			else if (this.nextballpositionx < this.paddlerightposition + (3 * this.paddlezone)){
+			}
+			else if (this.nextballpositionx < this.paddlerightposition + (4 * this.paddlezone)){
+				this.more_downward();
+			}
+			else {
+				this.more_downward();
+				this.more_downward();
+			}
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	bounce_left(): boolean {
+		if (this.nextballpositionx < this.paddlespace + this.paddlewidth && this.nextballpositionx > this.paddlespace && this.nextballpositiony > this.paddleleftposition && this.nextballpositiony < this.paddleleftposition + this.paddleheight){
+			this.quicker();
+			if (this.nextballpositionx < this.paddlerightposition + this.paddlezone){
+				this.more_upward();
+				this.more_upward();
+			}
+			else if (this.nextballpositionx < this.paddlerightposition + (2 * this.paddlezone)){
+				this.more_upward();
+			}
+			else if (this.nextballpositionx < this.paddlerightposition + (3 * this.paddlezone)){
+			}
+			else if (this.nextballpositionx < this.paddlerightposition + (4 * this.paddlezone)){
+				this.more_downward();
+			}
+			else {
+				this.more_downward();
+				this.more_downward();
+			}
+			console.log('return true ');
+			return true;
+		}
+		else{
+			console.log('return false ');
+			return false;
+		}
+	}
+
+	more_upward(){
+		//is going up 
+		if (this.nextballpositiony < this.ballpositiony){
+			this.more_horizontal_speed();
+		}
+		else{
+			this.more_vertical_speed();
+		}
+	}
+	more_downward(){
+		//is going down
+		if (this.nextballpositiony > this.ballpositiony){
+			this.more_vertical_speed();
+		}
+		else{
+			this.more_horizontal_speed();
+		}
+	}
+	more_vertical_speed(){
+		this.ballspeedx--;
+		this.ballspeedy++;
+	}
+
+	more_horizontal_speed(){
+		this.ballspeedx++;
+		this.ballspeedy--;
+	}
+
+	reset_speed(){
+		this.ballspeedx = 5;
+		this.ballpositiony = 5;
 	}
 }

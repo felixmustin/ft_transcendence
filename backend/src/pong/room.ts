@@ -89,6 +89,7 @@ export class Room {
 	emit_score_reset_ball(){
 		this.state.nextballpositionx = 300;
 		this.state.nextballpositiony = 200;
+		this.state.reset_speed();
 		const data: ScoreProps = {
 			player1 : 'player1',
 			player2 : 'player2',
@@ -99,7 +100,6 @@ export class Room {
 	}
 
 	update_paddle(paddle : number, uid: string){
-		console.log('update paddle uid : ' + uid + ' | ' + this.idp1 + ' | ' + this.idp2);
 		if (uid === this.idp1){
 			this.update_left_paddle(paddle);
 		}
@@ -120,7 +120,7 @@ export class Room {
 			this.playpause = true;
 			this.intervalid = setInterval( () => {
 				this.update_game_emit()
-			}, 100);
+			}, 50);
 		}
 	}
 
