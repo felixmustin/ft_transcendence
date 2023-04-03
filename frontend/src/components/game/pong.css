@@ -82,18 +82,7 @@
 	left: 290px;
 	border-radius: 50%;
   }
-  
-  /* Animate the ball */
-  @keyframes move-ball {
-	from {
-	  transform: translate(${ballPosition.x}px, ${ballPosition.y}px);
-	}
-	to {
-	  transform: translate(${nextballPosition.x}px, ${nextballPosition.y}px);
-	}
-  }
-  
-  
+
   .ball {
 	animation-name: move-ball;
 	animation-duration: 1s;
