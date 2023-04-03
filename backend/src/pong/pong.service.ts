@@ -53,9 +53,9 @@ export class PongService {
 		  }
 		}
 		// If no available room found, create a new room with a unique key
-		let key = Math.random().toString(36).substr(0, 9);
+		let key = Math.random().toString(36).substr(2, 9);
 		while (map.has(key)) {
-			key = Math.random().toString(36).substr(0, 9);
+			key = Math.random().toString(36).substr(2, 9);
 		}
 		const newRoom = new Room(key, server);
 		map.set(key, newRoom);
@@ -89,6 +89,15 @@ export class PongService {
 	wait_player2(room: Room){
 		
 	}
+	generateRandomKey(): string {
+		let key = "";
+		const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		for (let i = 0; i < 4; i++) {
+		  const randomIndex = Math.floor(Math.random() * possibleChars.length);
+		  key += possibleChars.charAt(randomIndex);
+		}
+		return key;
+	  }
 
 	// getUidFronSocketId = (id: string) => object.keys(this.server.sockets.sockets).find((uid) => this.server.sockets.sockets[uid] === id);
 //   private boardWidth = 600; // Width of the game board in pixels

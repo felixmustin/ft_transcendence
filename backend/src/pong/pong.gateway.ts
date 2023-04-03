@@ -7,6 +7,7 @@ import {Room} from './room';
 @WebSocketGateway( { cors: true })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private maproom: Map<string, Room> = new Map();
+	private privateroom: Map<string, Room> = new Map();
 
 	constructor(private readonly pongService: PongService) {
 
@@ -57,7 +58,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//connecting to room
 		const room = this.pongService.looking_room(this.maproom, this.server);
 		client.join(room);
-		this.maproom.get(room).connect(client.id);
+		this.maproom.get(room).connect(data);
 		// wait for oponent
 		let player = 0;
 		const waitForPlayer2 = new Promise((resolve) => {
@@ -88,9 +89,48 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('create_room')
 	async create_room(client: any, data: string) {
 		//create private room
+		let room = this.pongService.generateRandomKey();
+		while (this.privateroom.has(room)) {
+			room = this.pongService.generateRandomKey();
+		}
+		this.privateroom.set(room, new Room(room, this.server));
+		console.log('send data ');
+		client.join(room);
+		this.privateroom.get(room).connect(data);
+		console.log('room ' + room);
+		const score: ScoreProps = {
+			player1: this.privateroom.get(room).idp1,
+			player2: this.privateroom.get(room).idp2,
+			score1: 0,
+			score2: 0,
+		}
+		console.log('check');
+		const datamatch: matchdata = {
+			roomID: room,
+			score: score,
+			player: 1,
+		}
+		client.emit('room_created', datamatch)
 	}
 	@SubscribeMessage('join_room')
 	async join_room(client: any, data: string) {
 		//join private room
+		const room = data;
+		client.join(room);
+		console.log('join room 1')
+		this.privateroom.get(room).connect(client.id);
+		const score: ScoreProps = {
+			player1: this.privateroom.get(room).idp1,
+			player2: this.privateroom.get(room).idp2,
+			score1: 0,
+			score2: 0,
+		}
+		const datamatch: matchdata = {
+			roomID: room,
+			score: score,
+			player: 2,
+		}
+		console.log('join room 2');
+		this.server.to(room).emit('match_found', datamatch);
 	}
 }

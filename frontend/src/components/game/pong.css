@@ -117,3 +117,6 @@
 	justify-content: center;
   }
   
+  input {
+	background-color: black;
+  }

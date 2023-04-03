@@ -25,6 +25,9 @@ export class Room {
 	  this.score1 = 0;
 	  this.score2 = 0;
 	  this.state = new(GameState);
+	  this.room_complete = () => {
+        console.log('room_complete');
+      }
 	}
 
 	connect(id: string){
