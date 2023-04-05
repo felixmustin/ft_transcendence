@@ -22,6 +22,13 @@ export class UserController {
     return userProfile;
   }
 
+  @Get('profile/:username')
+  @UseGuards(JwtAuthGuard)
+  async getUserProfileByUsername(@Request() req, @Param('username') username: string) {
+    const userProfile = await this.userService.findUserProfileByUsername(username);
+    return userProfile;
+  }
+
   @Delete('delete')
   @UseGuards(JwtAuthGuard)
   async deleteUser(@Request() req) {
@@ -45,7 +52,7 @@ export class UserController {
   // @Patch('users/:id/profile')
   // public async updateUser( @Param() param, @Body() body) {
   //     const users = await this.userServices.update(param.ID, body);
-  // }
+  // }s
 
   // @Patch('users/:id/profile')
   // public async updateUserProfile( @Param() param, @Body() body) {

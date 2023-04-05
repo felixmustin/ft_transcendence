@@ -23,17 +23,21 @@ export class AuthService {
     private jwtService: JwtService) {
   }
 
-  async loginUser(username: string, wordpass: string) {
-   const user = await this.validateUser(username, wordpass)
+  async loginUser(loginName: string, wordpass: string) {
+   const user = await this.validateUser(loginName, wordpass)
    if (!user)
-      throw new BadRequestException('Username or password incorrect');
-    
+      throw new BadRequestException('loginName or password incorrect');
+    const userNotFinished = (await this.UserNotFinished(loginName))
+    if (userNotFinished)
+      throw new BadRequestException('Finish signup first');
     return (this.generateAccessToken(user));
   }
 
-  async validateUser(username: string, wordpass: string) {
-    const user = await this.userService.findUserByUsername(username);
+  async validateUser(loginName: string, wordpass: string) {
+    const user = await this.userService.findUserByloginName(loginName);
     if (!user)
+      return null;
+    if (!wordpass || !loginName)
       return null;
     const match = await bcrypt.compare(wordpass, user.wordpass);
     if (match)
@@ -43,11 +47,19 @@ export class AuthService {
   }
 
   async signupUser(createUserDto: CreateUserDto) {
-    if (! await this.isUsernameAvailable(createUserDto.username)) {
+    if (! await this.isUsernameInUse(createUserDto.loginName)) {
+        throw new BadRequestException('Username in use');
+    }
+    const userNotFinished = (await this.UserNotFinished(createUserDto.loginName))
+    if (userNotFinished)
+    {
+      if (await this.validateUser(createUserDto.loginName, createUserDto.wordpass))
+        return this.generateAccessToken(userNotFinished);
+      else
         throw new BadRequestException('Username in use');
     }
     const newUser = new User();
-    newUser.username = createUserDto.username;
+    newUser.loginName = createUserDto.loginName;
     const hashedPassword = await this.hashPassword(createUserDto.wordpass);
     newUser.wordpass = hashedPassword;
     const user = await this.userService.createUser(newUser);
@@ -59,14 +71,24 @@ export class AuthService {
     if (!user)
       throw new HttpException('User not found. Cannot create profile', HttpStatus.BAD_REQUEST)
     const defaultAvatar = "./assets/default-avatar.png"
-    const savedProfile = await this.userService.createUserProfile(createUserProfileDto.email, createUserProfileDto.firstname, createUserProfileDto.lastname, createUserProfileDto.age, defaultAvatar);
+    const savedProfile = await this.userService.createUserProfile(user.loginName, createUserProfileDto.email, createUserProfileDto.firstname, createUserProfileDto.lastname, createUserProfileDto.age, defaultAvatar);
     await this.userService.updateUserProfile(id, savedProfile)
   }
 
-  private async isUsernameAvailable(email: string): Promise<boolean> {
-    const user = await this.userService.findUserByUsername(email);
-    if (user) { return false; }
+
+  private async isUsernameInUse(username: string): Promise<boolean> {
+    const userProfile = await this.userService.findUserProfileByUsername(username);
+    if (userProfile)
+      return false;
     return true;
+  }
+
+  private async UserNotFinished(username: string): Promise<User> {
+    const user = await this.userService.findUserByloginName(username);
+    const userProfile = await this.userService.findUserProfileByUsername(username);
+    if (user && !userProfile)
+      return user;
+    return null;
   }
 
   async generateAccessToken(user: User/* ,isTwoFaAuth = false */) {
@@ -75,7 +97,6 @@ export class AuthService {
       id: user.id,
       access_token: this.jwtService.sign(payload),
       twoFaEnabled : user.is2faenabled,
-      // isTwoFaAuth,
     }
   }
 
@@ -98,18 +119,21 @@ export class AuthService {
       newUser.user42id = reqUser.id;
       const user = await this.userService.createUser(newUser);
       const defaultAvatar = "./assets/default-avatar.png"
-      const savedProfile = await this.userService.createUserProfile(reqUser.email, reqUser.firstName, reqUser.lastName, 0, defaultAvatar);
+      const savedProfile = await this.userService.createUserProfile('', reqUser.email, reqUser.firstName, reqUser.lastName, 0, defaultAvatar);
+      await this.userService.updateUserProfile(user.id, savedProfile)
+      savedProfile.username = "Default" + savedProfile.id;
       await this.userService.updateUserProfile(user.id, savedProfile)
       return (user);
   }
 
   async signUpWith42(reqUser: any, username: string) {
-    console.log("Bien")
     console.log(reqUser)
-    const user = await this.userService.findUserById(reqUser.id);
-    user.username = username;
-    await this.userRepository.save(user);
+    const userProfile = await this.userService.findUserProfileById(reqUser.id);
+    const userNotFinished = (await this.UserNotFinished(username))
+    if ((! await this.isUsernameInUse(username) ) || userNotFinished) {
+      throw new BadRequestException('Username in use');
+    }
+    userProfile.username = username;
+    return await this.userService.updateUserProfile(reqUser.id, userProfile)
   }
-
-  
 }

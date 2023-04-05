@@ -28,6 +28,7 @@ export class TwoFactorAuthenticationService {
 
   public async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, userId: number) {
     const user = await this.userService.findUserById(userId)
+
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.secret2fa

@@ -1,35 +1,41 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { getSessionsToken, removeSessionsToken } from '../../sessionsUtils';
 
 type Props = {}
 
 const Disconnect = (props: Props) => {
 
   const navigate = useNavigate();
-  const token = Cookies.get("access_token");
+  const token = getSessionsToken()
 
   const disconnect = () => {
-    Cookies.remove("access_token")
-    // deleteToken();
+    removeSessionsToken()
     navigate('/');
   };
 
   const deleteAcc = () => {
     let url = 'http://localhost:3001/user/delete/'
-    let auth = 'Bearer ' + token;
+    let auth = 'Bearer ' + token.access_token;
     fetch(url, {
       method: 'DELETE',
       headers: {'Authorization': auth}
-    }).then(res => res.json()
-    ).then(response => {
-      if (response.statusCode >= 400) {
-        alert("Deletion failed");
-        }
+    }).then(response => {
+      if (!response.ok)
+        alert("Deletion of user failed");
       else {
-        disconnect();
+        fetch('http://localhost:3001/friends/delete/user', {
+          method: 'DELETE',
+          headers: {'Authorization': auth}
+        }).then(response => {
+          if (response.ok)
+            disconnect();
+          else { 
+            alert("Deletion of friends failed");
+          }
+        });
       } 
-      });
+    });
   }
 
   return (

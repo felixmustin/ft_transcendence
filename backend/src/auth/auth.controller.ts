@@ -14,8 +14,9 @@ export class AuthController {
   @Post('login')
   @UsePipes(ValidationPipe)
   async login(@Body() body: CreateUserDto) {
-    const token = await this.authService.loginUser(body.username, body.wordpass);
-    return { token };
+    const token = await this.authService.loginUser(body.loginName, body.wordpass);
+    if (token)
+        return { token };
   }
 
   @Post('signup')
@@ -45,23 +46,24 @@ export class AuthController {
     if (!user)
     {
       const newUser = await this.authService.logInWith42(req.user);
-      const token = this.authService.generateAccessToken(newUser)
-      res.cookie('access_token', (await token).access_token)
-      return res.redirect(`http://localhost:3000/usernameinput`);
+      const token = await this.authService.generateAccessToken(newUser)
+      res.cookie('token', JSON.stringify(token))
+      return res.redirect(`http://localhost:3000/log42page`);
     }
     else
     {
       const token = await this.authService.generateAccessToken(user)
-      res.cookie('access_token', (await token).access_token)
-      return res.redirect(`http://localhost:3000/home`);
+      // if (token.twoFaEnabled == true)
+      res.cookie('token', JSON.stringify(token))
+      return res.redirect(`http://localhost:3000/log42page`);
     }
   }
 
   @Post('42/signup')
   @UseGuards(JwtAuthGuard)
   async signUp42(@Request() req, @Body() body) {
-    const token = await this.authService.signUpWith42(req.user, body.username)
-    return token;
+    const profile = await this.authService.signUpWith42(req.user, body.username)
+    return profile;
   }
 
 }

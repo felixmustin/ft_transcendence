@@ -4,10 +4,10 @@ import loginImg from '../../assets/login.jpg'
 import ProfileData from '../../components/user/ProfileData'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Cookies from 'js-cookie';
 import Loading from '../../components/utils/Loading'
 import Error from '../../components/utils/Error'
 import DisplayAvatar from '../../components/utils/DisplayAvatar'
+import { getSessionsToken } from '../../sessionsUtils'
 
 type Props = {
   username?: string;
@@ -21,11 +21,12 @@ const Profile = ({ username }: Props) => {
   const [isLoaded, setIsLoaded] = useState(false);
   // User data retrieved from the API
   const [profile, setProfile] = useState([]);
+
   // Navigation
   const navigate = useNavigate();
-  // Cookies and auth
-  const token = Cookies.get("access_token");
-  const auth = 'Bearer ' + token;
+  // Session and auth
+  const token = getSessionsToken()
+  const auth = 'Bearer ' + token.access_token;
 
   // Fetch user data and handles loading and error.
   // Depending on if the user asked for another user's profile or his own,
@@ -33,7 +34,7 @@ const Profile = ({ username }: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       const url = username
-        ? `http://localhost:3001/user/${username}`
+        ? `http://localhost:3001/user/profile/${username}`
         : 'http://localhost:3001/user/profile';
 
       try {
@@ -42,6 +43,7 @@ const Profile = ({ username }: Props) => {
         setIsLoaded(true);
         setProfile(result);
       } catch (error) {
+        console.log(error)
         setIsLoaded(true);
         setError(error);
       }
@@ -52,7 +54,7 @@ const Profile = ({ username }: Props) => {
     } else {
       fetchData();
     }
-  }, [token, username, navigate]);
+  }, [token.access_token, username]);
 
   // This needs to be updated to use the API.
   // Handle the launching of a game
@@ -62,13 +64,20 @@ const Profile = ({ username }: Props) => {
   // This needs to be updated to use the API.
   // Handle the adding of a friend
   const handleAddFriend = async () => {
-    //try {
-    //  // Call the API to add the user as a friend
-    //  await fetch(`http://localhost:3001/user/add-friend/${profile.id}`, { method: 'POST', headers: { 'Authorization': auth } });
-    //  console.log("Friend added successfully");
-    //} catch (error) {
-    //  console.error("Error adding friend:", error);
-    //}
+    try {
+     // Call the API to add the user as a friend
+     const res = await fetch(`http://localhost:3001/friends/send/request`, { method: 'POST', headers: {
+      'Authorization': auth,
+      'Content-Type': 'application/json',
+      },
+      body:JSON.stringify({username})});
+      if (res.ok)
+        alert("Friends request sent");
+      else if (res.status == 400)
+        alert("You are already friends with this player, or already sent a request")
+    } catch (error) {
+     console.error("Error sending friend request:", error);
+    }
   };
 
   // This needs to be updated to use the API.
@@ -94,9 +103,10 @@ const Profile = ({ username }: Props) => {
         <div className='flex justify-evenly'>
           <div className='bg-violet-900 rounded-lg w-[800px] m-5'>
             <div className='flex justify-evenly items-center p-4'>
-            <DisplayAvatar data={profile}/>
+            <DisplayAvatar avatar={profile.avatar}/>
               <div className='text-center p-3'>
-                <h2 className='text-white text-3xl underline'>{profile.firstname} TITLE</h2>
+                <h2 className='text-white text-3xl underline'>{profile.username}</h2>
+                <h2 className='text-white text-2xl underline'>{profile.firstname} {profile.lastname}</h2>
                 {username && (
                   <div className="flex justify-center space-x-4 my-4">
                     <button

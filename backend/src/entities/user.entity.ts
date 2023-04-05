@@ -9,7 +9,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Conversation } from './conversation.entity';
+import { ChatRoom } from './chatroom.entity';
 import { Message } from './message.entity';
 
 @Entity({ name: 'users' })
@@ -17,10 +17,10 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
-  username: string;
+  @Column({ unique: true, nullable: true})
+  loginName: string;
 
-  @Column()
+  @Column({ nullable: true })
   wordpass: string;
 
   @Column({nullable: true})
@@ -36,21 +36,10 @@ export class User {
   @JoinColumn({ name: 'profileid' })
   profile: Profile;
 
-  @ManyToMany(() => Conversation, (conversation) => conversation.participants)
-  @JoinTable({
-    name: 'conversation_participants',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'conversation_id',
-      referencedColumnName: 'id',
-    },
-  })
-  conversations: Conversation[];
+  @ManyToMany(() => ChatRoom, (chatroom) => chatroom.participants)
+  chatrooms: ChatRoom[];
 
-  @OneToMany(() => Message, (message) => message.sender)
+  @OneToMany(() => Message, (message) => message.user)
   messages: Message[];
 }
 

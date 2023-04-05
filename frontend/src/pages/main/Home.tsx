@@ -6,7 +6,7 @@ import Error from '../../components/utils/Error'
 import Loading from '../../components/utils/Loading'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import Cookies from 'js-cookie';
+import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
 
 type Props = {}
 
@@ -21,15 +21,14 @@ const Home = (props: Props) => {
   const [user, setUser] = useState([]);
   // Navigation
   const navigate = useNavigate();
-  // Cookies and auth
-  const token = Cookies.get("access_token");
-  const auth = 'Bearer ' + token;
 
   // Fetch user data and handles loading and error.
   useEffect(() => {
-    if (!token) // '!'token
+    if (!isSessionTokenSet()) // '!'token
       navigate('/');
     else {
+      const token = getSessionsToken()
+      const auth = 'Bearer ' + token.access_token;
       fetch('http://localhost:3001/user/id/', {method: 'GET', headers: {'Authorization': auth}})
         .then(res => res.json())
         .then(
@@ -43,7 +42,7 @@ const Home = (props: Props) => {
           }
         )
     }
-  }, [token, navigate])
+  }, [])
 
 
   if (error) // error

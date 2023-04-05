@@ -1,28 +1,36 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from './user.entity';
-import { Conversation } from './conversation.entity';
+import { ChatRoom } from './chatroom.entity';
 
 @Entity('message')
 export class Message {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  conversationId: number;
-
-  @Column()
-  senderId: number;
-
-  @Column()
+  @Column({ type: 'text' })
   content: string;
 
+  @Column()
+  chatroom_id: number;
+
+  @ManyToOne(() => ChatRoom, (chatroom) => chatroom.messages)
+  @JoinColumn({ name: 'chatroom_id' })
+  chatroom: ChatRoom;
+
+  @Column()
+  user_id: number;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
   @CreateDateColumn()
-  createdAt: Date;
-
-  @ManyToOne(() => User, user => user.messages)
-  @JoinColumn({ name: 'senderId' })
-  sender: User;
-
-  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
-  conversation: Conversation;
+  created_at: Date;
 }

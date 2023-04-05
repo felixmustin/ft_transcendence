@@ -1,14 +1,14 @@
 import React from 'react'
 import loginImg from '../../assets/login.jpg'
-import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import UserInfo from '../../components/authentication/UserInfo';
+import { tokenForm } from '../../sessionsUtils';
 
 type Props = {}
 
 interface FormValues {
-  username: string;
+  loginName: string;
   wordpass: string;
 }
 
@@ -16,12 +16,12 @@ const Signup = (props: Props) => {
 
   // Initializing the values and preparing the functions to handle the form
   const [formValues, setFormValues] = useState<FormValues>({
-    username: '',
+    loginName: '',
     wordpass: '',
   });
 
   const [isAuthenticated, setAuthentication] = useState(false);
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState<tokenForm>();
 
   // User for navigation
   const navigate = useNavigate();
@@ -53,17 +53,17 @@ const Signup = (props: Props) => {
     }).then(res => res.json()
     ).then(response => {
         if (response.statusCode >= 400) {
-          alert("Creation failed");
+          alert(response.message);
         } else {
           setAuthentication(true)
-          setToken(response.token.access_token)
+          setToken(response.token)
         }
       });
   };
 
 
   if (isAuthenticated)
-    return <UserInfo item={{token: token}}/>
+    return <UserInfo item={token}/>
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
     <div className='hidden sm:block'>
@@ -73,9 +73,9 @@ const Signup = (props: Props) => {
       <form className='max-w-[400px] w-full mx-auto bg-gray-900 p-8 px-8 rounded-lg shadow-lg shadow-slate-900/30' onSubmit={handleSubmit}>
         <h2 className='text-4xl dark:text-white font-bold text-center'>SIGN UP</h2>
         <div className='flex flex-col text-gray-400 py-2'>
-          <label>Username</label>
+          <label>Login</label>
           <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-            type='text' name='username' value={formValues.username} required onChange={handleInputChange}/>
+            type='text' name='loginName' value={formValues.loginName} required onChange={handleInputChange}/>
         </div>
         <div className='flex flex-col text-gray-400 py-2'>
           <label>Password</label>
@@ -83,11 +83,16 @@ const Signup = (props: Props) => {
             type='password' name='wordpass' value={formValues.wordpass} minLength={8} required onChange={handleInputChange}/>
         </div>
         <button className='w-full my-3 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' type='submit'>Sign Up</button>
-        <button className='w-full my-3 py-2 bg-gradient-to-tl from-white via-slate-900 to-white shadow-lg shadow-slate-900/30 hover:shadow-white/30 text-white font-semibold rounded-lg' type='submit'>Sign Up with 42</button>
-        <div className='text-white py-2'>
-          <p className="text-center">Already have an account?</p>
+        
+        <div className='mt-8 text-white py-2'>
+            <p className="text-center">Already have an account?</p>
         </div>
-        <button className='w-full my-3 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={gotoLoginPage}>Login</button>
+        <div className='flex justify-between'>
+        <div className="w-1/2 my-3 py-2 bg-gradient-to-tl from-white via-slate-900 to-white shadow-lg shadow-slate-900/30 hover:shadow-white/30 text-white font-semibold rounded-lg text-center mr-4">
+            <a href="http://localhost:3001/auth/42/login">Sign In with 42</a>
+          </div>
+          <button className='w-1/2 my-3 py-2 bg-gradient-to-tl from-white via-slate-900 to-white shadow-lg shadow-slate-900/30 hover:shadow-white/30 text-white font-semibold rounded-lg text-center' onClick={gotoLoginPage}>Login</button>
+        </div>
       </form>
     </div>
   </div>

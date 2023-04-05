@@ -1,13 +1,11 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import { useState, useEffect } from 'react';
 import loginImg from '../../assets/login.jpg'
+import { setSessionToken, tokenForm } from '../../sessionsUtils';
 
 type Props = {
-  item: {
-    token: string
-  };
+  item: tokenForm
 }
 
 interface FormValues {
@@ -25,14 +23,14 @@ const UserInfo = (props: Props) => {
     lastname: '',
     age: 0,
   });
-  const navigate = useNavigate();
 
-  const auth = 'Bearer ' + props.item.token;
+  const navigate = useNavigate();
+  const auth = 'Bearer ' + props.item.access_token;
 
   useEffect(() => {
-    if (!props.item.token)
+    if (!props.item)
       navigate('/');
-    }, [props.item.token, navigate])
+    }, [props.item])
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = event.target;
@@ -51,13 +49,13 @@ const UserInfo = (props: Props) => {
         body: JSON.stringify(formValues),
       }).then(response => {
           if (response.ok) {
-            Cookies.set('access_token', props.item.token)
+            setSessionToken(props.item)
             navigate('/home');
           } else {
             alert('Creation failed');
           }
         }).catch(error => {
-            alert('Creation failed');
+            alert('Creation failed ' + error);
           });
     };
 

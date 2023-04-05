@@ -1,7 +1,7 @@
-import Cookies from 'js-cookie';
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Home from '../../pages/main/Home';
+import { setSessionToken, tokenForm } from '../../sessionsUtils';
 
 
 interface FormValues {
@@ -9,9 +9,7 @@ interface FormValues {
   }
 
   type Props = {
-  item: {
-    token: string;
-  };
+  item: tokenForm
 }
   
 const TwoFactorAuthentication = (props: Props) => {
@@ -20,7 +18,7 @@ const TwoFactorAuthentication = (props: Props) => {
     const [formValues, setFormValues] = useState<FormValues>({code:''});
     const [imageUrl, setImageUrl] = useState('');
   
-    const auth = 'Bearer ' + props.item.token;
+    const auth = 'Bearer ' + props.item.access_token;
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = event.target;
@@ -45,7 +43,7 @@ const TwoFactorAuthentication = (props: Props) => {
         alert(response.message);
         }
       else {
-        Cookies.set('access_token', props.item.token)
+        setSessionToken(props.item)
         navigate('/home');
       } 
       });

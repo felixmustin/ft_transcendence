@@ -1,8 +1,6 @@
 COMPOSE = ./docker-compose.yml
 VOLUME_FOLDER= /Users/$(USER)/docker_volume
 
-
-
 all : $(VOLUME_FOLDER)
 	@echo "Starting all containers..."
 	@docker compose -f $(COMPOSE) up -d
@@ -56,9 +54,7 @@ re-back:
 	docker rmi trans-backend
 	make all
 
-re-full: refront reback
-
-re: clean all
+re: down clean all
 
 delete-db:
 	@echo deleting database

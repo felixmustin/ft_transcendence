@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 
-type Props = {}
+type Props = {
+  roomId: number;
+}
 
-const SendMessage = (props: Props) => {
+const SendMessage = ({ roomId }: Props) => {
 
   const [message, setMessage] = useState<string>('');
 

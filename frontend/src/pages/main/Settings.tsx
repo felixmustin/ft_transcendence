@@ -3,7 +3,6 @@ import Navbar from '../../components/design/Navbar'
 import loginImg from '../../assets/login.jpg'
 import Setting2FA from '../../components/settings/Setting2FA'
 import SettingProfile from '../../components/settings/SettingProfile'
-import Cookies from 'js-cookie'
 
 type Props = {}
 

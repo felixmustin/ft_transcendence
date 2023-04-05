@@ -1,6 +1,6 @@
-import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { getSessionsToken } from '../../sessionsUtils';
 import DisplayAvatar from '../utils/DisplayAvatar';
 
 
@@ -13,8 +13,8 @@ const SettingProfile = () => {
     
     const navigate = useNavigate();
 
-    const token = Cookies.get("access_token");
-    const auth = 'Bearer ' + token;
+    const token = getSessionsToken()
+    const auth = 'Bearer ' + token.access_token;
 
     useEffect(() => {
         fetch('http://localhost:3001/user/profile', {method: 'GET', headers: {'Authorization': auth}})
@@ -73,7 +73,7 @@ const SettingProfile = () => {
     } else {
           return (
                <div>
-                <DisplayAvatar data={profile}/>
+                <DisplayAvatar avatar={profile.avatar}/>
                 <label
                   htmlFor='avatar'
                   className="relative inset-0 cursor-pointer">

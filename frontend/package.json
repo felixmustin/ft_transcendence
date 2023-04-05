@@ -12,6 +12,7 @@
     "@heroicons/react": "^2.0.16",
     "axios": "^1.3.4",
     "buffer": "^6.0.3",
+    "esbuild": "^0.17.14",
     "framer-motion": "^10.2.3",
     "js-cookie": "^3.0.1",
     "react": "^18.2.0",

@@ -1,10 +1,12 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
-// import { Avatar } from './avatar.entity';
 
 @Entity({name: "user_profiles"})
 export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  username: string;
 
   @Column()
   email: string;

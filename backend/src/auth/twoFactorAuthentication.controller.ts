@@ -42,13 +42,29 @@ import { TwoFactorAuthenticationCodeDto } from './dto/twoFactorAuthenticationCod
         @Req() request,
         @Body() body: TwoFactorAuthenticationCodeDto
     ) {
+        const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+            body.code, request.user.id
+        );   
+        if (!isCodeValid) {
+          throw new UnauthorizedException('Wrong authentication code');
+        }
+        await this.userService.turnOn2FA(request.user.id);
+    }
+
+    @Post('turn-off')
+    @HttpCode(200)
+    @UseGuards(JwtAuthGuard)
+    async turnOffTwoFactorAuthentication(
+        @Req() request,
+        @Body() body: TwoFactorAuthenticationCodeDto
+    ) {
         const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
             body.code, request.user.id
         );
         if (!isCodeValid) {
         throw new UnauthorizedException('Wrong authentication code');
         }
-        await this.userService.turnOn2FA(request.user.id);
+        await this.userService.turnOff2FA(request.user.id);
     }
 
     @Post('authenticate')
@@ -58,6 +74,8 @@ import { TwoFactorAuthenticationCodeDto } from './dto/twoFactorAuthenticationCod
         @Req() request,
         @Body() body: TwoFactorAuthenticationCodeDto
     ) {
+        if (!body.code)
+          throw new UnauthorizedException('Wrong authentication code');
         const isCodeValid = await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
           body.code, request.user.id
         );
