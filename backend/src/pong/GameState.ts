@@ -39,12 +39,12 @@ export class GameState{
 	reset(){
 		this.paddleleftposition = 160;
 		this.paddlerightposition = 160;
-		this.ballpositionx = 290;
-		this.ballpositiony = 190;
+		// this.ballpositionx = 290;
+		// this.ballpositiony = 190;
 		this.nextballpositionx = 300;
 		this.nextballpositiony = 200;
-		this.ballspeedx = 10;
-		this.ballspeedy = 10;
+		this.ballspeedx = 5;
+		this.ballspeedy = 5;
 		this.boardWidth = 600;
 		this.boardHeight = 400;
 		this.ballRadius = 10;
@@ -197,6 +197,6 @@ export class GameState{
 
 	reset_speed(){
 		this.ballspeedx = 5;
-		this.ballpositiony = 5;
+		this.ballspeedy = 5;
 	}
 }

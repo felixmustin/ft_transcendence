@@ -65,7 +65,7 @@ class Game_Board extends Component<Game_BoardProps> {
 	<div className="game-board">
 		<Left_Paddle PaddleY={leftPaddleY} />
         <Right_Paddle PaddleY={rightPaddleY} />
-        <Ball {...ballPosition} />
+        <Ball {...nextballPosition} />
 	</div>
   );}
 }
@@ -134,15 +134,16 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 	}
 	componentDidMount(): void {
+		console.log('in room : ' + this.props.roomID);
 		document.addEventListener("keydown", this.handleKeyDown);
-    	this.props.socket.on('updateState', (data: string) => {
-    		const position: GameState = JSON.parse(data);
+    	this.props.socket.on('updateState', (data: GameState) => {
+    		// const position: GameState = JSON.parse(data);
     		this.setState({
-    		leftPaddleY: position.leftPaddleY,
-    		rightPaddleY: position.rightPaddleY,
-    		ballPosition: this.state.nextballPosition,
-			nextballPosition: position.ballPosition, 
-			play: position.play
+    		leftPaddleY: data.leftPaddleY,
+    		rightPaddleY: data.rightPaddleY,
+    		ballPosition: data.ballPosition,
+			nextballPosition: data.nextballPosition, 
+			play: data.play
     		});
     	});
 		this.props.socket.on('score', (data: string) => {
@@ -227,8 +228,9 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 					<div className="game-board-container">
 						<div className="game-board">
 							<Game_Board {...this.state}/>
+						</div>
 					</div>
-				</div>
+					<div>press 'c' to play or 'v' to pause<br />press 'w' to go up and 's' to go down</div>
 			</div>
 		</div>
 		);

@@ -16,8 +16,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("user connected");
 	}
 	handleDisconnect(client: any) {
-		console.log('user disconnected');
-	}	
+		for (const [key, room] of this.maproom.entries()){
+			client.leave(key);
+			room.disconnect(client.id);
+		}
+		for (const [key, room] of this.privateroom.entries()){
+			client.leave(key);
+			room.disconnect(client.id);
+		}
+	}
+	  
 	afterInit(server: any) {
 		console.log("websocket initialized");
 	}
