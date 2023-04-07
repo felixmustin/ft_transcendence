@@ -128,4 +128,19 @@ export class UserService {
     return await this.userProfileRepository.remove(userProfile)//await this.userRepository.remove(user);
   }
 
+  async updateUsername(id: number, newUsername: string): Promise<Profile> {
+    const alreadyProfile = await this.findUserProfileByUsername(newUsername);
+    if (alreadyProfile)
+      throw new BadRequestException('Username already in use');
+
+    const userProfile = await this.findUserProfileById(id)
+    userProfile.username = newUsername;
+    const user = await this.updateUserProfile(id,userProfile)
+    if (!user.user42id)
+    {
+      user.loginName = newUsername;
+      await this.userRepository.save(user);
+    }
+    return (userProfile)
+  }
 }

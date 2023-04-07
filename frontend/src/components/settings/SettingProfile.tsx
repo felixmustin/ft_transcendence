@@ -10,7 +10,9 @@ const SettingProfile = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [profile, setProfile] = useState([]);
     const [updatedProfile, setUpdatedProfile] = useState(null);
-    
+    const [newUsername, setNewUsername] = useState('');
+    const [editable, setEditable] = useState(false);
+
     const navigate = useNavigate();
 
     const token = getSessionsToken()
@@ -65,6 +67,31 @@ const SettingProfile = () => {
         }
     }, [updatedProfile])
 
+    function handleUpdateUsername() {
+      if (!newUsername) {
+          return;
+      }
+
+      fetch('http://localhost:3001/user/update/username', {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': auth
+          },
+          body: JSON.stringify({
+              username: newUsername
+          })
+      })
+      .then(res => res.json())
+      .then((result) => {
+          console.log(result);
+          setProfile(prevProfile => ({...prevProfile, username: newUsername}));
+          setEditable(false);
+      })
+      .catch((error) => {
+          console.error('Error updating username:', error);
+      });
+  }
 
     if (error) {
         return <div>Error: {error.message}</div>;
@@ -73,6 +100,29 @@ const SettingProfile = () => {
     } else {
           return (
                <div>
+
+                  <div className='text-center mx-auto'>
+                    <h1>
+                      {editable ?
+                        <input 
+                          type="text" 
+                          value={newUsername} 
+                          onChange={e => setNewUsername(e.target.value)} 
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                handleUpdateUsername();
+                            }
+                          }}
+                          onBlur={() => setEditable(false)}
+                        /> :
+                        <>
+                          {profile.username}
+                          <button onClick={() => setEditable(true)}>Edit</button>
+                        </>
+                      }
+                    </h1>
+                 </div>
+
                 <DisplayAvatar avatar={profile.avatar}/>
                 <label
                   htmlFor='avatar'

@@ -44,15 +44,17 @@ export class UserController {
   }
 
   @Get('user/:username')
+  @UseGuards(JwtAuthGuard)
   async getUserByUsername(@Param('username') username: string) {
     const user = await this.userService.findUserByUsername(username);
     return user;
   }
 
-  // @Patch('users/:id/profile')
-  // public async updateUser( @Param() param, @Body() body) {
-  //     const users = await this.userServices.update(param.ID, body);
-  // }s
+  @Put('update/username')
+  @UseGuards(JwtAuthGuard)
+  public async updateUsername(@Req() req, @Body() body) {
+    return await this.userService.updateUsername(req.user.id, body.username);
+  }
 
   // @Patch('users/:id/profile')
   // public async updateUserProfile( @Param() param, @Body() body) {

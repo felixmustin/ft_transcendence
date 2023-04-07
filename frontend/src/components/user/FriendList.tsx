@@ -64,15 +64,17 @@ const FriendList = (props: Props) => {
   else {
     return (
       <div>
-        <div className='bg-violet-700 rounded-lg p-2 m-2'>
-        Friends requests
+        <div className='w-1/4 text-center bg-violet-700 rounded-lg p-2 m-2'>
+          New requests
         </div>
         <div className='bg-violet-700 rounded-lg p-2 m-2'>
           {Object.entries(requestList).map(([key, request]) => (
                 <SocialDataRequest key={key} request={request} />
             ))}
         </div>
-
+        <div className='w-1/4 text-center bg-violet-700 rounded-lg p-2 m-2'>
+          Friends
+        </div>
         <div className='bg-violet-700 rounded-lg p-2 m-2'>
             {Object.entries(friends).map(([key, profile]) => (
                 <SocialDataFriends key={key} profile={profile} />
