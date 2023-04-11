@@ -150,4 +150,18 @@ export class UserService {
     await this.updateUserProfile(id,userProfile)
     return (userProfile)
   }
+
+  async updateFirstname(id: number, newFirstname: string): Promise<Profile> {
+    const userProfile = await this.findUserProfileById(id)
+    userProfile.firstname = newFirstname;
+    await this.updateUserProfile(id,userProfile)
+    return (userProfile)
+  }
+
+  async updateLastname(id: number, newLastname: string): Promise<Profile> {
+    const userProfile = await this.findUserProfileById(id)
+    userProfile.lastname = newLastname;
+    await this.updateUserProfile(id,userProfile)
+    return (userProfile)
+  }
 }

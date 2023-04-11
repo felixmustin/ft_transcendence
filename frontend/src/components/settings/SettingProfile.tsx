@@ -179,8 +179,7 @@ const SettingProfile = () => {
                <div>
 
                   <div className='mx-auto'>
-                    <h1> Username : </h1>
-                    <h1>
+                    <h1> Username :
                       {editUsername ?
                         <input type="text" 
                           value={newUsername} 
@@ -201,8 +200,7 @@ const SettingProfile = () => {
                   </div>
 
                   <div className='mx-auto'>
-                    <h1> Email : </h1>
-                    <h1>
+                    <h1> Email :
                       {editEmail ?
                         <input type="text" 
                           value={newEmail} 
@@ -223,8 +221,7 @@ const SettingProfile = () => {
                  </div>
 
                  <div className='mx-auto'>
-                    <h1> Firstname : </h1>
-                    <h1>
+                    <h1> Firstname :
                       {editFirstname ?
                         <input type="text" 
                           value={newFirstname} 
@@ -245,8 +242,7 @@ const SettingProfile = () => {
                   </div>
 
                   <div className='mx-auto'>
-                    <h1> Lastname : </h1>
-                    <h1>
+                    <h1> Lastname :
                       {editLastname ?
                         <input type="text" 
                           value={newLastname} 

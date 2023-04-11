@@ -65,13 +65,13 @@ export class UserController {
   @Put('update/firstname')
   @UseGuards(JwtAuthGuard)
   public async updateFirstname(@Req() req, @Body() body) {
-    return await this.userService.updateEmail(req.user.id, body.email);
+    return await this.userService.updateFirstname(req.user.id, body.firstname);
   }
 
   @Put('update/lastname')
   @UseGuards(JwtAuthGuard)
   public async updateLastname(@Req() req, @Body() body) {
-    return await this.userService.updateEmail(req.user.id, body.email);
+    return await this.userService.updateLastname(req.user.id, body.lastname);
   }
 
   // @Patch('users/:id/profile')
