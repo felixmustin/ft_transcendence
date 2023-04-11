@@ -143,4 +143,11 @@ export class UserService {
     }
     return (userProfile)
   }
+
+  async updateEmail(id: number, newEmail: string): Promise<Profile> {
+    const userProfile = await this.findUserProfileById(id)
+    userProfile.email = newEmail;
+    await this.updateUserProfile(id,userProfile)
+    return (userProfile)
+  }
 }

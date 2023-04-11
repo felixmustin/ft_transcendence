@@ -28,8 +28,8 @@ const FriendList = (props: Props) => {
                 const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
                 const result = await res.json();
         
-                console.log(result)
-                setFriends(result);
+                if (res.ok)
+                  setFriends(result);
               } catch (error) {
                 setError(error);
               }
@@ -41,10 +41,7 @@ const FriendList = (props: Props) => {
                 const result = await res.json();
                 
                 if (res.ok)
-                {
-                  console.log(result)
                   setRequestList(result);
-                }
               } catch (error) {
                 setError(error);
               }
@@ -67,11 +64,11 @@ const FriendList = (props: Props) => {
         <div className='w-1/4 text-center bg-violet-700 rounded-lg p-2 m-2'>
           New requests
         </div>
-        <div className='bg-violet-700 rounded-lg p-2 m-2'>
-          {Object.entries(requestList).map(([key, request]) => (
-                <SocialDataRequest key={key} request={request} />
-            ))}
-        </div>
+          <div className='bg-violet-700 rounded-lg p-2 m-2'>
+            {Object.entries(requestList).map(([key, request]) => (
+                  <SocialDataRequest key={key} request={request} />
+              ))}
+          </div>
         <div className='w-1/4 text-center bg-violet-700 rounded-lg p-2 m-2'>
           Friends
         </div>
@@ -79,7 +76,6 @@ const FriendList = (props: Props) => {
             {Object.entries(friends).map(([key, profile]) => (
                 <SocialDataFriends key={key} profile={profile} />
             ))}
-
         </div>
       </div>
     )

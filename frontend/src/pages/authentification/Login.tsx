@@ -60,7 +60,6 @@ const Login = (props: Props) => {
         alert(response.message);
         }
       else {
-        console.log(response.token)
         if (response.token.twoFaEnabled)
         {
           setIsTwoAuthentication(true)

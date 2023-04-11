@@ -10,8 +10,15 @@ const SettingProfile = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [profile, setProfile] = useState([]);
     const [updatedProfile, setUpdatedProfile] = useState(null);
+
     const [newUsername, setNewUsername] = useState('');
-    const [editable, setEditable] = useState(false);
+    const [editUsername, setEditUsername] = useState(false);
+    const [newEmail, setNewEmail] = useState('');
+    const [editEmail, setEditEmail] = useState(false);
+    const [newFirstname, setNewFirstname] = useState('');
+    const [editFirstname, setEditFirstname] = useState(false);
+    const [newLastname, setNewLastname] = useState('');
+    const [editLastname, setEditLastname] = useState(false);
 
     const navigate = useNavigate();
 
@@ -68,10 +75,8 @@ const SettingProfile = () => {
     }, [updatedProfile])
 
     function handleUpdateUsername() {
-      if (!newUsername) {
+      if (!newUsername)
           return;
-      }
-
       fetch('http://localhost:3001/user/update/username', {
           method: 'PUT',
           headers: {
@@ -86,11 +91,83 @@ const SettingProfile = () => {
       .then((result) => {
           console.log(result);
           setProfile(prevProfile => ({...prevProfile, username: newUsername}));
-          setEditable(false);
+          setEditUsername(false);
       })
       .catch((error) => {
           console.error('Error updating username:', error);
       });
+    }
+
+  function handleUpdateEmail() {
+    if (!newEmail)
+        return;
+    fetch('http://localhost:3001/user/update/email', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': auth
+        },
+        body: JSON.stringify({
+            email: newEmail
+        })
+    })
+    .then(res => res.json())
+    .then((result) => {
+        console.log(result);
+        setProfile(prevProfile => ({...prevProfile, email: newEmail}));
+        setEditEmail(false);
+    })
+    .catch((error) => {
+        console.error('Error updating email:', error);
+    });
+  }
+
+  function handleUpdateFirstname() {
+    if (!newFirstname)
+        return;
+    fetch('http://localhost:3001/user/update/firstname', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': auth
+        },
+        body: JSON.stringify({
+            firstname: newFirstname
+        })
+    })
+    .then(res => res.json())
+    .then((result) => {
+        console.log(result);
+        setProfile(prevProfile => ({...prevProfile, firstname: newFirstname}));
+        setEditFirstname(false);
+    })
+    .catch((error) => {
+        console.error('Error updating firstname:', error);
+    });
+  }
+
+  function handleUpdateLastname() {
+    if (!newLastname)
+        return;
+    fetch('http://localhost:3001/user/update/lastname', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': auth
+        },
+        body: JSON.stringify({
+            lastname: newLastname
+        })
+    })
+    .then(res => res.json())
+    .then((result) => {
+        console.log(result);
+        setProfile(prevProfile => ({...prevProfile, lastname: newLastname}));
+        setEditLastname(false);
+    })
+    .catch((error) => {
+        console.error('Error updating lastname:', error);
+    });
   }
 
     if (error) {
@@ -101,11 +178,11 @@ const SettingProfile = () => {
           return (
                <div>
 
-                  <div className='text-center mx-auto'>
+                  <div className='mx-auto'>
+                    <h1> Username : </h1>
                     <h1>
-                      {editable ?
-                        <input 
-                          type="text" 
+                      {editUsername ?
+                        <input type="text" 
                           value={newUsername} 
                           onChange={e => setNewUsername(e.target.value)} 
                           onKeyDown={e => {
@@ -113,15 +190,81 @@ const SettingProfile = () => {
                                 handleUpdateUsername();
                             }
                           }}
-                          onBlur={() => setEditable(false)}
+                          onBlur={() => setEditUsername(false)}
                         /> :
                         <>
                           {profile.username}
-                          <button onClick={() => setEditable(true)}>Edit</button>
+                          <button onClick={() => setEditUsername(true)}>Edit</button>
+                        </>
+                      }
+                    </h1>
+                  </div>
+
+                  <div className='mx-auto'>
+                    <h1> Email : </h1>
+                    <h1>
+                      {editEmail ?
+                        <input type="text" 
+                          value={newEmail} 
+                          onChange={e => setNewEmail(e.target.value)} 
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                handleUpdateEmail();
+                            }
+                          }}
+                          onBlur={() => setEditEmail(false)}
+                        /> :
+                        <>
+                          {profile.email}
+                          <button onClick={() => setEditEmail(true)}>Edit</button>
                         </>
                       }
                     </h1>
                  </div>
+
+                 <div className='mx-auto'>
+                    <h1> Firstname : </h1>
+                    <h1>
+                      {editFirstname ?
+                        <input type="text" 
+                          value={newFirstname} 
+                          onChange={e => setNewFirstname(e.target.value)} 
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                handleUpdateFirstname();
+                            }
+                          }}
+                          onBlur={() => setEditFirstname(false)}
+                        /> :
+                        <>
+                          {profile.firstname}
+                          <button onClick={() => setEditFirstname(true)}>Edit</button>
+                        </>
+                      }
+                    </h1>
+                  </div>
+
+                  <div className='mx-auto'>
+                    <h1> Lastname : </h1>
+                    <h1>
+                      {editLastname ?
+                        <input type="text" 
+                          value={newLastname} 
+                          onChange={e => setNewLastname(e.target.value)} 
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                handleUpdateLastname();
+                            }
+                          }}
+                          onBlur={() => setEditLastname(false)}
+                        /> :
+                        <>
+                          {profile.lastname}
+                          <button onClick={() => setEditLastname(true)}>Edit</button>
+                        </>
+                      }
+                    </h1>
+                  </div>
 
                 <DisplayAvatar avatar={profile.avatar}/>
                 <label
