@@ -105,7 +105,7 @@ export class GameState{
 	}
 
 	quicker(){
-		if (this.ballspeedx <= this.ballspeedy){
+		if (this.ballspeedx >= this.ballspeedy){
 			this.ballspeedx++;
 		}
 		else{
@@ -140,7 +140,7 @@ export class GameState{
 	}
 
 	bounce_left(): boolean {
-		if (this.nextballpositionx < this.paddlespace + this.paddlewidth && this.nextballpositionx > this.paddlespace && this.nextballpositiony > this.paddleleftposition && this.nextballpositiony < this.paddleleftposition + this.paddleheight){
+		if (this.nextballpositionx < this.paddlespace + this.paddlewidth && this.nextballpositionx > this.paddlespace && this.nextballpositiony + (this.ballRadius * 2) > this.paddleleftposition && this.nextballpositiony < this.paddleleftposition + this.paddleheight){
 			this.quicker();
 			if (this.nextballpositionx < this.paddlerightposition + this.paddlezone){
 				this.more_upward();
@@ -158,11 +158,11 @@ export class GameState{
 				this.more_downward();
 				this.more_downward();
 			}
-			console.log('return true ');
+			// console.log('return true ');
 			return true;
 		}
 		else{
-			console.log('return false ');
+			// console.log('return false ');
 			return false;
 		}
 	}

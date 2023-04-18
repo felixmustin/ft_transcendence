@@ -14,6 +14,7 @@ export class Room {
 	score2: number;
 	idp1: string;
 	idp2: string;
+	idspect: string[];
 	room_complete: Function;
   
 	constructor(id: string, server: Server) {
@@ -40,21 +41,25 @@ export class Room {
 			this.room_complete();
 		}
 		else {
-			console.log('error connect room');
+			this.idspect.push(id);
 		}
 	}
 
 	disconnect(id: string){
-		if (id == this.idp1){
-			console.log('user : ' + this.idp1 + " disconnected from room : " + this.id);
+		if (id === this.idp1){
+			console.log('user : ' + id + " disconnected from room : " + this.id);
 			this.reset_game();
 			this.idp1 = '';
 			this.players--;
 		}
-		else if (id == this.idp2){
-			console.log('user : ' + this.idp2 + " disconnected from room : " + this.id);
+		else if (id === this.idp2){
+			console.log('user : ' + id + " disconnected from room : " + this.id);
 			this.reset_game();
 			this.idp2 = '';
+			this.players--;
+		}
+		else if (this.idspect.includes(id)){
+			console.log('user : ' + id + " disconnected from room : " + this.id);
 			this.players--;
 		}
 	}
