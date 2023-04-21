@@ -66,4 +66,13 @@ export class AuthController {
     return profile;
   }
 
+  @Post('refresh-token')
+  async refreshAccessToken(@Body() body) {
+    const refreshToken = body.refreshToken
+    if (!refreshToken) {
+        throw new UnauthorizedException('Refresh token not found');
+    }
+    const token = await this.authService.verifyRefreshToken(refreshToken);
+    return ( token );
+}
 }

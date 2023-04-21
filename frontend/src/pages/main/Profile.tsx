@@ -8,11 +8,11 @@ import Loading from '../../components/utils/Loading'
 import Error from '../../components/utils/Error'
 import DisplayAvatar from '../../components/utils/DisplayAvatar'
 import { getSessionsToken } from '../../sessionsUtils'
+import { tokenForm } from '../../interfaceUtils'
 
 type Props = {
   username?: string;
 }
-
 
 const Profile = ({ username }: Props) => {
   // Error management
@@ -21,18 +21,29 @@ const Profile = ({ username }: Props) => {
   const [isLoaded, setIsLoaded] = useState(false);
   // User data retrieved from the API
   const [profile, setProfile] = useState([]);
+  const [token, setToken] = useState<tokenForm>();
+  const [isTokenSet, setIsTokenSet] = useState(false);
+
 
   // Navigation
   const navigate = useNavigate();
   // Session and auth
-  const token = getSessionsToken()
-  const auth = 'Bearer ' + token.access_token;
+  useEffect(() => {
+    async function getToken() {
+      const sessionToken = await getSessionsToken();
+      setToken(sessionToken);
+      setIsTokenSet(true)
+    }
+    getToken();
+  }, []);
+
 
   // Fetch user data and handles loading and error.
   // Depending on if the user asked for another user's profile or his own,
   // the API will return different data.
   useEffect(() => {
     const fetchData = async () => {
+      const auth = 'Bearer ' + token.accessToken;
       const url = username
         ? `http://localhost:3001/user/profile/${username}`
         : 'http://localhost:3001/user/profile';
@@ -40,21 +51,26 @@ const Profile = ({ username }: Props) => {
       try {
         const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
         const result = await res.json();
-        setIsLoaded(true);
-        setProfile(result);
+        if (result.statusCode === 401)
+              navigate('/');
+        else {
+          setIsLoaded(true);
+          setProfile(result);
+        }
       } catch (error) {
-        console.log(error)
         setIsLoaded(true);
         setError(error);
       }
     };
 
-    if (!token) {
-      navigate('/');
-    } else {
-      fetchData();
+    if (isTokenSet) {
+      if (!token) {
+        navigate('/');
+      } else {
+        fetchData();
+      }
     }
-  }, [token.access_token, username]);
+  }, [isTokenSet, username]);
 
   // This needs to be updated to use the API.
   // Handle the launching of a game
@@ -65,6 +81,7 @@ const Profile = ({ username }: Props) => {
   // Handle the adding of a friend
   const handleAddFriend = async () => {
     try {
+      const auth = 'Bearer ' + token.accessToken;
      // Call the API to add the user as a friend
      const res = await fetch(`http://localhost:3001/friends/send/request`, { method: 'POST', headers: {
       'Authorization': auth,

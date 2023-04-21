@@ -15,7 +15,7 @@ import { TwoFactorAuthenticationService } from './twoFactorAuthentication.servic
 @Module({
   imports: [UserModule, PassportModule, TypeOrmModule.forFeature([User]), JwtModule.register({
     secret: jwtConstants.secret,
-    signOptions: { expiresIn: '20m' },
+    signOptions: { expiresIn: '15m' },
   }),],
   controllers: [AuthController, TwoFactorAuthenticationController],
   providers: [AuthService, JwtStrategy, FortyTwoStrategy, TwoFactorAuthenticationService],

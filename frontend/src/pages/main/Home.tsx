@@ -8,9 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
 
-type Props = {}
-
-const Home = (props: Props) => {
+const Home = () => {
 
   console.log('hello home');
   // Error management
@@ -27,20 +25,28 @@ const Home = (props: Props) => {
     if (!isSessionTokenSet()) // '!'token
       navigate('/');
     else {
-      const token = getSessionsToken()
-      const auth = 'Bearer ' + token.access_token;
+      async function fetchReq(){
+      const token = await getSessionsToken()
+      const auth = 'Bearer ' + token.accessToken;
       fetch('http://localhost:3001/user/id/', {method: 'GET', headers: {'Authorization': auth}})
         .then(res => res.json())
         .then(
+          
           (result) => {
-            setIsLoaded(true);
-            setUser(result);
+            if (result.statusCode === 401)
+              navigate('/');
+            else {
+              setIsLoaded(true);
+              setUser(result);
+            }
           },
           (error) => {
             setIsLoaded(true);
             setError(error);
           }
         )
+      }
+      fetchReq()
     }
   }, [])
 

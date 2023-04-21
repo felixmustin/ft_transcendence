@@ -3,8 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { getSessionsToken } from '../../sessionsUtils';
 import DisplayAvatar from '../utils/DisplayAvatar';
 
+type Props = {
+  item: {
+    accessToken: string | undefined;
+  };
+}
 
-const SettingProfile = () => {
+
+const SettingProfile = (props: Props) => {
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -22,24 +28,29 @@ const SettingProfile = () => {
 
     const navigate = useNavigate();
 
-    const token = getSessionsToken()
-    const auth = 'Bearer ' + token.access_token;
-
     useEffect(() => {
+      if (props.item.accessToken) {
+        const auth = 'Bearer ' + props.item.accessToken;
         fetch('http://localhost:3001/user/profile', {method: 'GET', headers: {'Authorization': auth}})
-        .then(res => res.json())
-        .then(
-        (result) => {
-            console.log(result)
-            setIsLoaded(true);
-            setProfile(result);
-        },
-            (error) => {
-            setIsLoaded(true);
-            setError(error);
+          .then(res => res.json())
+          .then(
+          (result) => {
+            if (result.statusCode === 401)
+              navigate('/')
+            else {
+              setIsLoaded(true);
+              setProfile(result);
+            }
+          },
+              (error) => {
+              setIsLoaded(true);
+              setError(error);
+          }
+          )
         }
-        )
-    }, [navigate])
+        else
+          navigate('/')
+    }, [props.item.accessToken])
 
 
    function handleAvatarChange(event) {
@@ -47,7 +58,8 @@ const SettingProfile = () => {
     if (file) {
       const formData = new FormData();
       formData.append("avatar", file);
-      if (token) {
+      if (props.item.accessToken) {
+        const auth = 'Bearer ' + props.item.accessToken
         fetch("http://localhost:3001/user/profiles/avatar", {
           method: "POST",
           headers: {
@@ -77,6 +89,7 @@ const SettingProfile = () => {
     function handleUpdateUsername() {
       if (!newUsername)
           return;
+      const auth = 'Bearer ' + props.item.accessToken
       fetch('http://localhost:3001/user/update/username', {
           method: 'PUT',
           headers: {
@@ -101,6 +114,8 @@ const SettingProfile = () => {
   function handleUpdateEmail() {
     if (!newEmail)
         return;
+    const auth = 'Bearer ' + props.item.accessToken
+
     fetch('http://localhost:3001/user/update/email', {
         method: 'PUT',
         headers: {
@@ -125,6 +140,7 @@ const SettingProfile = () => {
   function handleUpdateFirstname() {
     if (!newFirstname)
         return;
+    const auth = 'Bearer ' + props.item.accessToken
     fetch('http://localhost:3001/user/update/firstname', {
         method: 'PUT',
         headers: {
@@ -149,6 +165,8 @@ const SettingProfile = () => {
   function handleUpdateLastname() {
     if (!newLastname)
         return;
+    const auth = 'Bearer ' + props.item.accessToken
+
     fetch('http://localhost:3001/user/update/lastname', {
         method: 'PUT',
         headers: {
@@ -176,11 +194,29 @@ const SettingProfile = () => {
         return <div>Loading...</div>;
     } else {
           return (
-               <div>
-
-                  <div className='mx-auto'>
-                    <h1> Username :
+              <div className='flex flex-col space-y-4'>
+                 <div className='mx-auto'>
+                    <DisplayAvatar avatar={profile.avatar}/>
+                  {/* </div>
+                  <div className='mx-auto'> */}
+                    <label
+                      htmlFor='avatar'
+                      className="relative inset-0 cursor-pointer">
+                      {profile.avatar ? 'Change Avatar' : 'Upload Avatar'}
+                    </label>
+                    <input
+                      type='file'
+                      name='avatar'
+                      id='avatar'
+                      accept='.png'
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                  </div>
+                  <div className='flex justify-between items-start'>
+                    <h1 > Username : 
                       {editUsername ?
+                     
                         <input type="text" 
                           value={newUsername} 
                           onChange={e => setNewUsername(e.target.value)} 
@@ -190,17 +226,18 @@ const SettingProfile = () => {
                             }
                           }}
                           onBlur={() => setEditUsername(false)}
-                        /> :
+                        />
+                          :
                         <>
                           {profile.username}
-                          <button onClick={() => setEditUsername(true)}>Edit</button>
+                          <button className="ml-2"  onClick={() => setEditUsername(true)}>Edit</button>
                         </>
                       }
                     </h1>
                   </div>
 
-                  <div className='mx-auto'>
-                    <h1> Email :
+                  <div className='flex justify-between items-start' >
+                    <h1> Email : 
                       {editEmail ?
                         <input type="text" 
                           value={newEmail} 
@@ -214,14 +251,14 @@ const SettingProfile = () => {
                         /> :
                         <>
                           {profile.email}
-                          <button onClick={() => setEditEmail(true)}>Edit</button>
+                          <button className="ml-2"  onClick={() => setEditEmail(true)}>Edit</button>
                         </>
                       }
                     </h1>
                  </div>
 
-                 <div className='mx-auto'>
-                    <h1> Firstname :
+                 <div className='flex justify-between items-start'>
+                    <h1> Firstname : 
                       {editFirstname ?
                         <input type="text" 
                           value={newFirstname} 
@@ -235,14 +272,14 @@ const SettingProfile = () => {
                         /> :
                         <>
                           {profile.firstname}
-                          <button onClick={() => setEditFirstname(true)}>Edit</button>
+                          <button className="ml-2" onClick={() => setEditFirstname(true)}>Edit</button>
                         </>
                       }
                     </h1>
                   </div>
 
-                  <div className='mx-auto'>
-                    <h1> Lastname :
+                  <div className='flex justify-between items-start'>
+                    <h1> Lastname : 
                       {editLastname ?
                         <input type="text" 
                           value={newLastname} 
@@ -256,26 +293,11 @@ const SettingProfile = () => {
                         /> :
                         <>
                           {profile.lastname}
-                          <button onClick={() => setEditLastname(true)}>Edit</button>
+                          <button className="ml-2" onClick={() => setEditLastname(true)}>Edit</button>
                         </>
                       }
                     </h1>
                   </div>
-
-                <DisplayAvatar avatar={profile.avatar}/>
-                <label
-                  htmlFor='avatar'
-                  className="relative inset-0 cursor-pointer">
-                  {profile.avatar ? 'Change Avatar' : 'Upload Avatar'}
-                </label>
-                <input
-                  type='file'
-                  name='avatar'
-                  id='avatar'
-                  accept='.png'
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
               </div>        
         )
     }

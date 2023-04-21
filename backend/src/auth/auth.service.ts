@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException,HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, BadRequestException,HttpStatus, HttpException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
@@ -62,6 +62,7 @@ export class AuthService {
     newUser.loginName = createUserDto.loginName;
     const hashedPassword = await this.hashPassword(createUserDto.wordpass);
     newUser.wordpass = hashedPassword;
+    newUser.statusid = 0;
     const user = await this.userService.createUser(newUser);
     return this.generateAccessToken(user);
   }
@@ -91,14 +92,63 @@ export class AuthService {
     return null;
   }
 
-  async generateAccessToken(user: User/* ,isTwoFaAuth = false */) {
-    const payload = { id: user.id };
-    return {
-      id: user.id,
-      access_token: this.jwtService.sign(payload),
-      twoFaEnabled : user.is2faenabled,
-    }
+  
+  async generateAccessToken(user: User) {
+    const payload = { id: user.id, twoFaEnabled: user.is2faenabled, expiresIn: '15m'};
+    const accessToken = this.jwtService.sign(payload);
+
+    this.userService.changeStatus(user, 1);
+    const refreshToken = await this.generateRefreshToken(user)
+
+    return { accessToken, refreshToken };
   }
+
+  async generateRefreshToken(user: User) {
+    const payload = { id: user.id, expiresIn: '7d'};
+    const refreshToken = this.jwtService.sign(payload)
+
+    user.refreshtoken = refreshToken
+    await this.userRepository.save(user)
+    return refreshToken;
+  }
+
+  async verifyRefreshToken(refreshToken: string) {
+    const payload = this.jwtService.verify(refreshToken);
+    if (!payload) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const user = await this.userService.findUserById(payload.id);
+    if (!user) {
+      throw new UnauthorizedException('Invalid user');
+    }
+    if (user.refreshtoken != refreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    // Check if the refresh token is still valid
+    if (Date.now() >= payload.expiresIn * 1000) {
+      throw new UnauthorizedException('Expired refresh token');
+    }
+    // Generate a new access token with the same payload as before
+    return this.generateAccessToken(user);
+  }
+
+  // async generateAccessTokenFromRefreshToken(refreshToken: string) {
+  //   const decoded = this.jwtService.verify(refreshToken, { secret: 'myRefreshSecret' });
+  //   const user = await this.userService.findById(decoded.id);
+  
+  //   if (!user) {
+  //     throw new UnauthorizedException('Invalid refresh token');
+  //   }
+  
+  //   const accessToken = {
+  //     id: user.id,
+  //     access_token: this.jwtService.sign({ id: user.id }, { expiresIn: '15m' }),
+  //     twoFaEnabled: user.is2faenabled,
+  //     expiresIn: '15m'
+  //   };
+  
+  //   return accessToken;
+  // }
 
   async hashPassword(wordpass: string) {
     const salt = await bcrypt.genSalt();
@@ -117,6 +167,7 @@ export class AuthService {
   async logInWith42(reqUser: any) {
       const newUser = new User();
       newUser.user42id = reqUser.id;
+      newUser.statusid = 0;
       const user = await this.userService.createUser(newUser);
       const defaultAvatar = "./assets/default-avatar.png"
       const savedProfile = await this.userService.createUserProfile('', reqUser.email, reqUser.firstName, reqUser.lastName, 0, defaultAvatar);

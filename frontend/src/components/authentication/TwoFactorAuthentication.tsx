@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Home from '../../pages/main/Home';
-import { setSessionToken, tokenForm } from '../../sessionsUtils';
+import { setSessionToken } from '../../sessionsUtils';
+import { tokenForm } from '../../interfaceUtils';
+import jwtDecode from 'jwt-decode';
 
 
 interface FormValues {
@@ -18,7 +20,7 @@ const TwoFactorAuthentication = (props: Props) => {
     const [formValues, setFormValues] = useState<FormValues>({code:''});
     const [imageUrl, setImageUrl] = useState('');
   
-    const auth = 'Bearer ' + props.item.access_token;
+    const auth = 'Bearer ' + props.item.accessToken;
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = event.target;
@@ -28,7 +30,6 @@ const TwoFactorAuthentication = (props: Props) => {
   
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      console.log(formValues.code)
   
       fetch('http://localhost:3001/2fa/authenticate', {
       method: 'POST',

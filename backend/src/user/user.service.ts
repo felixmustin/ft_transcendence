@@ -121,11 +121,16 @@ export class UserService {
     .leftJoinAndSelect("user.profile", "profile")
     .where("user.id = :id", { id: id })
     .getOne();
-    console.log(user)
     const userProfile = user.profile;
     await this.userRepository.remove(user);
     // this.userProfileRepository.remove(user.profile)
     return await this.userProfileRepository.remove(userProfile)//await this.userRepository.remove(user);
+  }
+
+  async changeStatus(user: User, statusId: number)
+  {
+    user.statusid = statusId;
+    return await this.userRepository.save(user);
   }
 
   async updateUsername(id: number, newUsername: string): Promise<Profile> {
@@ -164,4 +169,6 @@ export class UserService {
     await this.updateUserProfile(id,userProfile)
     return (userProfile)
   }
+
+
 }

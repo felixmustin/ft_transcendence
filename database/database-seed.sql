@@ -19,6 +19,8 @@ CREATE TABLE public.Users
     secret2fa VARCHAR(255),
     is2faenabled BOOLEAN,
     user42id INT,
+    statusid INT,
+    refreshtoken VARCHAR(255),
     profileId INT,
     CONSTRAINT fk_profile
     FOREIGN KEY (profileId)

@@ -32,6 +32,12 @@ export class User {
   @Column({ unique: true, nullable: true })
   user42id: number;
 
+  @Column({ })
+  statusid: number;
+
+  @Column({ unique: true, nullable: true })
+  refreshtoken: string;
+
   @OneToOne(() => Profile, { cascade: true })
   @JoinColumn({ name: 'profileid' })
   profile: Profile;

@@ -6,7 +6,12 @@ import SocialDataRequest from './SocialDataRequest';
 
 import Error from '../../components/utils/Error'
 
-type Props = {}
+
+type Props = {
+  item: {
+    accessToken: string | undefined;
+  };
+}
 
 const FriendList = (props: Props) => {
 
@@ -18,8 +23,7 @@ const FriendList = (props: Props) => {
 
     const navigate = useNavigate();
 
-    const token = getSessionsToken()
-    const auth = 'Bearer ' + token.access_token;
+    const auth = 'Bearer ' + props.item.accessToken;
 
     useEffect(() => {
             const fetchFriends = async () => {
@@ -47,13 +51,13 @@ const FriendList = (props: Props) => {
               }
             };
         
-            if (!token) {
-              navigate('/');
-            } else {
+            // if (!token) {
+            //   navigate('/');
+            // } else {
               fetchFriends();
               fetchRequestList();
-            }
-          }, [token.access_token]);
+            // }
+          }, []);
 
 
   if (error) // error
