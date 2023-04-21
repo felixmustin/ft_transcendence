@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useEffect, useReducer, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { ISocketContextState, SocketContextProvider, SocketReducer, defaultSocketContextState } from './Socket';
+import { getSessionsToken } from '../sessionsUtils';
 
 export interface ISocketContextComponentProps extends PropsWithChildren {}
 
@@ -15,10 +16,17 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 	const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
 	const [loading, setloading ] = useState(true);
 
+	const token = await.getsessiontoken
+	const auth = bearer + 
 	const socket = useSocket('ws://127.0.0.1:3001', {
 		reconnectionAttempts: 5,
 		reconnectionDelay: 5000,
 		autoConnect: false,
+		auth: {
+			headers: {
+			  Authorization: `Bearer ${token}`,
+			},
+		},
 	});
 
 	useEffect(() =>{

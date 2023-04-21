@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {Room} from './room';
 import { Server } from 'socket.io';
+import { Game } from 'src/entities/game.entity';
 
 export type handshake = {
 	uid : string,
@@ -57,7 +58,7 @@ export class PongService {
 		while (map.has(key)) {
 			key = Math.random().toString(36).substr(2, 9);
 		}
-		const newRoom = new Room(key, server);
+		const newRoom = new Room(key, server, this);
 		map.set(key, newRoom);
 		console.log('created room : ' + key);
 		return key;
@@ -99,6 +100,9 @@ export class PongService {
 		return key;
 	  }
 
+	GameSave(game : Game){
+		
+	}
 	// getUidFronSocketId = (id: string) => object.keys(this.server.sockets.sockets).find((uid) => this.server.sockets.sockets[uid] === id);
 //   private boardWidth = 600; // Width of the game board in pixels
 //   private boardHeight = 400; // Height of the game board in pixels

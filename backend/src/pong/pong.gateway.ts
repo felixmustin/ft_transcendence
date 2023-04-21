@@ -2,9 +2,13 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnG
 import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause } from './pong.service';
 import { Server } from 'socket.io';
 import {Room} from './room';
+import { UseGuards } from '@nestjs/common';
+import { isNumberString } from 'class-validator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 // import { Socket } from 'dgram';
 
 @WebSocketGateway( { cors: true })
+@UseGuards(JwtAuthGuard)
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private maproom: Map<string, Room> = new Map();
 	private privateroom: Map<string, Room> = new Map();
@@ -36,14 +40,22 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('playPong')
 	async playPong(client: any, data: playpause) {
 		const room = data.roomID;
-		if (this.maproom.get(room)){
-			this.maproom.get(room).play();}
+		if (isNumberString(room) && this.maproom.get(room)){
+			this.maproom.get(room).play();
+		}
+		else if (this.privateroom.get(room)){
+			this.privateroom.get(room).play();
+		}
 	}
 	@SubscribeMessage('stopPong')
 	async stopPong(client: any, data: playpause){
 		const room = data.roomID;
-		if (this.maproom.get(room)){
-			this.maproom.get(room).pause();}
+		if (isNumberString(room) && this.maproom.get(room)){
+			this.maproom.get(room).pause();
+		}
+		else if (this.privateroom.get(room)){
+			this.privateroom.get(room).pause();
+		}
 	}
 	@SubscribeMessage('updatePaddle')
 	async updatepaddle(client:any, data: PaddleMove){
@@ -101,10 +113,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		while (this.privateroom.has(room)) {
 			room = this.pongService.generateRandomKey();
 		}
-		this.privateroom.set(room, new Room(room, this.server));
+		this.privateroom.set(room, new Room(room, this.server, this.pongService));
 		console.log('send data ');
 		client.join(room);
-		this.privateroom.get(room).connect(data);
+		this.privateroom.get(room).connect(client.id);
 		console.log('room ' + room);
 		const score: ScoreProps = {
 			player1: this.privateroom.get(room).idp1,
@@ -125,7 +137,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//join private room
 		const room = data;
 		client.join(room);
-		console.log('join room 1')
+		console.log('join room 1');
 		this.privateroom.get(room).connect(client.id);
 		const score: ScoreProps = {
 			player1: this.privateroom.get(room).idp1,
