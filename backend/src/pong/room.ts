@@ -71,7 +71,7 @@ export class Room {
 	
 	post_score_db(){
 		const game: Game = {
-			players: ,
+			players: {idp1, idp2},
 			score1: this.score1,
 			score2: this.score2,
 		}

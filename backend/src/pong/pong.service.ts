@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import {Room} from './room';
 import { Server } from 'socket.io';
 import { Game } from 'src/entities/game.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 export type handshake = {
 	uid : string,
@@ -42,6 +44,10 @@ export type playpause = {
 
 @Injectable()
 export class PongService {
+	constructor(
+		@InjectRepository(Game) private gameRepository: Repository<Game>,
+		// @InjectRepository(Friends) private friendsRepository: Repository<Friends>,
+	  ) {}
 	looking_room(map: Map<string, Room>, server: Server): string {
 		for (const [key, value] of map.entries()) {
 		  if (value.players === 1) {
@@ -100,8 +106,9 @@ export class PongService {
 		return key;
 	  }
 
-	GameSave(game : Game){
-		
+	async GameSave(game : Game){
+		const newgame = await this.gameRepository.create(game);
+		await this.gameRepository.save(newgame);
 	}
 	// getUidFronSocketId = (id: string) => object.keys(this.server.sockets.sockets).find((uid) => this.server.sockets.sockets[uid] === id);
 //   private boardWidth = 600; // Width of the game board in pixels

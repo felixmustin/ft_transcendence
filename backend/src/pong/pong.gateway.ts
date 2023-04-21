@@ -18,6 +18,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	handleConnection(client: any, ...args: any[]) {
 		console.log("user connected");
+		console.log(args.auth.token);
 	}
 	handleDisconnect(client: any) {
 		for (const [key, room] of this.maproom.entries()){

@@ -12,20 +12,17 @@ type handshake = {
 
 const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = (props) => {
 	const {children } = props;
+	const {token} = props;
 
 	const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
 	const [loading, setloading ] = useState(true);
 
-	const token = await.getsessiontoken
-	const auth = bearer + 
 	const socket = useSocket('ws://127.0.0.1:3001', {
 		reconnectionAttempts: 5,
 		reconnectionDelay: 5000,
 		autoConnect: false,
 		auth: {
-			headers: {
-			  Authorization: `Bearer ${token}`,
-			},
+			token : token,
 		},
 	});
 

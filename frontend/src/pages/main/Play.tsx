@@ -1,8 +1,24 @@
 import Matchmaking from "../../components/game/Matchmaking";
 import Navbar from '../../components/design/Navbar'
 import SocketContextComponent from "../../context/ComponentSocket";
+import { useEffect, useState } from "react";
+import { getSessionsToken } from "../../sessionsUtils";
+import { tokenForm } from "../../interfaceUtils";
 
 const Play = () => {
+	const [token, setToken] = useState<tokenForm>();
+	const [isTokenSet, setIsTokenSet] = useState(false);
+
+  	// Session and auth
+  	useEffect(() => {
+    async function getToken() {
+      const sessionToken = await getSessionsToken();
+      setToken(sessionToken);
+      setIsTokenSet(true)
+    }
+    getToken();
+  }, []);
+
 	console.log('hello from page ');
 	const matchmaking = <Matchmaking />
 	return (
@@ -14,7 +30,7 @@ const Play = () => {
 			</div>
 			<div className="flex justify-evenly">
 				<div className="grid grid-cols-2 w-full">
-					<SocketContextComponent children={matchmaking}/>
+					<SocketContextComponent children={matchmaking} token={token?.accessToken}/>
 				</div>
 			</div>
 		</div>
