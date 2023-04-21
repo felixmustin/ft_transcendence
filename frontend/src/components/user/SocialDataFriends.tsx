@@ -17,7 +17,7 @@ type Props = {
 const SocialDataFriends = (props: Props) => {
 
   const token = getSessionsToken()
-  const auth = 'Bearer ' + token.access_token;
+  const auth = 'Bearer ' + token.accessToken;
   // This needs to be updated to use the API.
   // Handle the launching of a game
   const handleLaunchGame = () => {

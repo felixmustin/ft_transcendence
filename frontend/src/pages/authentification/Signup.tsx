@@ -1,21 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import loginImg from '../../assets/login.jpg'
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import UserInfo from '../../components/authentication/UserInfo';
-import { tokenForm } from '../../sessionsUtils';
+import { LoginForm, tokenForm } from '../../interfaceUtils';
+import { getSessionsToken } from '../../sessionsUtils';
 
-type Props = {}
 
-interface FormValues {
-  loginName: string;
-  wordpass: string;
-}
-
-const Signup = (props: Props) => {
+const Signup = () => {
 
   // Initializing the values and preparing the functions to handle the form
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [LoginForm, setLoginForm] = useState<LoginForm>({
     loginName: '',
     wordpass: '',
   });
@@ -23,10 +18,19 @@ const Signup = (props: Props) => {
   const [isAuthenticated, setAuthentication] = useState(false);
   const [token, setToken] = useState<tokenForm>();
 
-  // User for navigation
+  // Used for navigation
   const navigate = useNavigate();
   // Function responsible for redirecting the user to the signup page
   const gotoLoginPage = () => navigate("/");
+
+  useEffect(() => {
+    async function getToken() {
+      const sessionToken = await getSessionsToken();
+      if (sessionToken)
+        navigate("/home")
+    }
+    getToken();
+  }, []);
 
   /*
     Function responsible for updating the values of the form.
@@ -34,7 +38,7 @@ const Signup = (props: Props) => {
   */
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    setFormValues(prevState => ({ ...prevState, [name]: value }));
+    setLoginForm(prevState => ({ ...prevState, [name]: value }));
   };
 
   /*
@@ -49,7 +53,7 @@ const Signup = (props: Props) => {
       headers: {
       'Content-Type': 'application/json',
       },
-      body: JSON.stringify(formValues),
+      body: JSON.stringify(LoginForm),
     }).then(res => res.json()
     ).then(response => {
         if (response.statusCode >= 400) {
@@ -63,7 +67,7 @@ const Signup = (props: Props) => {
 
 
   if (isAuthenticated)
-    return <UserInfo item={token}/>
+    return <UserInfo item={token!}/>
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
     <div className='hidden sm:block'>
@@ -75,12 +79,12 @@ const Signup = (props: Props) => {
         <div className='flex flex-col text-gray-400 py-2'>
           <label>Login</label>
           <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-            type='text' name='loginName' value={formValues.loginName} required onChange={handleInputChange}/>
+            type='text' name='loginName' value={LoginForm.loginName} required onChange={handleInputChange}/>
         </div>
         <div className='flex flex-col text-gray-400 py-2'>
           <label>Password</label>
           <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-            type='password' name='wordpass' value={formValues.wordpass} minLength={8} required onChange={handleInputChange}/>
+            type='password' name='wordpass' value={LoginForm.wordpass} minLength={8} required onChange={handleInputChange}/>
         </div>
         <button className='w-full my-3 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' type='submit'>Sign Up</button>
         

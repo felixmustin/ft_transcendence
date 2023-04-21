@@ -9,6 +9,7 @@ import Log42Page from './pages/authentification/Log42Page'
 import UserInfo from './components/authentication/UserInfo'
 import Settings from './pages/main/Settings'
 import Play from './pages/main/Play'
+import ChatPage from './pages/main/ChatPage'
 // import {SocketContext, socket} from './context/Socket';
 
 function ProfileWrapper() {
@@ -33,6 +34,7 @@ function App() {
         <Route path='/social' element={<Social />} />
         <Route path='/settings' element={<Settings />} />
         <Route path='/play' element={<Play />} />
+        <Route path='/chatpage' element={<ChatPage />} />
       </Routes>
     </BrowserRouter>
     // </SocketContext.Provider>

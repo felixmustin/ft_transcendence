@@ -15,6 +15,7 @@
     "esbuild": "^0.17.14",
     "framer-motion": "^10.2.3",
     "js-cookie": "^3.0.1",
+    "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
     "react-anchor-link-smooth-scroll": "^1.0.12",
     "react-dom": "^18.2.0",

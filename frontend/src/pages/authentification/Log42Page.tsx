@@ -3,18 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useState } from 'react';
 import loginImg from '../../assets/login.jpg'
-import { getSessionsToken, removeSessionsToken, setSessionToken, tokenForm } from '../../sessionsUtils';
+import { getSessionsToken, removeSessionsToken, setSessionToken } from '../../sessionsUtils';
+import { UsernameInput, tokenForm } from '../../interfaceUtils';
 
-type Props = {}
-
-interface FormValues {
-  username: string;
-}
-
-const Log42Page = (props: Props) => {
+const Log42Page = () => {
 
   // Initialize form values
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [UsernameInput, setUsernameInput] = useState<UsernameInput>({
     username: '',
   });
   // const cst = true;
@@ -34,7 +29,7 @@ const Log42Page = (props: Props) => {
 
       const fetchProfile = async () => {
         const url = 'http://localhost:3001/user/profile';
-        const auth = 'Bearer ' + parseTok.access_token;
+        const auth = 'Bearer ' + parseTok.accessToken;
         try {
           const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
           const result = await res.json();
@@ -55,7 +50,7 @@ const Log42Page = (props: Props) => {
   // Handle input change
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    setFormValues(prevState => ({ ...prevState, [name]: value }));
+    setUsernameInput(prevState => ({ ...prevState, [name]: value }));
   };
 
   // Handle form submission
@@ -66,9 +61,9 @@ const Log42Page = (props: Props) => {
       method: 'POST',
       headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token?.access_token}`
+      'Authorization': `Bearer ${token?.accessToken}`
       },
-      body: JSON.stringify(formValues),
+      body: JSON.stringify(UsernameInput),
     }).then(res => res.json()
     ).then(response => {
         if (response.statusCode >= 400) {
@@ -97,7 +92,7 @@ const Log42Page = (props: Props) => {
             <div className='flex flex-col text-gray-400 py-2'>
               <label>Username</label>
               <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-                type='text' name='username' value={formValues.username} onChange={handleInputChange}/>
+                type='text' name='username' value={UsernameInput.username} onChange={handleInputChange}/>
             </div>
             <button className='w-full my-3 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' type='submit'>Sign In</button>
           </form>

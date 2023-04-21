@@ -35,6 +35,13 @@ export class UserController {
     return await this.userService.remove(req.user.id);
   }
 
+  @Put('disconnect')
+  @UseGuards(JwtAuthGuard)
+  async disconnectUser(@Req() req) {
+    const user = await this.userService.findUserById(req.user.id)
+    return await this.userService.changeStatus(user, 0);
+  }
+
   @Post('profiles/avatar')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('avatar'))
@@ -49,6 +56,7 @@ export class UserController {
     const user = await this.userService.findUserByUsername(username);
     return user;
   }
+
 
   @Put('update/username')
   @UseGuards(JwtAuthGuard)

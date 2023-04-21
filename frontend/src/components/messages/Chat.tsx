@@ -4,10 +4,14 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ConvBox from './ConvBox';
 import { ChatRoomInterface } from './types';
-import { getSessionsToken } from '../../sessionsUtils';
+import Loading from '../utils/Loading';
 
 
-type Props = {}
+type Props = {
+  item: {
+    accessToken: string | undefined;
+  };
+}
 
 const Chat = (props: Props) => {
 
@@ -18,11 +22,11 @@ const Chat = (props: Props) => {
   const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);
 
   const navigate = useNavigate();
-  const token = getSessionsToken()
-  const auth = 'Bearer ' + token.access_token;
+
 
   useEffect(() => {
     const fetchRooms = async () => {
+      const auth = 'Bearer ' + props.item.accessToken;
       const url = 'http://localhost:3001/chatroom/all_my_rooms';
       try {
         const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
@@ -35,11 +39,12 @@ const Chat = (props: Props) => {
         setError(error);
       }
     };
-    if (!token) {
-        navigate('/');
-      } else {
-        fetchRooms();
-      }
+      // if (!token) {
+      //     navigate('/');
+      //   } else {
+          fetchRooms();
+        // }
+
     }, []);
 
 
@@ -47,18 +52,20 @@ const Chat = (props: Props) => {
     setId(roomId);
   };
 
-  return (
-    <div className='flex bg-violet-700 rounded-lg p-2 m-2'>
-      <ChatRoom key={id} roomId={id} />
-      <div className='bg-violet-800 w-1/3 rounded-lg mx-1'>
-        {
-          rooms.map((room) => (
-            <ConvBox key={room.id} room={room} onBoxClick={onConvBoxClick} />
-          ))
-        }
+
+    return (
+      <div className='flex bg-violet-700 rounded-lg p-2 m-2'>
+        <ChatRoom key={id} roomId={id} />
+        <div className='bg-violet-800 w-1/3 rounded-lg mx-1'>
+          {
+            rooms.map((room) => (
+              <ConvBox key={room.id} room={room} onBoxClick={onConvBoxClick} />
+            ))
+          }
+        </div>
       </div>
-    </div>
-  )
+    )
+
 }
 
 export default Chat

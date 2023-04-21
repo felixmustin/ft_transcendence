@@ -2,22 +2,16 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import loginImg from '../../assets/login.jpg'
-import { setSessionToken, tokenForm } from '../../sessionsUtils';
+import { setSessionToken } from '../../sessionsUtils';
+import { SignupForm, tokenForm } from '../../interfaceUtils';
 
 type Props = {
   item: tokenForm
 }
 
-interface FormValues {
-  email: string;
-  firstname: string;
-  lastname: string;
-  age: number;
-}
-
 const UserInfo = (props: Props) => {
 
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [SignupForm, setSignupForm] = useState<SignupForm>({
     email: '',
     firstname: '',
     lastname: '',
@@ -25,7 +19,7 @@ const UserInfo = (props: Props) => {
   });
 
   const navigate = useNavigate();
-  const auth = 'Bearer ' + props.item.access_token;
+  const auth = 'Bearer ' + props.item.accessToken;
 
   useEffect(() => {
     if (!props.item)
@@ -34,7 +28,7 @@ const UserInfo = (props: Props) => {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = event.target;
-      setFormValues(prevState => ({ ...prevState, [name]: value }));
+      setSignupForm(prevState => ({ ...prevState, [name]: value }));
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -46,13 +40,17 @@ const UserInfo = (props: Props) => {
         'Content-Type': 'application/json',
         'Authorization': auth,
         },
-        body: JSON.stringify(formValues),
+        body: JSON.stringify(SignupForm),
       }).then(response => {
           if (response.ok) {
+            console.log("ici")
+            console.log(props.item)
             setSessionToken(props.item)
             navigate('/home');
-          } else {
-            alert('Creation failed');
+          }  else if (response.status === 401){
+              alert('Please login first');}
+            else {
+              alert('Creation failed');
           }
         }).catch(error => {
             alert('Creation failed ' + error);
@@ -70,22 +68,22 @@ const UserInfo = (props: Props) => {
         <div className='flex flex-col text-gray-400 py-2'>
           <label>Email</label>
           <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-            type='text' name='email' value={formValues.email} required onChange={handleInputChange}/>
+            type='text' name='email' value={SignupForm.email} required onChange={handleInputChange}/>
         </div>
         <div className='flex flex-col text-gray-400 py-2'>
           <label>First Name</label>
           <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-            type='text' name='firstname' value={formValues.firstname} required onChange={handleInputChange}/>
+            type='text' name='firstname' value={SignupForm.firstname} required onChange={handleInputChange}/>
         </div>
         <div className='flex flex-col text-gray-400 py-2'>
           <label>Last Name</label>
           <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-            type='text' name='lastname' value={formValues.lastname} required onChange={handleInputChange}/>
+            type='text' name='lastname' value={SignupForm.lastname} required onChange={handleInputChange}/>
         </div>
         <div className='flex flex-col text-gray-400 py-2'>
           <label>Age</label>
           <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none'
-            type='number' name='age' value={formValues.age} required onChange={handleInputChange}/>
+            type='number' name='age' value={SignupForm.age} required onChange={handleInputChange}/>
         </div>
         <button className='w-full my-3 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' type='submit'>Save</button>
       </form>
