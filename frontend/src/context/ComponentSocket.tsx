@@ -9,6 +9,15 @@ type handshake = {
 	uid: string,
 	users: string[],
 }
+type token = {
+	token : string,
+}
+type auth = {
+	reconnectionAttempts: number,
+	reconnectionDelay: number,
+	autoConnect: boolean,
+	auth: token 
+}
 
 const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = (props) => {
 	const {children } = props;

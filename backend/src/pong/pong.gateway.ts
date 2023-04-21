@@ -1,5 +1,5 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause } from './pong.service';
+import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause, auth } from './pong.service';
 import { Server } from 'socket.io';
 import {Room} from './room';
 import { UseGuards } from '@nestjs/common';
@@ -16,7 +16,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	constructor(private readonly pongService: PongService) {
 
 	}
-	handleConnection(client: any, ...args: any[]) {
+	handleConnection(client: any, args: auth) {
 		console.log("user connected");
 		console.log(args.auth.token);
 	}

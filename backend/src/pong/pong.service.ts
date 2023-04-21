@@ -9,6 +9,15 @@ export type handshake = {
 	uid : string,
 	users: string[],
 }
+export type token = {
+	token : string,
+}
+export type auth = {
+	reconnectionAttempts: number,
+	reconnectionDelay: number,
+	autoConnect: boolean,
+	auth: token 
+}
 export type ScoreProps = {
 	player1: string,
 	player2: string,
@@ -45,7 +54,7 @@ export type playpause = {
 @Injectable()
 export class PongService {
 	constructor(
-		@InjectRepository(Game) private gameRepository: Repository<Game>,
+		// @InjectRepository(Game) private gameRepository: Repository<Game>,
 		// @InjectRepository(Friends) private friendsRepository: Repository<Friends>,
 	  ) {}
 	looking_room(map: Map<string, Room>, server: Server): string {
@@ -106,10 +115,10 @@ export class PongService {
 		return key;
 	  }
 
-	async GameSave(game : Game){
-		const newgame = await this.gameRepository.create(game);
-		await this.gameRepository.save(newgame);
-	}
+	// async GameSave(game : Game){
+	// 	const newgame = await this.gameRepository.create(game);
+	// 	await this.gameRepository.save(newgame);
+	// }
 	// getUidFronSocketId = (id: string) => object.keys(this.server.sockets.sockets).find((uid) => this.server.sockets.sockets[uid] === id);
 //   private boardWidth = 600; // Width of the game board in pixels
 //   private boardHeight = 400; // Height of the game board in pixels

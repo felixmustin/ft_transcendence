@@ -71,3 +71,7 @@ save:
 	@git push;
 
 .PHONY: all re down clean save
+
+# authentification gateway 
+# chat en socket 
+# ajouter bonus jeu

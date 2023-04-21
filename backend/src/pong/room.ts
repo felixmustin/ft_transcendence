@@ -69,14 +69,14 @@ export class Room {
 		}
 	}
 	
-	post_score_db(){
-		const game: Game = {
-			players: {idp1, idp2},
-			score1: this.score1,
-			score2: this.score2,
-		}
-		this.PongService.GameSave(game);
-	}
+	// post_score_db(){
+	// 	const game: Game = {
+	// 		players: {this.idp1, this.idp2},
+	// 		score1: this.score1,
+	// 		score2: this.score2,
+	// 	}
+	// 	this.PongService.GameSave(game);
+	// }
 
 	end_match(){
 		if (this.score1 >= 10 || this.score2 >= 10){
