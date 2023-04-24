@@ -32,7 +32,7 @@ export class User {
   @Column({ unique: true, nullable: true })
   user42id: number;
 
-  @Column({ })
+  @Column({ default: 0 })
   statusid: number;
 
   @Column({ unique: true, nullable: true })

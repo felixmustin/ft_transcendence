@@ -48,6 +48,28 @@ CREATE TABLE public.friends (
     UNIQUE (from_user_id, to_user_id)
 );
 
+CREATE TABLE public.game
+(
+    id SERIAL PRIMARY KEY,
+    player1_id INT,
+    player2_id INT,
+    player1_score INT,
+    player2_score INT
+);
+
+CREATE TABLE public.user_profiles_games
+(
+    user_profile_id INT,
+    game_id INT,
+    PRIMARY KEY(user_profile_id, game_id),
+    FOREIGN KEY (user_profile_id)
+        REFERENCES public.user_profiles(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (game_id)
+        REFERENCES public.game(id)
+        ON DELETE CASCADE
+);
+
 CREATE TYPE chatroommode AS ENUM ('public', 'protected', 'private');
 
 CREATE TABLE public.message
@@ -104,6 +126,8 @@ CREATE TABLE public.chatroom_participants
 ALTER TABLE public.Users OWNER TO myUsername;
 ALTER TABLE public.user_profiles OWNER TO myUsername;
 ALTER TABLE public.friends OWNER TO myUsername;
+ALTER TABLE public.game OWNER TO myUsername;
+ALTER TABLE public.user_profiles_games OWNER TO myUsername;
 ALTER TABLE public.chatroom OWNER TO myUsername;
 ALTER TABLE public.message OWNER TO myUsername;
 ALTER TABLE public.chatroom_participants OWNER TO myUsername;

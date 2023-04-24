@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany } from 'typeorm';
+import { Game } from './game.entity';
 
 @Entity({name: "user_profiles"})
 export class Profile {
@@ -19,6 +20,14 @@ export class Profile {
 
   @Column()
   age: number;
+
+  @ManyToMany(() => Game)
+  @JoinTable({
+    name: 'user_profiles_games',
+    joinColumn: { name: 'user_profile_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'game_id', referencedColumnName: 'id' },
+  })
+  games: Game[];
 
   @Column({ type: 'bytea' })
   avatar: Buffer;
