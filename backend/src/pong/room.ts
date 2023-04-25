@@ -1,8 +1,12 @@
 import { GameState } from "./GameState";
 import { Server } from 'socket.io';
 import { ScoreProps, GameStateupdate } from "./pong.service";
+import { PongService } from "./pong.service";
+import { Game } from "src/entities/game.entity";
 
+// constructor (private readonly PongService: PongService){}
 export class Room {
+
 	id: string;
 	state: GameState;
 	intervalid: NodeJS.Timer;
@@ -16,8 +20,9 @@ export class Room {
 	idp2: string;
 	idspect: string[];
 	room_complete: Function;
+	// service: PongService;
   
-	constructor(id: string, server: Server) {
+	constructor(id: string, server: Server, private readonly PongService : PongService) {
 	  this.id = id;
 	  this.server = server;
 	  this.playpause = false;
@@ -64,6 +69,22 @@ export class Room {
 		}
 	}
 	
+	// post_score_db(){
+	// 	const game: Game = {
+	// 		players: {this.idp1, this.idp2},
+	// 		score1: this.score1,
+	// 		score2: this.score2,
+	// 	}
+	// 	this.PongService.GameSave(game);
+	// }
+
+	end_match(){
+		if (this.score1 >= 10 || this.score2 >= 10){
+			this.finished = true;
+			this.reset_game();
+		}
+	}
+	
 	reset_game(){
 		this.playpause = false;
 		this.finished = false;
@@ -85,10 +106,12 @@ export class Room {
 		if (this.state.ballpositionx < 0){
 			this.score2++;
 			this.emit_score_reset_ball();
+			this.end_match();
 		}
 		else if (this.state.ballpositionx > 590){
 			this.score1++;
 			this.emit_score_reset_ball();
+			this.end_match();
 		}
 	}
 

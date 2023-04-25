@@ -11,6 +11,26 @@ CREATE TABLE public.user_profiles
     avatar BYTEA
 );
 
+CREATE TABLE public.game
+(
+    id SERIAL PRIMARY KEY,
+    score1 INT,
+    score2 INT
+);
+
+CREATE TABLE public.profile_games
+(
+    profile_id INT,
+    game_id INT,
+    PRIMARY KEY(profile_id, game_id),
+    FOREIGN KEY (profile_id)
+        REFERENCES public.user_profiles(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (game_id)
+        REFERENCES public.game(id)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE public.Users
 (
     id SERIAL PRIMARY KEY,

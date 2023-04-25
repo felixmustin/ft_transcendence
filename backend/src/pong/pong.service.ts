@@ -9,6 +9,15 @@ export type handshake = {
 	uid : string,
 	users: string[],
 }
+export type token = {
+	token : string,
+}
+export type auth = {
+	reconnectionAttempts: number,
+	reconnectionDelay: number,
+	autoConnect: boolean,
+	auth: token 
+}
 export type ScoreProps = {
 	player1: string,
 	player2: string,
@@ -73,7 +82,7 @@ export class PongService {
 		while (map.has(key)) {
 			key = Math.random().toString(36).substr(2, 9);
 		}
-		const newRoom = new Room(key, server);
+		const newRoom = new Room(key, server, this);
 		map.set(key, newRoom);
 		console.log('created room : ' + key);
 		return key;

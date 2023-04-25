@@ -1,19 +1,39 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WsException } from '@nestjs/websockets';
 import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause } from './pong.service';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import {Room} from './room';
+import { UseGuards } from '@nestjs/common';
+import { ExecutionContext } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
+import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
+import { map } from 'rxjs';
 // import { Socket } from 'dgram';
 
 @WebSocketGateway( { cors: true })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private maproom: Map<string, Room> = new Map();
 	private privateroom: Map<string, Room> = new Map();
+	private identifiate: Map<string, string> = new Map();
 
-	constructor(private readonly pongService: PongService) {
+	constructor(private readonly pongService: PongService, private readonly jwtStrategy: JwtStrategy) {
 
 	}
-	handleConnection(client: any, ...args: any[]) {
-		console.log("user connected");
+	async handleConnection(client: any, ...args: any[]) {
+		// const context = client.createSocket(client);
+		// const jwtStrategy = this.injector.get(JwtAuthGuard).getJwtStrategy();
+		try {
+			const user = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
+			// JWT token is valid
+			// Do something with the user object
+			console.log('user connected : ' + user.id);
+			this.identifiate.set(client.id, user.id);
+		} catch (err) {
+			// JWT token is invalid
+			// Close the WebSocket connection
+			// client.close();
+			this.server.close(client);
+			// throw new WsException('Invalid JWT token');
+		}
 	}
 	handleDisconnect(client: any) {
 		for (const [key, room] of this.maproom.entries()){
@@ -101,7 +121,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		while (this.privateroom.has(room)) {
 			room = this.pongService.generateRandomKey();
 		}
-		this.privateroom.set(room, new Room(room, this.server));
+		this.privateroom.set(room, new Room(room, this.server, this.pongService));
 		console.log('send data ');
 		client.join(room);
 		this.privateroom.get(room).connect(data);

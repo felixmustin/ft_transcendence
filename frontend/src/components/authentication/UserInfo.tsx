@@ -43,8 +43,6 @@ const UserInfo = (props: Props) => {
         body: JSON.stringify(SignupForm),
       }).then(response => {
           if (response.ok) {
-            console.log("ici")
-            console.log(props.item)
             setSessionToken(props.item)
             navigate('/home');
           }  else if (response.status === 401){

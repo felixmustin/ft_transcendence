@@ -1,16 +1,28 @@
 import React, { PropsWithChildren, useEffect, useReducer, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { ISocketContextState, SocketContextProvider, SocketReducer, defaultSocketContextState } from './Socket';
+import { getSessionsToken } from '../sessionsUtils';
 
-export interface ISocketContextComponentProps extends PropsWithChildren {}
+export interface ISocketContextComponentProps extends PropsWithChildren {
+	token: string | undefined;
+}
 
 type handshake = {
 	uid: string,
 	users: string[],
 }
+type token = {
+	token : string,
+}
+type auth = {
+	reconnectionAttempts: number,
+	reconnectionDelay: number,
+	autoConnect: boolean,
+	auth: token 
+}
 
 const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = (props) => {
-	const {children } = props;
+	const {children, token } = props;
 
 	const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
 	const [loading, setloading ] = useState(true);
@@ -19,9 +31,13 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 		reconnectionAttempts: 5,
 		reconnectionDelay: 5000,
 		autoConnect: false,
+		extraHeaders: {
+			Authorization: token ? `Bearer ` + token : '',
+		  },
 	});
 
 	useEffect(() =>{
+		console.log('token is ' + token);
 		// connection
 		socket.connect();
 
@@ -33,7 +49,9 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
 		// send the handshake 
 		sendhandshake();
-	}, []);
+
+		setloading(false);
+	}, [token]);
 
 	const startlisteners = () => {
 		//connect
@@ -70,7 +88,6 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 		});
 	};
 	const sendhandshake = () => {
-		console.info('sending handshake');
 
 		// socket.emit('handshake', (uid : string, users: string[]) =>{
 		// 	console.log('user handshake callback message received');

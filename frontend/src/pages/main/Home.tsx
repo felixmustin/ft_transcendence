@@ -10,7 +10,6 @@ import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
 
 const Home = () => {
 
-  console.log('hello home');
   // Error management
   const [error, setError] = useState(null);
   // Loading management
@@ -26,7 +25,8 @@ const Home = () => {
       navigate('/');
     else {
       async function fetchReq(){
-      const token = await getSessionsToken()
+        const token = await getSessionsToken()
+        console.log("in home token is " + token.accessToken)
       const auth = 'Bearer ' + token.accessToken;
       fetch('http://localhost:3001/user/id/', {method: 'GET', headers: {'Authorization': auth}})
         .then(res => res.json())
