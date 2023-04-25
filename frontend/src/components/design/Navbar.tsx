@@ -27,7 +27,7 @@ const Navbar = (props: Props) => {
 
   return (
     <nav className="w-full flex py-4 justify-between items-center navbar">
-    <a href='/home'><img src={ Logo } className='w-[100px] h-[100px]' /> </a>
+    <a href='/profile'><img src={ Logo } className='w-[100px] h-[100px]' /> </a>
     <input
       className="rounded-lg bg-gray-700 m-2 ml-10 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
       placeholder="  Search for Targets"
@@ -36,7 +36,6 @@ const Navbar = (props: Props) => {
       onKeyDown={handleSearch}
     />
     <ul className="list-none sm:flex hidden justify-end items-center flex-1">
-      <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/home">Home</a></li>
       <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/play">Play</a></li>
       <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/profile">Profile</a></li>
       {/*<li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/ladder">Ladder</a></li>*/}

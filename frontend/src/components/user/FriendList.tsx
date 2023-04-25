@@ -16,7 +16,6 @@ type Props = {
 const FriendList = (props: Props) => {
 
     const [error, setError] = useState(null);
-    // Loading management
     // User data retrieved from the API
     const [friends, setFriends] = useState([]);
     const [requestList, setRequestList] = useState([]);
@@ -51,12 +50,8 @@ const FriendList = (props: Props) => {
               }
             };
         
-            // if (!token) {
-            //   navigate('/');
-            // } else {
-              fetchFriends();
-              fetchRequestList();
-            // }
+            fetchFriends();
+            fetchRequestList();
           }, []);
 
 
@@ -65,14 +60,18 @@ const FriendList = (props: Props) => {
   else {
     return (
       <div>
-        <div className='w-1/4 text-center bg-violet-700 rounded-lg p-2 m-2'>
-          New requests
-        </div>
-          <div className='bg-violet-700 rounded-lg p-2 m-2'>
-            {Object.entries(requestList).map(([key, request]) => (
-                  <SocialDataRequest key={key} request={request} />
-              ))}
-          </div>
+        {requestList.length > 0 && (
+          <>
+            <div className='w-1/4 text-center bg-violet-700 rounded-lg p-2 m-2'>
+              New requests
+            </div>
+            <div className='bg-violet-700 rounded-lg p-2 m-2'>
+              {Object.entries(requestList).map(([key, request]) => (
+                    <SocialDataRequest key={key} request={request} />
+                ))}
+            </div>
+          </>
+        )}
         <div className='w-1/4 text-center bg-violet-700 rounded-lg p-2 m-2'>
           Friends
         </div>

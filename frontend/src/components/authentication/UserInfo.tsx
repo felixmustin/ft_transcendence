@@ -46,7 +46,7 @@ const UserInfo = (props: Props) => {
             console.log("ici")
             console.log(props.item)
             setSessionToken(props.item)
-            navigate('/home');
+            navigate('/profile');
           }  else if (response.status === 401){
               alert('Please login first');}
             else {

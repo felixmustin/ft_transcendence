@@ -27,7 +27,7 @@ const Signup = () => {
     async function getToken() {
       const sessionToken = await getSessionsToken();
       if (sessionToken)
-        navigate("/home")
+        navigate("/profile")
     }
     getToken();
   }, []);

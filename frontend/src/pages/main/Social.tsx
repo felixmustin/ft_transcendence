@@ -42,11 +42,8 @@ const Social = (props: Props) => {
 
       <div className="flex justify-evenly">
         <div className='bg-violet-900 w-[800px] rounded-lg m-5'>
-          <div className='grid grid-cols-2 content-center text-center text-violet-700 text-3xl p-5' >
-            <div>
-              Friends List
-            </div>
-
+          <div className='flex content-center text-center text-violet-300 text-3xl p-5' >
+            Friends List
           </div>
           <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>
           <div>

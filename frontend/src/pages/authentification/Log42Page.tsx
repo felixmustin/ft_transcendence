@@ -70,7 +70,7 @@ const Log42Page = () => {
           alert(response.message);
         } else {
           setSessionToken(token)
-          navigate("/home");
+          navigate("/profile");
         }
       });
   };
@@ -79,7 +79,7 @@ const Log42Page = () => {
   if (profile.username != usernameTmp && profile.username != null)
   {
     setSessionToken(token)
-    navigate('/home');
+    navigate('/profile');
   }
   return (
       <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
