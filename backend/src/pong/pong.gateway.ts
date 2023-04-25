@@ -1,24 +1,39 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause, auth } from './pong.service';
-import { Server } from 'socket.io';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WsException } from '@nestjs/websockets';
+import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause } from './pong.service';
+import { Server, Socket } from 'socket.io';
 import {Room} from './room';
 import { UseGuards } from '@nestjs/common';
-import { isNumberString } from 'class-validator';
+import { ExecutionContext } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
+import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
+import { map } from 'rxjs';
 // import { Socket } from 'dgram';
 
 @WebSocketGateway( { cors: true })
-@UseGuards(JwtAuthGuard)
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private maproom: Map<string, Room> = new Map();
 	private privateroom: Map<string, Room> = new Map();
+	private identifiate: Map<string, string> = new Map();
 
-	constructor(private readonly pongService: PongService) {
+	constructor(private readonly pongService: PongService, private readonly jwtStrategy: JwtStrategy) {
 
 	}
-	handleConnection(client: any, args: auth) {
-		console.log("user connected");
-		console.log(args.auth.token);
+	async handleConnection(client: any, ...args: any[]) {
+		// const context = client.createSocket(client);
+		// const jwtStrategy = this.injector.get(JwtAuthGuard).getJwtStrategy();
+		try {
+			const user = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
+			// JWT token is valid
+			// Do something with the user object
+			console.log('user connected : ' + user.id);
+			this.identifiate.set(client.id, user.id);
+		} catch (err) {
+			// JWT token is invalid
+			// Close the WebSocket connection
+			// client.close();
+			this.server.close(client);
+			// throw new WsException('Invalid JWT token');
+		}
 	}
 	handleDisconnect(client: any) {
 		for (const [key, room] of this.maproom.entries()){
@@ -41,22 +56,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('playPong')
 	async playPong(client: any, data: playpause) {
 		const room = data.roomID;
-		if (isNumberString(room) && this.maproom.get(room)){
-			this.maproom.get(room).play();
-		}
-		else if (this.privateroom.get(room)){
-			this.privateroom.get(room).play();
-		}
+		if (this.maproom.get(room)){
+			this.maproom.get(room).play();}
 	}
 	@SubscribeMessage('stopPong')
 	async stopPong(client: any, data: playpause){
 		const room = data.roomID;
-		if (isNumberString(room) && this.maproom.get(room)){
-			this.maproom.get(room).pause();
-		}
-		else if (this.privateroom.get(room)){
-			this.privateroom.get(room).pause();
-		}
+		if (this.maproom.get(room)){
+			this.maproom.get(room).pause();}
 	}
 	@SubscribeMessage('updatePaddle')
 	async updatepaddle(client:any, data: PaddleMove){
@@ -117,7 +124,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.privateroom.set(room, new Room(room, this.server, this.pongService));
 		console.log('send data ');
 		client.join(room);
-		this.privateroom.get(room).connect(client.id);
+		this.privateroom.get(room).connect(data);
 		console.log('room ' + room);
 		const score: ScoreProps = {
 			player1: this.privateroom.get(room).idp1,
@@ -138,7 +145,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		//join private room
 		const room = data;
 		client.join(room);
-		console.log('join room 1');
+		console.log('join room 1')
 		this.privateroom.get(room).connect(client.id);
 		const score: ScoreProps = {
 			player1: this.privateroom.get(room).idp1,

@@ -18,7 +18,6 @@ function ProfileWrapper() {
   }
 
 function App() {
-  console.log('hello from app' );
   return (
     // <SocketContext.Provider value={socket}>
     <BrowserRouter>

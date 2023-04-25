@@ -14,8 +14,6 @@ export async function getSessionsToken() {
   const accessTokenExp = jwtDecode(tokenObj.accessToken).exp;
   const now = Math.floor(Date.now() / 1000);
   const timeLeft = accessTokenExp - now;
-  console.log("ici")
-  console.log(timeLeft)
   if (timeLeft < 300) {
     const res = await fetch('http://localhost:3001/auth/refresh-token', {
       method: 'POST',

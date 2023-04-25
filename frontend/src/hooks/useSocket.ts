@@ -5,6 +5,7 @@ export const useSocket = (uri: string, opt?: Partial<ManagerOptions & SocketOpti
 	const { current : socket } = useRef(io(uri, opt));
 
 	useEffect(() =>{
+		console.log(opt);
 		return ()=>{
 			if (socket) socket.close();
 		}
