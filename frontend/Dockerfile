@@ -4,7 +4,7 @@ RUN apt-get update -y && apt-get install vim -y
 
 WORKDIR /app
 
-COPY package*.json .
+COPY package*.json ./
 
 RUN npm i
 

@@ -30,7 +30,7 @@ const Login = () => {
     async function getToken() {
       const sessionToken = await getSessionsToken();
       if (sessionToken)
-        navigate("/home")
+        navigate("/profile")
     }
     getToken();
   }, []);
@@ -71,7 +71,7 @@ const Login = () => {
         }
         else {
           setSessionToken(response.token)
-          navigate("/home");
+          navigate("/profile");
         }
       } 
       });

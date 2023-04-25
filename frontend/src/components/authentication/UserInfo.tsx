@@ -44,7 +44,7 @@ const UserInfo = (props: Props) => {
       }).then(response => {
           if (response.ok) {
             setSessionToken(props.item)
-            navigate('/home');
+            navigate('/profile');
           }  else if (response.status === 401){
               alert('Please login first');}
             else {
