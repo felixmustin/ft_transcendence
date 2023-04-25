@@ -1,6 +1,6 @@
 import { GameState } from "./GameState";
 import { Server } from 'socket.io';
-import { ScoreProps, GameStateupdate } from "./pong.service";
+import { ScoreProps, GameStateupdate, gameResume } from "./pong.service";
 import { PongService } from "./pong.service";
 import { Game } from "src/entities/game.entity";
 
@@ -69,18 +69,22 @@ export class Room {
 		}
 	}
 	
-	// post_score_db(){
-	// 	const game: Game = {
-	// 		players: {this.idp1, this.idp2},
-	// 		score1: this.score1,
-	// 		score2: this.score2,
-	// 	}
-	// 	this.PongService.GameSave(game);
-	// }
+	post_score_db(){
+		const id1: number = this.PongService.identifiate(this.idp1).id;
+		const id2: number = this.PongService.identifiate(this.idp2).id;
+		const game: gameResume = {
+			player1_id: id1,
+			player2_id: id2,
+			player1_score: this.score1,
+			player2_score: this.score2,
+		}
+		this.PongService.saveGame(game);
+	}
 
 	end_match(){
 		if (this.score1 >= 10 || this.score2 >= 10){
 			this.finished = true;
+			this.post_score_db();
 			this.reset_game();
 		}
 	}
@@ -116,11 +120,6 @@ export class Room {
 	}
 
 	emit_score_reset_ball(){
-		// this.state.nextballpositionx = 300;
-		// this.state.nextballpositiony = 200;
-		// this.state.reset_speed();
-		// this.state.updategame();
-		// this.state.updategame();
 		this.state.reset();
 		const state : GameStateupdate = { 
 			leftPaddleY: this.state.paddleleftposition,
@@ -132,8 +131,8 @@ export class Room {
 		this.server.to(this.id).emit('updateState', state)
 		this.pause();
 		const data: ScoreProps = {
-			player1 : this.idp1,
-			player2 : this.idp2,
+			player1 : this.PongService.identifiate(this.idp1).username,
+			player2 : this.PongService.identifiate(this.idp2).username,
 			score1 : this.score1,
 			score2 : this.score2,
 		}

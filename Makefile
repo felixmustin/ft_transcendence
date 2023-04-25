@@ -54,7 +54,7 @@ re-back:
 	docker rmi trans-backend
 	make all
 
-re: down clean all
+re: clean all
 
 delete-db:
 	@echo deleting database

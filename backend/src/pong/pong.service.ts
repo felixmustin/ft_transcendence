@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {Room} from './room';
 import { Server } from 'socket.io';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from 'src/entities/game.entity';
 import { Repository } from 'typeorm';
+import { Profile } from 'src/entities/profile.entity';
+import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
+import { UserService } from 'src/user/user.service';
+import { WebSocketServer } from '@nestjs/websockets';
+import { PongGateway } from './pong.gateway';
 
 export type handshake = {
 	uid : string,
@@ -60,12 +65,131 @@ export type gameResume = {
 
 @Injectable()
 export class PongService {
+	private maproom: Map < string, Room > = new Map();
+	private privateroom: Map < string, Room > = new Map();
+	private identitymap: Map < string, Profile > = new Map();
 
 	constructor(
 		@InjectRepository(Game)
 		private gameRepository: Repository<Game>,
+		private readonly jwtStrategy: JwtStrategy, 
+		private readonly userservice: UserService
 	) {}
 
+	async login(client: any){
+		const id = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
+		const user: Profile = await this.userservice.findUserProfileById(id.id);
+		this.identitymap.set(client.id, user);
+	}
+
+	logout(client: any){
+		for (const [key, room] of this.maproom.entries()){
+			client.leave(key);
+			room.disconnect(client.id);
+		}
+		for (const [key, room] of this.privateroom.entries()){
+			client.leave(key);
+			room.disconnect(client.id);
+		}
+	}
+
+	play(client: any, data: playpause){
+		const room = data.roomID;
+		if (this.maproom.get(room)){
+			this.maproom.get(room).play();}
+	}
+
+	pause(client: any, data: playpause){
+		const room = data.roomID;
+		if (this.maproom.get(room)){
+			this.maproom.get(room).pause();}
+	}
+
+	paddelupdate(client:any, data: PaddleMove){
+		const room = data.roomID;
+		this.maproom.get(room).update_paddle(data.paddleY, data.uid);
+	}
+
+	// setServer(server: Server) {
+	// 	this.server = server;
+	//   }
+	async find_match(client: any, data: string, server: Server){
+		//connecting to room
+		const room = this.looking_room(this.maproom, server);
+		client.join(room);
+		this.maproom.get(room).connect(data);
+		// wait for oponent
+		let player = 0;
+		const waitForPlayer2 = new Promise((resolve) => {
+			const roomObj = this.maproom.get(room);
+			if (roomObj.players <= 1) {
+				player = 1;
+			  roomObj.room_complete = resolve;
+			} else {
+				player = 2;
+			  	resolve(resolve);
+			}
+		  });
+		await waitForPlayer2;
+		//collect info
+		const score: ScoreProps = {
+			player1: this.identifiate(this.maproom.get(room).idp1).username,
+			player2: this.identifiate(this.maproom.get(room).idp2).username,
+			score1: 0,
+			score2: 0,
+		};
+		const datamatch: matchdata = {
+			roomID: room,
+			score: score,
+			player: player,
+		};
+		client.emit('match_found', datamatch);
+	}
+	create_room(client: any, data: string, server: Server){
+		//create private room
+		let room = this.generateRandomKey();
+		while (this.privateroom.has(room)) {
+			room = this.generateRandomKey();
+		}
+		this.privateroom.set(room, new Room(room, server, this));
+		console.log('send data ');
+		client.join(room);
+		this.privateroom.get(room).connect(data);
+		console.log('room ' + room);
+		const score: ScoreProps = {
+			player1: this.identifiate(this.privateroom.get(room).idp1).username,
+			player2: this.identifiate(this.privateroom.get(room).idp2).username,
+			score1: 0,
+			score2: 0,
+		}
+		console.log('check');
+		const datamatch: matchdata = {
+			roomID: room,
+			score: score,
+			player: 1,
+		}
+		client.emit('room_created', datamatch)
+	}
+	join_room(client: any, data: string, server: Server){
+		//join private room
+		const room = data;
+		client.join(room);
+		console.log('join room 1')
+		this.privateroom.get(room).connect(client.id);
+		const score: ScoreProps = {
+			player1: this.identifiate(this.privateroom.get(room).idp1).username,
+			player2: this.identifiate(this.privateroom.get(room).idp2).username,
+			score1: 0,
+			score2: 0,
+		}
+		const datamatch: matchdata = {
+			roomID: room,
+			score: score,
+			player: 2,
+		}
+		console.log('join room 2');
+		server.to(room).emit('match_found', datamatch);
+	}
 	looking_room(map: Map<string, Room>, server: Server): string {
 		for (const [key, value] of map.entries()) {
 		  if (value.players === 1) {
@@ -109,11 +233,12 @@ export class PongService {
 	  
 		// If we get here, the client is not in any rooms
 		return null;
-	  }
+	}
 
 	wait_player2(room: Room){
 		
 	}
+
 	generateRandomKey(): string {
 		let key = "";
 		const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -122,7 +247,7 @@ export class PongService {
 		  key += possibleChars.charAt(randomIndex);
 		}
 		return key;
-	  }
+	}
 
 	async saveGame(scoreData: gameResume): Promise<Game> {
 		const game = new Game();
@@ -134,51 +259,7 @@ export class PongService {
 		return await this.gameRepository.save(game);
 	}
 
-	// getUidFronSocketId = (id: string) => object.keys(this.server.sockets.sockets).find((uid) => this.server.sockets.sockets[uid] === id);
-//   private boardWidth = 600; // Width of the game board in pixels
-//   private boardHeight = 400; // Height of the game board in pixels
-//   private ballRadius = 10; // Radius of the ball in pixels
-//   private ballSpeed = 10; // Speed of the ball in pixels per frame
-// //   private ballAngle = 45; // Initial angle of the ball in degrees
-//   private paddlewidth = 20; // paddle width 
-//   private paddlespace = 20; // space between paddle and bord
-//   private paddleheight = 80; // height of the paddle
-
-//   calculateBallX(leftPaddleY: number, rightPaddleY: number, ballpositionx: number, ballpositiony: number, nextballpositionx: number, nextballpositiony: number): number {
-//     let ballx = 0;
-// 	if (ballpositionx > nextballpositionx){
-// 		ballx = nextballpositionx - this.ballSpeed;
-// 	}
-// 	else{
-// 		ballx = nextballpositionx + this.ballSpeed;
-// 	}
-// 	let ballFinalX = ballx;
-// 	//calculate bounce right
-// 	if (ballx > this.boardWidth - this.paddlespace - this.paddlewidth - this.ballRadius && ballx < this.boardWidth - this.paddlespace - this.ballRadius && nextballpositiony + this.ballRadius > rightPaddleY && nextballpositiony < rightPaddleY +  this.paddleheight){
-// 		ballFinalX -= (this.ballSpeed * 2);
-// 	} // bounce left
-// 	else if (ballx < this.paddlespace + this.paddlewidth && ballx > this.paddlespace && nextballpositiony + this.ballRadius > leftPaddleY && nextballpositiony < leftPaddleY + this.paddleheight){
-// 		ballFinalX += (this.ballSpeed * 2);
-// 	} 
-//     return ballFinalX;
-//   }
-
-//   calculateBallY(ballPosition: number, nextballposition: number): number {
-// 	let ballY = 0;
-//     if (ballPosition > nextballposition){
-// 		ballY = nextballposition - this.ballSpeed;
-// 	}
-// 	else{
-// 		ballY = nextballposition + this.ballSpeed;
-// 	}
-// 	let ballFinalY = ballY;
-// 	//calculate bounce down
-// 	if (ballY > this.boardHeight - this.ballRadius){
-//     	ballFinalY -= (this.ballSpeed * 2);
-// 	} // bounce up 
-// 	else if (ballY < 0){
-// 		ballFinalY += (this.ballSpeed * 2);
-// 	}
-//     return ballFinalY;
-//   }
+	identifiate(id: string): Profile{
+		return (this.identitymap.get(id));
+	}
 }

@@ -6,12 +6,22 @@ import { Game } from 'src/entities/game.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/auth/constants';
 import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game]), JwtModule.register({
-    secret: jwtConstants.secret,
-    signOptions: { expiresIn: '15m' },
-  }),],
-  providers: [PongService, PongGateway, JwtStrategy],
+  imports: [
+    UserModule,
+    TypeOrmModule.forFeature([Game]),
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '15m' },
+    }),
+  ],
+  providers: [
+    PongService,
+    PongGateway,
+    JwtStrategy,
+  ],
 })
 export class PongModule {}
+
