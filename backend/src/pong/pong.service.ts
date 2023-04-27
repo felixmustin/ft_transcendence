@@ -9,6 +9,7 @@ import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
 import { UserService } from 'src/user/user.service';
 import { WebSocketServer } from '@nestjs/websockets';
 import { PongGateway } from './pong.gateway';
+import { coordonate } from './game/Pong';
 
 export type handshake = {
 	uid : string,
@@ -35,7 +36,7 @@ export type matchdata = {
 	player: number,
 }
 export type PaddleMove = {
-	paddleY: number,
+	paddle: coordonate,
 	roomID: string,
 	uid: string,
 }
@@ -76,10 +77,15 @@ export class PongService {
 		private readonly userservice: UserService
 	) {}
 
-	async login(client: any){
-		const id = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
-		const user: Profile = await this.userservice.findUserProfileById(id.id);
-		this.identitymap.set(client.id, user);
+	async login(client: any, server: Server){
+		try {
+			const id = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
+			const user: Profile = await this.userservice.findUserProfileById(id.id);
+			this.identitymap.set(client.id, user);
+		  } catch (error) {
+			console.log('Error occurred during login:', error);
+			server.close(client);
+		  }
 	}
 
 	logout(client: any){
@@ -107,7 +113,7 @@ export class PongService {
 
 	paddelupdate(client:any, data: PaddleMove){
 		const room = data.roomID;
-		this.maproom.get(room).update_paddle(data.paddleY, data.uid);
+		this.maproom.get(room).update_paddle(data.paddle, client.id);
 	}
 
 	// setServer(server: Server) {

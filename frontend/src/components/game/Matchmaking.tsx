@@ -21,6 +21,7 @@ function Matchmaking() {
     // Listen for "match_found" events and update the state accordingly
     const onMatchFound = (data: matchdata) => {
       if (SocketState.socket != undefined){
+        console.log("uid : " + SocketState.uid);
 		    const pongprops:GamePongProps = {
 		    	roomID: data.roomID,
 		    	score: data.score,
@@ -55,7 +56,7 @@ function Matchmaking() {
       SocketState.socket?.off('room_created', onRoom_created);
       SocketState.socket?.off('match_found', onMatchFound);
     };
-  }, [SocketState.socket]);
+  }, [SocketState.socket, SocketState.uid]);
 
   const handleFindMatch = () => {
     setwaiting(1);

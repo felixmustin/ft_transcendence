@@ -30,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return new Promise((resolve, reject) => {
       jwt.verify(token, jwtConstants.secret, (err, payload) => {
         if (err) {
-          reject(new UnauthorizedException());
+          throw (new UnauthorizedException());
         } else {
           resolve(payload);
         }

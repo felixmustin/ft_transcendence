@@ -1,71 +1,23 @@
 import React, { useState, useEffect, Component } from 'react';
 import './pong.css';
-// import io, {Socket} from 'socket.io-client';
 import { Socket } from 'socket.io-client';
+import { Left_Paddle, Right_Paddle } from './paddle';
+import { Balls } from './balls';
 
-type ballPosition = {
-	x: number,
-	y: number,
-}
-type paddleProps = {
-	PaddleY : number,
-}
-class Right_Paddle extends Component<paddleProps> {
-	render(){
-		const {PaddleY} = this.props;
-		return (
-			<div className="paddle" id="right-paddle" style={{ top: PaddleY }} />
-		);
-	}
+export type pose_size = {
+	pos: coordonate,
+	size: coordonate,
 }
 
-class Left_Paddle extends Component<paddleProps> {
-	render() {
-		const {PaddleY} = this.props;
-		return (
-			<div className="paddle" id="left-paddle" style={{ top: PaddleY }} />
-		);
-	}
-}
 
-type ballProps = {
-	ballPosition: ballPosition,
-	nextballPosition: ballPosition,
-}
-class Ball extends Component <ballPosition> {
-	render() {
-		const ballPosition = this.props;
-		return (
-			<div className='ball' style={{ 
-				position: 'absolute',
-				top: ballPosition.y,
-				left: ballPosition.x,
-				width: '20px',
-				height: '20px',
-				backgroundColor: 'rgba(255, 255, 0, 0.775)',
-				borderRadius: '50%',
-				transitionProperty: "top, left",
-				transitionDuration: "0.1s",
-				transitionTimingFunction: "linear",
-			  }} />
-		);
-	}
-}
-
-type Game_BoardProps = {
-	leftPaddleY: number, 
-	rightPaddleY: number, 
-	ballPosition: ballPosition, 
-	nextballPosition: ballPosition,
-}
-class Game_Board extends Component<Game_BoardProps> {
+class Game_Board extends Component<GameState> {
   	render(){ 
-	const { leftPaddleY, rightPaddleY, ballPosition, nextballPosition } = this.props;
+	const { paddleleft, paddleright, ball } = this.props;
 	return (
 	<div className="game-board">
-		<Left_Paddle PaddleY={leftPaddleY} />
-        <Right_Paddle PaddleY={rightPaddleY} />
-        <Ball {...nextballPosition} />
+		<Left_Paddle pos={paddleleft.pos} size={paddleleft.size} />
+        <Right_Paddle pos={paddleright.pos} size={paddleright.size} />
+        <Balls balls={ball}/>
 	</div>
   );}
 }
@@ -99,15 +51,17 @@ export type GamePongProps = {
   };
 
 type GameState = {
-	leftPaddleY: number,
-	rightPaddleY: number,
-	ballPosition: ballPosition,
-	nextballPosition: ballPosition,
-	play: boolean,
+	paddleright: pose_size,
+	paddleleft: pose_size,
+	ball: pose_size[],
   };
 
+type coordonate = {
+	x: number,
+	y: number,
+}
 type PaddleMove = {
-	paddleY: number,
+	paddle: coordonate,
 	roomID: string,
 	uid: string,
 }
@@ -120,106 +74,81 @@ type playpause = {
 
 class GamePong extends React.Component<GamePongProps, GameState> {
 	private score: ScoreProps;
+	private keysPressed: Set<string> = new Set<string>();
+	private moveIntervalId: any;
 
 	constructor (props: any){
 		super(props);
+		console.log("gamepong uid : " + this.props.uid);
+		const paddlesize: coordonate = {
+			x: 20,
+			y: 80,
+		}
 		this.state = {
-			leftPaddleY: 160,
-  			rightPaddleY: 160,
-  			ballPosition: {x: 290, y: 190},
-  			nextballPosition: {x: 300, y: 200},
-			play: false,
+			paddleleft: {pos:{x: 20, y: 160}, size: paddlesize},
+  			paddleright: {pos:{x: 560, y: 160}, size: paddlesize},
+  			ball: [{pos:{x: 300, y: 200}, size:{x: 20, y: 20}}],
 		};
 		this.score = this.props.score;
 		this.handleKeyDown = this.handleKeyDown.bind(this);
+		this.handleKeyUp = this.handleKeyUp.bind(this);
 	}
 	componentDidMount(): void {
 		console.log('in room : ' + this.props.roomID);
 		document.addEventListener("keydown", this.handleKeyDown);
+		document.addEventListener("keyup", this.handleKeyUp);
     	this.props.socket.on('updateState', (data: GameState) => {
     		// const position: GameState = JSON.parse(data);
-    		this.setState({
-    		leftPaddleY: data.leftPaddleY,
-    		rightPaddleY: data.rightPaddleY,
-    		ballPosition: data.ballPosition,
-			nextballPosition: data.nextballPosition, 
-			play: data.play
-    		});
+    		this.setState(data);
     	});
 		this.props.socket.on('score', (data: string) => {
 			const score: ScoreProps = JSON.parse(data);
 			this.score = score;
 		});
+		this.moveIntervalId = setInterval(() => {
+			if (this.keysPressed.size === 0) return; // nothing to do
+			let dx = 0, dy = 0;
+			if (this.keysPressed.has("w")) dy -= 10;
+			if (this.keysPressed.has("s")) dy += 10;
+			if (this.keysPressed.has("a")) dx -= 10;
+			if (this.keysPressed.has("d")) dx += 10;
+			if (dx === 0 && dy === 0) return; // nothing to do
+			const data: PaddleMove = {
+			  paddle: { x: dx, y: dy },
+			  roomID: this.props.roomID,
+			  uid: this.props.uid,
+			};
+			this.props.socket.emit("updatePaddle", data);
+		  }, 50);
 	}
 	componentWillUnmount(): void {
 		document.removeEventListener("keydown", this.handleKeyDown);
+		document.removeEventListener("keyup", this.handleKeyUp);
+		clearInterval(this.moveIntervalId);
 	}
-	 // Handle keydown events
-	 handleKeyDown(event: any) {
-		let newvalue;
-		switch (event.key) {
-		  case "w":{
-			if (this.props.player == 1 && this.state.play){
-				const data: PaddleMove = {
-					paddleY : this.state.leftPaddleY - 10,
-					roomID : this.props.roomID,
-					uid : this.props.uid,
-				};
-				this.props.socket.emit("updatePaddle", data);
-			}
-			else if (this.props.player == 2 && this.state.play){
-				const data: PaddleMove = {
-					paddleY : this.state.rightPaddleY - 10,
-					roomID : this.props.roomID,
-					uid : this.props.uid,
-				};
-				this.props.socket.emit("updatePaddle", data);
-			}
-		}
-			break;
-		  case "s":{
-			if (this.props.player == 1 && this.state.play){
-				const data: PaddleMove = {
-					paddleY : this.state.leftPaddleY + 10,
-					roomID : this.props.roomID,
-					uid : this.props.uid,
-				};
-				this.props.socket.emit("updatePaddle", data);
-			}
-			else if (this.props.player == 2 && this.state.play){
-				const data: PaddleMove = {
-					paddleY : this.state.rightPaddleY + 10,
-					roomID : this.props.roomID,
-					uid : this.props.uid,
-				};
-				this.props.socket.emit("updatePaddle", data);
-			}
-		}
-			break;
-		  case "c":
-			{
-				const data: playpause = {
-					roomID : this.props.roomID,
-					uid : this.props.uid,
-					play: true,
-				};
-				this.props.socket.emit('playPong', data);
+	handleKeyDown = (event: KeyboardEvent) => {
+		event.preventDefault();
+		this.keysPressed.add(event.key);
+		if (this.keysPressed.has("c")) { // C
+			const data: playpause = {
+				roomID : this.props.roomID,
+				uid : this.props.uid,
+				play: true,
 			};
-			break;
-		  case "v":
-			this.setState({play : false}, () =>{
-				const data: playpause = {
-					roomID : this.props.roomID,
-					uid : this.props.uid,
-					play: false,
-				};
-				this.props.socket.emit('stopPong', data);
-			});
-			break;
-		  default:
-			break;
+			this.props.socket.emit('playPong', data);
 		}
-	  }
+		if (this.keysPressed.has("v")) { // V
+			const data: playpause = {
+				roomID : this.props.roomID,
+				uid : this.props.uid,
+				play: false,
+			};
+			this.props.socket.emit('stopPong', data);
+		}
+	  };
+	  handleKeyUp = (event: KeyboardEvent) => {
+		this.keysPressed.delete(event.key);
+	  };
 	render () {
 		return (
 		<div>
@@ -230,7 +159,7 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 							<Game_Board {...this.state}/>
 						</div>
 					</div>
-					<div>press 'c' to play or 'v' to pause<br />press 'w' to go up and 's' to go down</div>
+					<div>press 'c' to play or 'v' to pause<br />press 'w' to go up and 's' to go down<br />press'a' to go left and 'd' to go right</div>
 			</div>
 		</div>
 		);

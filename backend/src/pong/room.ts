@@ -1,14 +1,26 @@
-import { GameState } from "./GameState";
 import { Server } from 'socket.io';
 import { ScoreProps, GameStateupdate, gameResume } from "./pong.service";
 import { PongService } from "./pong.service";
 import { Game } from "src/entities/game.entity";
+import { Pong } from "./game/Pong";
+import { coordonate } from "./game/Pong";
+import { Item } from "./game/Item";
 
-// constructor (private readonly PongService: PongService){}
+export type pose_size = {
+	pos: coordonate,
+	size: coordonate,
+}
+
+export type Game_state = {
+	paddleright: pose_size,
+	paddleleft: pose_size,
+	ball: pose_size[],
+}
+
 export class Room {
 
 	id: string;
-	state: GameState;
+	state: Pong;
 	intervalid: NodeJS.Timer;
 	finished: boolean;
 	playpause: boolean;
@@ -20,7 +32,6 @@ export class Room {
 	idp2: string;
 	idspect: string[];
 	room_complete: Function;
-	// service: PongService;
   
 	constructor(id: string, server: Server, private readonly PongService : PongService) {
 	  this.id = id;
@@ -30,7 +41,7 @@ export class Room {
 	  this.players = 0;
 	  this.score1 = 0;
 	  this.score2 = 0;
-	  this.state = new(GameState);
+	  this.state = new(Pong);
 	  this.room_complete = () => {
         console.log('room_complete');
       }
@@ -63,12 +74,28 @@ export class Room {
 			this.idp2 = '';
 			this.players--;
 		}
-		else if (this.idspect.includes(id)){
+		else if (this.idspect && this.idspect.includes(id)){
 			console.log('user : ' + id + " disconnected from room : " + this.id);
 			this.players--;
 		}
 	}
-	
+
+	item_to_pose_size(item: Item): pose_size{
+		const pose = {
+			x: item.x,
+			y: item.y,
+		}
+		const size = {
+			x: item.width,
+			y: item.heigth,
+		}
+		const ret = {
+			pos: pose,
+			size: size,
+		}
+		return ret;
+	}
+
 	post_score_db(){
 		const id1: number = this.PongService.identifiate(this.idp1).id;
 		const id2: number = this.PongService.identifiate(this.idp2).id;
@@ -97,39 +124,40 @@ export class Room {
 		this.score2 = 0;
 	}
 
-	update_game_emit(){
-		this.state.updategame();
-		const data : GameStateupdate = { 
-			leftPaddleY: this.state.paddleleftposition,
-			rightPaddleY: this.state.paddlerightposition, 
-			ballPosition: {x: this.state.ballpositionx, y: this.state.ballpositiony},
-			nextballPosition: {x: this.state.nextballpositionx, y: this.state.nextballpositiony},
-			play : true,
-		};
-		this.server.to(this.id).emit('updateState', data)
-		if (this.state.ballpositionx < 0){
+	check_goal(index: number){
+		if (this.state.ball[index].x <= 0){
 			this.score2++;
-			this.emit_score_reset_ball();
+			this.emit_score_reset_ball(index);
 			this.end_match();
 		}
-		else if (this.state.ballpositionx > 590){
+		else if (this.state.ball[index].x + this.state.ball[index].width >= this.state.board.width){
 			this.score1++;
-			this.emit_score_reset_ball();
+			this.emit_score_reset_ball(index);
 			this.end_match();
 		}
 	}
 
-	emit_score_reset_ball(){
-		this.state.reset();
-		const state : GameStateupdate = { 
-			leftPaddleY: this.state.paddleleftposition,
-			rightPaddleY: this.state.paddlerightposition, 
-			ballPosition: {x: this.state.ballpositionx, y: this.state.ballpositiony},
-			nextballPosition: {x: this.state.nextballpositionx, y: this.state.nextballpositiony},
-			play : true,
+	gen_game_state(): Game_state{
+		const data : Game_state = { 
+			paddleleft: this.item_to_pose_size(this.state.paddleleft),
+			paddleright: this.item_to_pose_size(this.state.paddleright), 
+			ball: this.state.ball.map(item => this.item_to_pose_size(item)),
 		};
-		this.server.to(this.id).emit('updateState', state)
+		return data;
+	}
+
+	update_game_emit(){
+		this.state.updategame();
+		this.server.to(this.id).emit('updateState', this.gen_game_state())
+		for (let i: number = 0; i < this.state.ball.length; i++){
+			this.check_goal(i);
+		}
+	}
+
+	emit_score_reset_ball(index: number){
 		this.pause();
+		this.state.reset();
+		this.server.to(this.id).emit('updateState', this.gen_game_state())
 		const data: ScoreProps = {
 			player1 : this.PongService.identifiate(this.idp1).username,
 			player2 : this.PongService.identifiate(this.idp2).username,
@@ -139,20 +167,35 @@ export class Room {
 		this.server.to(this.id).emit('score', JSON.stringify(data));
 	}
 
-	update_paddle(paddle : number, uid: string){
-		if (uid === this.idp1){
+	update_paddle(paddle : coordonate, uid: string){
+		console.log('trying to update paddle : ' + JSON.stringify(paddle) + '\nuid : ' + uid + '\nidp1 : ' + this.idp1 + '\nidp2 : ' + this.idp2);
+		if (this.playpause){
+			if (uid === this.idp1){
 			this.update_left_paddle(paddle);
-		}
-		else if (uid === this.idp2){
-			this.update_right_paddle(paddle);
+			}
+			else if (uid === this.idp2){
+				this.update_right_paddle(paddle);
+			}
 		}
 	}
-	update_left_paddle(leftPaddleY: number){
-		this.state.update_left_paddle(leftPaddleY);
+	update_left_paddle(coor: coordonate){
+		//horizontal check 
+		if (this.state.paddleleft.x + coor.x > 0 && this.state.paddleleft.x + this.state.paddleleft.width + coor.x < this.state.board.width / 2){
+			//vertical check
+			if (this.state.paddleleft.y + coor.y > 0 && this.state.paddleleft.y + this.state.paddleleft.heigth + coor.y < this.state.board.heigth){
+				this.state.paddleleft.move(coor.x, coor.y);
+			}
+		}
 	}
 
-	update_right_paddle(rightPaddleY: number){
-		this.state.update_right_paddle(rightPaddleY);
+	update_right_paddle(coor: coordonate){
+		//horizontal check
+		if (this.state.paddleright.x + coor.x > this.state.board.width / 2 && this.state.paddleright.x + this.state.paddleright.width + coor.x < this.state.board.width){
+			//vertical check
+			if (this.state.paddleright.y + coor.y > 0 && this.state.paddleright.y + this.state.paddleright.heigth + coor.y < this.state.board.heigth){
+				this.state.paddleright.move(coor.x, coor.y);
+			}
+		}
 	}
 
 	play(){

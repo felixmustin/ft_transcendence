@@ -6,6 +6,7 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 import { User } from '../entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { TokenExpiredError } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 
 
@@ -113,6 +114,7 @@ export class AuthService {
   }
 
   async verifyRefreshToken(refreshToken: string) {
+    try{
     const payload = this.jwtService.verify(refreshToken);
     if (!payload) {
       throw new UnauthorizedException('Invalid refresh token');
@@ -130,6 +132,16 @@ export class AuthService {
     }
     // Generate a new access token with the same payload as before
     return this.generateAccessToken(user);
+  }
+  catch (error) { // <-- Include the error parameter here
+  if (error instanceof TokenExpiredError) {
+    // Handle expired refresh token
+    // ... generate new refresh token ...
+  } else {
+    // Handle other errors
+    throw error;
+  }
+  }
   }
 
   // async generateAccessTokenFromRefreshToken(refreshToken: string) {

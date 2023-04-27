@@ -9,22 +9,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	constructor(private readonly pongService: PongService) {}
 	async handleConnection(client: any, ...args: any[]) {
-		// this.pongService.setServer(this.server);
-		try {
-			this.pongService.login(client);
-		} catch (err) {
-			this.server.close(client);
-		}
+		this.pongService.login(client, this.server);
 	}
 	handleDisconnect(client: any) {
 		this.pongService.logout(client);
 	}
-	  
 	afterInit(server: any) {
 		console.log("websocket initialized");
 	}
-
-	//calculate
 	@SubscribeMessage('playPong')
 	async playPong(client: any, data: playpause) {
 		this.pongService.play(client, data);
@@ -45,6 +37,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			uid : uid,
 			users: users,
 		}
+		console.log("responding to handshake");
   		client.emit('handshake-response', shake);
 	}
 	@SubscribeMessage('find_match')
