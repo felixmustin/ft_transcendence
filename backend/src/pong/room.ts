@@ -168,7 +168,6 @@ export class Room {
 	}
 
 	update_paddle(paddle : coordonate, uid: string){
-		console.log('trying to update paddle : ' + JSON.stringify(paddle) + '\nuid : ' + uid + '\nidp1 : ' + this.idp1 + '\nidp2 : ' + this.idp2);
 		if (this.playpause){
 			if (uid === this.idp1){
 			this.update_left_paddle(paddle);

@@ -28,7 +28,6 @@ export class Pong{
 		this.ball = [new Item(300, 200, ballsize, ballsize)];
 		this.ballspeedx = [this.or_speed];
 		this.ballspeedy = [this.or_speed];
-		console.log('paddle right : ' + this.paddleright.x);
 	}
 
 	reset(){
@@ -44,12 +43,10 @@ export class Pong{
 		this.ball.forEach((element, index) => {
 			element.move(this.ballspeedx[index], this.ballspeedy[index]);
 			if (this.ballspeedx[index] > 0 && element.is_in(this.paddleright)){
-				this.ballspeedx[index] *= -1;
-				element.rebound_hor(this.ballspeedx[index]);
+				this.bounce_right(index);
 			}
 			else if (this.ballspeedx[index] < 0 && element.is_in(this.paddleleft)){
-				this.ballspeedx[index] *= -1;
-				element.rebound_hor(this.ballspeedx[index]);
+				this.bounce_left(index);
 			}
 			if (!element.is_verticaly_in(this.board)){
 				this.ballspeedy[index] *= -1;
@@ -70,6 +67,7 @@ export class Pong{
 	}
 
 	quicker(index: number){
+		console.log('quicker summoned : ' + this.ballspeedx[index] + ' | ' + this.ballspeedy[index]);
 		if (this.ballspeedx[index] >= this.ballspeedy[index]){
 			if (this.ballspeedy[index] > 0)
 				this.ballspeedy[index]++;
