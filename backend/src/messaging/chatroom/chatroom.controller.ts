@@ -2,10 +2,12 @@ import { Controller, Delete, Get, Post, Param, Request, UseGuards, ParseIntPipe 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatRoomService } from './chatroom.service';
 import { Message } from '../../entities/message.entity';
+import { UserService } from 'src/user/user.service';
 
 @Controller('chatroom')
 export class ChatRoomController {
-  constructor(private chatRoomService: ChatRoomService) {}
+  constructor(private chatRoomService: ChatRoomService,
+    private userService: UserService) {}
 
   @Post('create/:targetId')
   @UseGuards(JwtAuthGuard)
@@ -60,5 +62,17 @@ export class ChatRoomController {
   @Get('last_message/:roomId')
   async getLastMessageByChatRoomId(@Param('roomId') roomId: number) {
     return await this.chatRoomService.getLastMessageByChatRoomId(roomId);
+  }
+
+  @Get(':userId/:targetId')
+  async getChatRoomByUsers(@Param('userId') userId: number, @Param('targetId') targetId: number) {
+    return await this.chatRoomService.getChatRoomByUsers(userId, targetId);
+  }
+
+  @Get(':roomId/all/users/')
+  async getUsersByChatRoomId(@Param('roomId') roomId: number) {
+    const result = await this.chatRoomService.getUsersByChatRoomId(roomId);
+    console.log('getUsersByChatRoomId result:', result);
+    return result;
   }
 }

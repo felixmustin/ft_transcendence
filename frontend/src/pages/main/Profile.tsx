@@ -100,8 +100,24 @@ const Profile = ({ username }: Props) => {
   // This needs to be updated to use the API.
   // Handle the sending of a message to the user
   const handleSendMessage = async () => {
-    // Implement sending a message to the user
-    //console.log("Sending a message to user:", profile.username);
+    try {
+      const auth = 'Bearer ' + token.accessToken;
+      const res = await fetch(`http://localhost:3001/chatroom/create/${profile.id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': auth,
+        },
+      });
+  
+      if (res.ok) {
+        const chatRoom = await res.json();
+        navigate(`/chatpage/`);
+      } else {
+        console.error("Error creating chat room:", res.statusText);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   if (error) //error

@@ -22,6 +22,20 @@ export class UserController {
     return userProfile;
   }
 
+  @Post('profiles')
+  async getUsersUsernameByIds(@Body() body: { users: number[] }) {
+    console.log('Received body:', body);
+    let profiles = [];
+    const userIds = body.users;
+    for (let i = 0; i < userIds.length; i++) {
+      let profile = (await this.userService.findUserProfileById(userIds[i])).username;
+      profiles.push(profile);
+    }
+    console.log('Returning profiles:', profiles);
+    return profiles;
+  }
+
+
   @Get('profile/:username')
   @UseGuards(JwtAuthGuard)
   async getUserProfileByUsername(@Request() req, @Param('username') username: string) {
@@ -57,6 +71,11 @@ export class UserController {
     return user;
   }
 
+  @Get('userid/:username')
+  async getUserIdByUsername(@Param('username') username: string) {
+    const user = await this.userService.findUserByUsername(username);
+    return user.id;
+  }
 
   @Put('update/username')
   @UseGuards(JwtAuthGuard)

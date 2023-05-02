@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { ChatRoom } from '../../entities/chatroom.entity';
 import { User } from '../../entities/user.entity';
 import { Message } from '../../entities/message.entity';
+import { Profile } from 'src/entities/profile.entity';
 
 @Injectable()
 export class ChatRoomService {
@@ -14,11 +15,13 @@ export class ChatRoomService {
     private userRepository: Repository<User>,
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
+    @InjectRepository(Profile)
+    private profileRepository: Repository<Profile>,
   ) {}
 
 
   async createChatRoomFromUsers(userId: number, targetId: number): Promise<ChatRoom> {
-    const chatRoom = await this.getChatRoomByUsers(userId, targetId);
+    let chatRoom = await this.getChatRoomByUsers(userId, targetId);
     if (!chatRoom) {
       // Fetch the User entities using the provided IDs
       const user1 = await this.userRepository.findOne({ where: { id: userId } });
@@ -37,7 +40,7 @@ export class ChatRoomService {
     return chatRoom;
   }
 
-  // This function looks for a chatroom that has the two users as participants
+  // This function looks for a chatroom that has the two users as participants and only those 2
   async getChatRoomByUsers(userId: number, targetId: number): Promise<ChatRoom> {
     const chatRoom = await this.chatRoomRepository
     .createQueryBuilder('chatroom')
@@ -114,4 +117,11 @@ export class ChatRoomService {
     return chatRoom.messages[chatRoom.messages.length - 1];
   }
 
+  async getUsersByChatRoomId(roomId: number): Promise<number[]> {
+    const chatRoom = await this.chatRoomRepository.findOne({ where: { id: roomId }, relations: ['participants'] });
+    if (!chatRoom) {
+      throw new NotFoundException('Chatroom not found');
+    }
+    return chatRoom.participants.map((user) => user.id);
+  }
 }

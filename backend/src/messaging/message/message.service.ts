@@ -14,29 +14,37 @@ export class MessageService {
     @InjectRepository(ChatRoom) private chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(User) private userRepository: Repository<User>,) {}
 
-  async sendToChatRoom(chatRoom: ChatRoom, senderId: number, content: string) {
-    const sender = await this.userRepository.findOne({ where: { id: senderId } });
-    if (!sender) {
-      throw new NotFoundException(`Sender with ID ${senderId} not found.`);
+    // This function need a chatroom, a sender and a content.
+    // It will create a new message and save it in the database.
+    // It will also update the last_message and last_user of the chatroom.
+    // It will return the new message.
+    async sendToChatRoom(chatRoomId: number, senderId: number, content: string): Promise<Message> {
+      const sender = await this.userRepository.findOne({ where: { id: senderId } });
+      const chatRoom = await this.chatRoomRepository.findOne({ where: { id: chatRoomId } });
+      if (!sender) {
+        throw new NotFoundException(`Sender with ID ${senderId} not found.`);
+      }
+      if (!chatRoom) {
+        throw new NotFoundException(`Conversation with ID ${chatRoomId} not found.`);
+      }
+  
+      const newMessage = this.messageRepository.create({
+        content: content,
+        chatroom: chatRoom,
+        user: sender,
+      });
+  
+      if (newMessage) {
+        chatRoom.last_message = newMessage;
+        chatRoom.last_user = sender;
+      }
+  
+      await this.messageRepository.save(newMessage);
+      await this.chatRoomRepository.save(chatRoom);
+      return (newMessage);
     }
 
-    const newMessage = this.messageRepository.create({
-      content: content,
-      chatroom: chatRoom,
-      user: sender,
-    });
-
-    if (newMessage) {
-      chatRoom.last_message = newMessage;
-      chatRoom.last_user = sender;
-    }
-
-    await this.messageRepository.save(newMessage);
-    await this.chatRoomRepository.save(chatRoom);
-    return newMessage;
-  }
-
-
+}
 
 
   //async createMessage(roomId: number, senderId: number, content: string): Promise<Message> {
@@ -82,4 +90,4 @@ export class MessageService {
   //  return await this.messageRepository.find({ where: { senderId: id } });
   //}
 
-}
+
