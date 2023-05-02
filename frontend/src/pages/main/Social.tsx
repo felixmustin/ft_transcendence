@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/design/Navbar'
-import Chat from '../../components/messages/Chat'
 import FriendList from '../../components/user/FriendList'
 import { tokenForm } from '../../interfaceUtils'
 import { useNavigate } from 'react-router-dom'
 import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
 import Loading from '../../components/utils/Loading'
 
-type Props = {}
 
-const Social = (props: Props) => {
+const Social = () => {
 
   const [token, setToken] = useState<tokenForm>();
   const [isTokenSet, setIsTokenSet] = useState(false);
@@ -36,7 +34,7 @@ const Social = (props: Props) => {
       <div className='app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden'>
           <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
               <div className="xl:max-w-[1280px] w-full">
-                    <Navbar />
+                    <Navbar item={token}/>
               </div>
           </div>
 
@@ -47,7 +45,7 @@ const Social = (props: Props) => {
           </div>
           <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>
           <div>
-            <FriendList item={{ accessToken: token?.accessToken }} />
+            <FriendList item={{ accessToken: token.accessToken }} />
           </div>
         </div>
       </div>

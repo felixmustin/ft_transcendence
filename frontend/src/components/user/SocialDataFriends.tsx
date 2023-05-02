@@ -1,5 +1,4 @@
 import React from 'react'
-import { getSessionsToken } from '../../sessionsUtils';
 import DisplayAvatar from '../utils/DisplayAvatar'
 
 type Props = {
@@ -11,13 +10,16 @@ type Props = {
     lastname: string;
     age: number;
     avatar: {type: string, data: []}
+  },
+  item: {
+    accessToken: string;
   };
+  onChange: () => void;
 }
 
 const SocialDataFriends = (props: Props) => {
 
-  const token = getSessionsToken()
-  const auth = 'Bearer ' + token.accessToken;
+  const auth = 'Bearer ' + props.item.accessToken;
   // This needs to be updated to use the API.
   // Handle the launching of a game
   const handleLaunchGame = () => {
@@ -35,8 +37,10 @@ const SocialDataFriends = (props: Props) => {
             method: 'DELETE', 
             headers: { 'Authorization': auth },
             })
-        if (res.ok)
-            alert("Friendship deleted")
+        if (res.ok) {
+          alert("Friendship deleted")
+          props.onChange()
+        }
     } catch (error) {
         alert(error);
     }

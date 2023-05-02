@@ -1,31 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { getSessionsToken, removeSessionsToken } from '../../sessionsUtils';
+import { removeSessionsToken } from '../../sessionsUtils';
 import Loading from '../utils/Loading';
 import { tokenForm } from '../../interfaceUtils';
 
-type Props = {}
+type Props = {
+  item: tokenForm
+}
 
 const Disconnect = (props: Props) => {
 
-  const [token, setToken] = useState<tokenForm>();
-  const [isTokenSet, setIsTokenSet] = useState(false);
-
   // Navigation
   const navigate = useNavigate();
-  // Session and auth
-  useEffect(() => {
-    async function getToken() {
-      const sessionToken = await getSessionsToken();
-      setToken(sessionToken);
-      setIsTokenSet(true)
-    }
-    getToken();
-  }, []);
 
   const disconnect = () => {
     let url = 'http://localhost:3001/user/disconnect/'
-    let auth = 'Bearer ' + token.accessToken;
+    let auth = 'Bearer ' + props.item.accessToken;
     fetch(url, {
       method: 'PUT',
       headers: {'Authorization': auth}
@@ -41,7 +31,7 @@ const Disconnect = (props: Props) => {
 
   const deleteAcc = () => {
     let url = 'http://localhost:3001/user/delete/'
-    let auth = 'Bearer ' + token.accessToken;
+    let auth = 'Bearer ' + props.item.accessToken;
     fetch(url, {
       method: 'DELETE',
       headers: {'Authorization': auth}
@@ -63,10 +53,6 @@ const Disconnect = (props: Props) => {
     });
   }
 
-  if (!isTokenSet)
-    return <Loading />
-  else 
-  {
     return (
       <div className="flex flex-col absolute right-0 mt-2 py-2">
         <button className='link' onClick={disconnect}>Disconnect</button>
@@ -74,6 +60,5 @@ const Disconnect = (props: Props) => {
     </div>
     )
   }
-}
 
 export default Disconnect

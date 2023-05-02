@@ -89,7 +89,7 @@ const Setting2FA = (props: Props) => {
     try {
       const auth = 'Bearer ' + props.item.accessToken
       const response = await fetch('http://localhost:3001/2fa/generate', {
-        method: 'POST',
+        method: 'GET',
         headers: {
           Authorization: auth,
         },

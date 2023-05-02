@@ -6,7 +6,6 @@ export function setSessionToken(tokenObj: any) {
   }
 
 export async function getSessionsToken() {
-
   const tokenStr = sessionStorage.getItem('token')
   const tokenObj = JSON.parse(tokenStr!)
   if (!tokenObj)
@@ -14,7 +13,7 @@ export async function getSessionsToken() {
   const accessTokenExp = jwtDecode(tokenObj.accessToken).exp;
   const now = Math.floor(Date.now() / 1000);
   const timeLeft = accessTokenExp - now;
-  if (timeLeft < 300) {
+  if (timeLeft < 30) {
     const res = await fetch('http://localhost:3001/auth/refresh-token', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},

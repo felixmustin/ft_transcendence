@@ -4,7 +4,6 @@ import { PongGateway } from './pong.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Game } from 'src/entities/game.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/auth/constants';
 import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
 import { UserModule } from 'src/user/user.module';
 
@@ -13,7 +12,7 @@ import { UserModule } from 'src/user/user.module';
     UserModule,
     TypeOrmModule.forFeature([Game]),
     JwtModule.register({
-      secret: jwtConstants.secret,
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '15m' },
     }),
   ],
