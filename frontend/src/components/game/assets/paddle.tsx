@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { pose_size } from "./Pong";
+import { pose_size } from "../Pong";
 
 export class Right_Paddle extends Component<pose_size> {
 	render(){

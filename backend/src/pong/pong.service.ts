@@ -113,6 +113,7 @@ export class PongService {
 
 	paddelupdate(client:any, data: PaddleMove){
 		const room = data.roomID;
+		// console.log('received : ' + JSON.stringify(data));
 		this.maproom.get(room).update_paddle(data.paddle, client.id);
 	}
 

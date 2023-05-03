@@ -27,7 +27,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 	const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
 	const [loading, setloading ] = useState(true);
 
-	const socket = useSocket('ws://127.0.0.1:3001', {
+	const socket = useSocket('ws://127.0.0.1:3001/play', {
 		reconnectionAttempts: 5,
 		reconnectionDelay: 5000,
 		autoConnect: false,

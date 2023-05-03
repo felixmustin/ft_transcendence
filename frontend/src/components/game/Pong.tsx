@@ -1,8 +1,9 @@
 import React, { useState, useEffect, Component } from 'react';
 import './pong.css';
 import { Socket } from 'socket.io-client';
-import { Left_Paddle, Right_Paddle } from './paddle';
-import { Balls } from './balls';
+import { Left_Paddle, Right_Paddle } from './assets/paddle';
+import { Balls } from './assets/balls';
+import GameboardIcon from './assets/bonus';
 
 export type pose_size = {
 	pos: coordonate,
@@ -12,12 +13,13 @@ export type pose_size = {
 
 class Game_Board extends Component<GameState> {
   	render(){ 
-	const { paddleleft, paddleright, ball } = this.props;
+	const { paddleleft, paddleright, ball, bonus, which_bonus } = this.props;
 	return (
 	<div className="game-board">
 		<Left_Paddle pos={paddleleft.pos} size={paddleleft.size} />
         <Right_Paddle pos={paddleright.pos} size={paddleright.size} />
-        <Balls balls={ball}/>
+        <Balls balls={ball} which_bonus={which_bonus}/>
+		<GameboardIcon bonus={bonus} which_bonus={which_bonus} />
 	</div>
   );}
 }
@@ -54,9 +56,11 @@ type GameState = {
 	paddleright: pose_size,
 	paddleleft: pose_size,
 	ball: pose_size[],
+	bonus: coordonate | undefined,
+	which_bonus: number,
   };
 
-type coordonate = {
+export type coordonate = {
 	x: number,
 	y: number,
 }
@@ -88,6 +92,8 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 			paddleleft: {pos:{x: 20, y: 160}, size: paddlesize},
   			paddleright: {pos:{x: 560, y: 160}, size: paddlesize},
   			ball: [{pos:{x: 300, y: 200}, size:{x: 20, y: 20}}],
+			bonus: undefined,
+			which_bonus: -1,
 		};
 		this.score = this.props.score;
 		this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -98,7 +104,6 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 		document.addEventListener("keydown", this.handleKeyDown);
 		document.addEventListener("keyup", this.handleKeyUp);
     	this.props.socket.on('updateState', (data: GameState) => {
-    		// const position: GameState = JSON.parse(data);
     		this.setState(data);
     	});
 		this.props.socket.on('score', (data: string) => {
@@ -118,6 +123,7 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 			  roomID: this.props.roomID,
 			  uid: this.props.uid,
 			};
+			console.log('emiting : ' + JSON.stringify(data));
 			this.props.socket.emit("updatePaddle", data);
 		  }, 50);
 	}

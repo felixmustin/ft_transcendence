@@ -72,6 +72,12 @@ save:
 
 .PHONY: all re down clean save
 
-# authentification gateway 
-# chat en socket 
 # ajouter bonus jeu
+# double balle continue tant qui a une balle
+# balle bonus plusieurs points
+# palette plus rapide
+# palette plus grande
+# palette plus petite
+# socket general
+# fix private room
+# useguard gateway

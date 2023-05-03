@@ -2,7 +2,7 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnG
 import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause } from './pong.service';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway( { cors: true })
+@WebSocketGateway( { namespace:'/play', cors: true })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	// server
 	@WebSocketServer() server: Server;

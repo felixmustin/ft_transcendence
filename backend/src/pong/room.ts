@@ -15,6 +15,8 @@ export type Game_state = {
 	paddleright: pose_size,
 	paddleleft: pose_size,
 	ball: pose_size[],
+	bonus: coordonate | undefined,
+	which_bonus: number,
 }
 
 export class Room {
@@ -127,11 +129,15 @@ export class Room {
 	check_goal(index: number){
 		if (this.state.ball[index].x <= 0){
 			this.score2++;
+			if (this.state.which_bonus === 5)
+				this.score2++;
 			this.emit_score_reset_ball(index);
 			this.end_match();
 		}
 		else if (this.state.ball[index].x + this.state.ball[index].width >= this.state.board.width){
 			this.score1++;
+			if (this.state.which_bonus === 5)
+				this.score1++;
 			this.emit_score_reset_ball(index);
 			this.end_match();
 		}
@@ -142,6 +148,8 @@ export class Room {
 			paddleleft: this.item_to_pose_size(this.state.paddleleft),
 			paddleright: this.item_to_pose_size(this.state.paddleright), 
 			ball: this.state.ball.map(item => this.item_to_pose_size(item)),
+			bonus: this.state.bonus ? {x: this.state.bonus.x, y: this.state.bonus.y} : undefined,
+			which_bonus: this.state.which_bonus,
 		};
 		return data;
 	}
@@ -179,22 +187,22 @@ export class Room {
 	}
 	update_left_paddle(coor: coordonate){
 		//horizontal check 
-		if (this.state.paddleleft.x + coor.x > 0 && this.state.paddleleft.x + this.state.paddleleft.width + coor.x < this.state.board.width / 2){
-			//vertical check
-			if (this.state.paddleleft.y + coor.y > 0 && this.state.paddleleft.y + this.state.paddleleft.heigth + coor.y < this.state.board.heigth){
-				this.state.paddleleft.move(coor.x, coor.y);
-			}
-		}
+		// if (this.state.paddleleft.x + coor.x > 0 && this.state.paddleleft.x + this.state.paddleleft.width + coor.x < this.state.board.width / 2){
+		// 	//vertical check
+		// 	if (this.state.paddleleft.y + coor.y > 0 && this.state.paddleleft.y + this.state.paddleleft.heigth + coor.y < this.state.board.heigth){
+				this.state.update_left_paddle(coor.x, coor.y);
+		// 	}
+		// }
 	}
 
 	update_right_paddle(coor: coordonate){
 		//horizontal check
-		if (this.state.paddleright.x + coor.x > this.state.board.width / 2 && this.state.paddleright.x + this.state.paddleright.width + coor.x < this.state.board.width){
-			//vertical check
-			if (this.state.paddleright.y + coor.y > 0 && this.state.paddleright.y + this.state.paddleright.heigth + coor.y < this.state.board.heigth){
-				this.state.paddleright.move(coor.x, coor.y);
-			}
-		}
+		// if (this.state.paddleright.x + coor.x > this.state.board.width / 2 && this.state.paddleright.x + this.state.paddleright.width + coor.x < this.state.board.width){
+		// 	//vertical check
+		// 	if (this.state.paddleright.y + coor.y > 0 && this.state.paddleright.y + this.state.paddleright.heigth + coor.y < this.state.board.heigth){
+				this.state.update_right_paddle(coor.x, coor.y);
+		// 	}
+		// }
 	}
 
 	play(){
