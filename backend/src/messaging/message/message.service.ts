@@ -44,6 +44,17 @@ export class MessageService {
       return (newMessage);
     }
 
+    async getMessageById(id: number): Promise<Message> {
+      const message = await this.messageRepository.findOne({ where: { id: id }, relations: ['user', 'user.profile'] });
+      if (!message) {
+        throw new NotFoundException(`Message with ID ${id} not found.`);
+      }
+      return message;
+    }
+
+    async deleteMessageById(id: number): Promise<void> {
+      await this.messageRepository.delete(id);
+    }
 }
 
 

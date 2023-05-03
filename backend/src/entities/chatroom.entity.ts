@@ -64,6 +64,6 @@ import {
     @UpdateDateColumn()
     updated_at: Date;
 
-    @OneToMany(() => Message, (message) => message.chatroom)
+    @OneToMany(() => Message, (message) => message.chatroom, {onDelete: 'CASCADE'})
     messages: Message[];
   }

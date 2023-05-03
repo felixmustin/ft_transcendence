@@ -37,7 +37,14 @@ export class MessageController {
     return await this.messageService.sendToChatRoom(chatRoom.id, userId, createMessageDto.content);
   }
 
-
+  @Get(':roomId/messages')
+  async getMessagesFromRoom(@Param('roomId') roomId: number) {
+    let chatRoom = await this.chatRoomService.getChatRoomById(roomId);
+    let messages = [];
+    for (let i = 0; i < chatRoom.messages.length; i++)
+      messages.push(await this.messageService.getMessageById(chatRoom.messages[i].id));
+    return messages;
+  }
 
 
   //@Post('create')

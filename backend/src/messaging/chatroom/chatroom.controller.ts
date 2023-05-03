@@ -1,13 +1,15 @@
-import { Controller, Delete, Get, Post, Param, Request, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Param, Request, UseGuards, ParseIntPipe, Body } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatRoomService } from './chatroom.service';
 import { Message } from '../../entities/message.entity';
 import { UserService } from 'src/user/user.service';
+import { MessageService } from '../message/message.service';
 
 @Controller('chatroom')
 export class ChatRoomController {
   constructor(private chatRoomService: ChatRoomService,
-    private userService: UserService) {}
+    private userService: UserService,
+    private messageService: MessageService) {}
 
   @Post('create/:targetId')
   @UseGuards(JwtAuthGuard)
@@ -19,6 +21,17 @@ export class ChatRoomController {
   @Post('create/:targetId/:userId')
   async createChatRoomFromUsersWithoutAuth(@Param('targetId') targetId: number, @Param('userId') userId: number) {
     return await this.chatRoomService.createChatRoomFromUsers(userId, targetId);
+  }
+
+  @Post('create')
+@UseGuards(JwtAuthGuard)
+async createChatRoom(@Request() req: any, @Body() { name, mode, password }: { name: string, mode: string, password: string }) {
+  return await this.chatRoomService.createCustomChatRoom(name, mode, password, req.user.id);
+}
+
+  @Get(':roomId/users')
+  async getUsersByChatRoom(@Param('roomId') roomId: number) {
+    return await this.chatRoomService.getFullUsersByChatRoomId(roomId);
   }
 
   @Post('create_public')
@@ -56,6 +69,17 @@ export class ChatRoomController {
 
   @Delete(':roomId')
   async deleteChatRoomById(@Param('roomId') roomId: number) {
+    let chatRoom = await this.chatRoomService.getChatRoomById(roomId);
+    chatRoom.last_message = null;
+    chatRoom.last_user = null;
+    chatRoom.last_message_id = null;
+    chatRoom.last_user_id = null;
+    await this.chatRoomService.updateChatRoom(chatRoom);
+    let messages = await this.chatRoomService.getMessagesByChatRoomId(roomId);
+    for (let i = 0; i < messages.length; i++) {
+      messages[i].chatroom = null;
+      await this.messageService.deleteMessageById(messages[i].id);
+    }
     return await this.chatRoomService.deleteChatRoomById(roomId);
   }
 

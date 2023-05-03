@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ChatRoom } from '../../entities/chatroom.entity';
+import { ChatRoom, ChatRoomMode } from '../../entities/chatroom.entity';
 import { User } from '../../entities/user.entity';
 import { Message } from '../../entities/message.entity';
 import { Profile } from 'src/entities/profile.entity';
+import { MessageService } from '../message/message.service';
 
 @Injectable()
 export class ChatRoomService {
@@ -17,6 +18,7 @@ export class ChatRoomService {
     private messageRepository: Repository<Message>,
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
+	private messageService: MessageService
   ) {}
 
 
@@ -39,6 +41,27 @@ export class ChatRoomService {
     }
     return chatRoom;
   }
+
+  async createCustomChatRoom(name: string, mode: string, password: string, userId: number): Promise<ChatRoom> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    if (!Object.values(ChatRoomMode).includes(mode as ChatRoomMode)) {
+      throw new NotFoundException('Invalid chat room mode');
+    }
+  
+    const chatRoom = this.chatRoomRepository.create({
+      name: name,
+      mode: mode as ChatRoomMode,
+      password_hash: (mode === ChatRoomMode.PROTECTED || mode === ChatRoomMode.PRIVATE) ? password : null,
+      participants: [user],
+    });
+    await this.chatRoomRepository.save(chatRoom);
+    return chatRoom;
+  }
+  
 
   // This function looks for a chatroom that has the two users as participants and only those 2
   async getChatRoomByUsers(userId: number, targetId: number): Promise<ChatRoom> {
@@ -97,8 +120,11 @@ export class ChatRoomService {
     if (!chatRoom) {
       return [];//throw new NotFoundException(`Chatroom with ID ${roomId} not found.`);
     }
-  
-    return chatRoom.messages;
+	let messages = [];
+	for (let i = 0; i < chatRoom.messages.length; i++) {
+		messages.push(await this.messageService.getMessageById(chatRoom.messages[i].id));
+	}
+	return messages;
   }
 
   async deleteChatRoomById(roomId: number): Promise<void> {
@@ -106,6 +132,7 @@ export class ChatRoomService {
     if (!chatRoom) {
       throw new NotFoundException('Chatroom not found');
     }
+    chatRoom.messages = [];
     await this.chatRoomRepository.remove(chatRoom);
   }
 
@@ -123,5 +150,17 @@ export class ChatRoomService {
       throw new NotFoundException('Chatroom not found');
     }
     return chatRoom.participants.map((user) => user.id);
+  }
+
+  async getFullUsersByChatRoomId(roomId: number): Promise<User[]> {
+    const chatRoom = await this.chatRoomRepository.findOne({ where: { id: roomId }, relations: ['participants', 'participants.profile'] });
+    if (!chatRoom) {
+      throw new NotFoundException('Chatroom not found');
+    }
+    return chatRoom.participants.map((user) => user);
+  }
+
+  async updateChatRoom(chatRoom: ChatRoom): Promise<void> {
+    await this.chatRoomRepository.save(chatRoom);
   }
 }

@@ -20,7 +20,7 @@ const Play = () => {
   	// Session and auth
   	useEffect(() => {
 		  if (!isSessionTokenSet()) // '!'token
-			navigate('/');
+		  navigate('/');
 		  else {
 			  async function fetchReq(){
 				  const token = await getSessionsToken();
@@ -29,6 +29,7 @@ const Play = () => {
 				  fetch('http://localhost:3001/user/id/', {method: 'GET', headers: {'Authorization': auth}})
 				  .then(res => res.json())
 				  .then(
+					  
 					  (result) => {
 						  if (result.statusCode === 401)
 						  navigate('/');
@@ -52,7 +53,7 @@ const Play = () => {
 				<div>
 			<div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
         		<div className="xl:max-w-[1280px] w-full">
-					<Navbar item={token}/>
+					<Navbar />
 				</div>
 			</div>
 			<div className="flex justify-evenly">

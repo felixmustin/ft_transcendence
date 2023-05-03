@@ -5,7 +5,6 @@ import Chat from '../../components/messages/Chat';
 import { tokenForm } from '../../interfaceUtils'
 import { useNavigate } from 'react-router-dom'
 import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
-import Loading from '../../components/utils/Loading';
 
 type Props = {};
 
@@ -30,23 +29,17 @@ const ChatPage = (props: Props) => {
       getToken();
   }, []);
 
-  if (!isTokenSet)
-    return <Loading />
-  else {
-    console.log("what")
-    console.log(token)
-    return (
-      <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
-          <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
-            <div className="xl:max-w-[1280px] w-full">
-              <Navbar item={token}/>
-            </div>
-          </div>
-          <Chat accessToken={token.accessToken} />
+  return (
+    <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
+      <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
+        <div className="xl:max-w-[1280px] w-full">
+          <Navbar />
+        </div>
       </div>
-    );
-  };
-}
+      {token && <Chat accessToken={token.accessToken} />}
+    </div>
+  );
+};
 
 export default ChatPage;
 

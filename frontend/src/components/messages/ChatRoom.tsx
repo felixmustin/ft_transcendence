@@ -3,6 +3,7 @@ import ChatBox from './ChatBox';
 import SendMessage from './SendMessage';
 import { Socket } from 'socket.io-client';
 import { MessageInterface } from './types';
+import Participants from './Participants';
 
 type Props = {
   roomId: number;
@@ -18,6 +19,7 @@ const ChatRoom = ({ roomId, id, socket }: Props) => {
 
   return (
     <div className="bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 relative w-2/3 p-3 rounded-lg">
+      <Participants roomId={roomId} id={id}/>
       <ChatBox roomId={roomId} id={id} socket={socket} />
       <SendMessage roomId={roomId} id={id} socket={socket} />
     </div>

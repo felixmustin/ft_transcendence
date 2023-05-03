@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Message from './Message';
-import { ChatRoomInterface, MessageInterface } from './types';
+import { ChatRoomInterface, MessageInterface, UserInterface } from './types';
 import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 
@@ -13,13 +13,14 @@ type Props = {
 const ChatBox = ({ roomId, id, socket }: Props) => {
 
   const [messages, setMessages] = useState<MessageInterface[]>([]);
+  const [blocklist, setBlocklist] = useState<UserInterface[]>([]);
 
   useEffect(() => {
     if (!socket) return;
     // Fetch the entire conversation of the room
     const fetchConversation = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/chatroom/${roomId}/messages`);
+        const response = await fetch(`http://localhost:3001/messages/${roomId}/messages`);
         const data = await response.json();
         setMessages(data);
       } catch (error) {
@@ -28,6 +29,23 @@ const ChatBox = ({ roomId, id, socket }: Props) => {
     };
     fetchConversation();
   }, [socket, roomId]);
+
+  //useEffect(() => {
+  //  const fetchBlocklist = async () => {
+  //    try {
+  //      const response = await fetch(`http://localhost:3001/user/${id}/blocklist`);
+  //      const data = await response.json();
+  //      setBlocklist(data);
+  //    } catch (error) {
+  //      console.error('Error fetching the blocklist:', error);
+  //    }
+  //  };
+  //  fetchBlocklist();
+  //}, [id]);
+
+  //const isUserBlocked = (userId: number) => {
+  //  return blocklist.some((user) => user.id === userId);
+  //};
 
   useEffect(() => {
     if (!socket || !roomId) return;

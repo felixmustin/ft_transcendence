@@ -65,7 +65,7 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
       const result = await res.json();
       console.log('fetchUsersnames result:', result);
       setUsernames(result);
-      if (users.length > 2 && room.name) setGroupName(room.name);
+      if (room.name) setGroupName(room.name);
       else if (users.length === 2) {
         const index = users.indexOf(id);
         if (index === 0) setGroupName(result[1]);
@@ -75,6 +75,19 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
       console.error('Error fetching users:', error);
     }
   };
+
+  const deleteRoom = async () => {
+    const auth = 'Bearer ' + token;
+    const url = 'http://localhost:3001/chatroom/' + room.id;
+    try {
+      const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth } });
+      const result = await res.json();
+      console.log('deleteRoom result:', result);
+    } catch (error) {
+      console.error('Error deleting room:', error);
+    }
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,6 +132,7 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
         <div className="justify-center text-center text-black">{groupName}</div>
       </div>
       <div className="w-2/3 text-center text-black">{lastMessage?.content}</div>
+      <button onClick={deleteRoom}>X</button>
     </div>
   );
 };

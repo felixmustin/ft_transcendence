@@ -77,6 +77,22 @@ const Profile = ({ username }: Props) => {
   const handleLaunchGame = async () => {
   };
 
+  const handleBlockUser = async () => {
+    //try {
+    //  const auth = 'Bearer ' + token.accessToken;
+    // // Call the API to add the user as a friend
+    // const res = await fetch(`http://localhost:3001/user/${profile.id}/block`, { method: 'POST', headers: {
+    //  'Authorization': auth,
+    //  },});
+    //  if (res.ok)
+    //    alert("User blocked");
+    //  else if (res.status == 400)
+    //    alert("User already blocked")
+    //} catch (error) {
+    // console.error("Error blocking user:", error);
+    //}
+  };
+
   // This needs to be updated to use the API.
   // Handle the adding of a friend
   const handleAddFriend = async () => {
@@ -129,7 +145,7 @@ const Profile = ({ username }: Props) => {
       <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
         <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
           <div className="xl:max-w-[1280px] w-full">
-            <Navbar item={token}/>
+            <Navbar />
           </div>
         </div>
 
@@ -159,6 +175,12 @@ const Profile = ({ username }: Props) => {
                       onClick={handleSendMessage}
                     >
                       Message
+                    </button>
+                    <button
+                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    onClick={handleBlockUser}
+                    >
+                    Block
                     </button>
                   </div>
                 )}

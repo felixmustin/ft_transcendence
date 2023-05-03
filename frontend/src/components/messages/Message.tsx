@@ -6,7 +6,7 @@ type Props = {
   currentUserId: number
 }
 
-const Message = ({ message, currentUserId}: Props) => {
+const Message = ({ message, currentUserId }: Props) => {
   const bubbleStyle = {
     display: 'inline-block',
     backgroundColor: message.user_id === currentUserId ? '#4FD1C5' : '#2d3748',
@@ -18,6 +18,7 @@ const Message = ({ message, currentUserId}: Props) => {
 
   return (
     <div className='chat chat-start' style={{ display: 'flex', justifyContent: message.user_id === currentUserId ? 'flex-end' : 'flex-start' }}>
+      {message.user_id !== currentUserId && <p>{message.user.profile.username}</p>}
       <div style={bubbleStyle}>{ message.content }</div>
     </div>
   )

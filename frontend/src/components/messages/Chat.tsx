@@ -4,6 +4,7 @@ import ConvList from './ConvList';
 import { ChatRoomInterface, MessageInterface } from './types';
 import jwtDecode from 'jwt-decode';
 import { Socket, io } from 'socket.io-client';
+import CreateRoom from './CreateRoom';
 
 interface DecodedToken {
   id: number;
@@ -28,6 +29,7 @@ const Chat = (props: Props) => {
 
   // Rooms
   const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);
+  const [createRoom, setCreateRoom] = useState<boolean>(false);
   // Selected room
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
@@ -74,9 +76,16 @@ const Chat = (props: Props) => {
     setSelectedRoomId(roomId);
   };
 
+  // Create new room
+  const createNewRoom = () => {
+    setCreateRoom(true);
+  }
+
   return (
     <div className="flex bg-violet-700 rounded-lg p-2 m-2">
       <div className="bg-violet-800 w-1/3 rounded-lg mx-1">
+        {!createRoom && <button onClick={createNewRoom}>Create Room</button>}
+        {createRoom && <CreateRoom token={props.accessToken} id={userId} setCreateRoom={setCreateRoom} />}
         <ConvList
           rooms={rooms}
           onRoomSelect={onConvBoxClick}
