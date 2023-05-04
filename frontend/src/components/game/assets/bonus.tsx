@@ -1,6 +1,10 @@
-import PropTypes from 'prop-types';
 import { coordonate } from '../Pong';
 import { Component } from 'react';
+import bigger from './bigger.png';
+import bonusball from './bonusball.png';
+import doubleball from './double_ball.jpg';
+import quicker from './quicker.png';
+import smaller from './smaller2.png';
 
 interface GameboardIconProps {
 	bonus?: coordonate;
@@ -12,21 +16,27 @@ export class GameboardIcon extends Component <GameboardIconProps> {
 		const {which_bonus, bonus} = this.props;
 		let icon: string;
 		if (which_bonus === 0)
-			icon = 'frontend/src/components/game/assets/double_ball.jpg';
+			icon = doubleball;
 		else if (which_bonus === 1)
-			icon = 'frontend/src/components/game/assets/bonusball.png';
+			icon = bonusball;
 		else if (which_bonus === 2)
-			icon = 'frontend/src/components/game/assets/quicker.png';
+			icon = quicker;
 		else if (which_bonus === 3)
-			icon = 'frontend/src/components/game/assets/bigger.png';
+			icon = bigger;
 		else 
-			icon = 'frontend/src/components/game/assets/smaller2.png';
-		if (bonus === undefined){
+			icon = smaller;
+		if (bonus === undefined || which_bonus === -1 || which_bonus === 5){
 			return null;
 		}
+		console.log(JSON.stringify(this.props));
 		return (
-			<div className="gameboard-icon" style={{ left: bonus.x, top: bonus.y }}>
-				<img src={icon} alt="Gameboard Icon" style={{ width: '10px', height: '10px' }} />
+			<div className="gameboard-icon">
+				<img src={icon} alt="Gameboard Icon" style={{ 
+					position: 'absolute',
+					width: '20px', 
+					height: '20px', 
+					left: bonus.x, 
+					top: bonus.y }} />
 			</div>
 		  );
 	}

@@ -163,9 +163,11 @@ export class Room {
 	}
 
 	emit_score_reset_ball(index: number){
-		this.pause();
-		this.state.reset();
-		this.server.to(this.id).emit('updateState', this.gen_game_state())
+		if (this.state.ball.length <= 1){
+			this.pause();
+			this.state.reset();
+			this.server.to(this.id).emit('updateState', this.gen_game_state())
+		}
 		const data: ScoreProps = {
 			player1 : this.PongService.identifiate(this.idp1).username,
 			player2 : this.PongService.identifiate(this.idp2).username,
@@ -178,7 +180,7 @@ export class Room {
 	update_paddle(paddle : coordonate, uid: string){
 		if (this.playpause){
 			if (uid === this.idp1){
-			this.update_left_paddle(paddle);
+				this.update_left_paddle(paddle);
 			}
 			else if (uid === this.idp2){
 				this.update_right_paddle(paddle);

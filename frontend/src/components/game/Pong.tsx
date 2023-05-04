@@ -123,7 +123,6 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 			  roomID: this.props.roomID,
 			  uid: this.props.uid,
 			};
-			console.log('emiting : ' + JSON.stringify(data));
 			this.props.socket.emit("updatePaddle", data);
 		  }, 50);
 	}

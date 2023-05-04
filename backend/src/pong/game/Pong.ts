@@ -40,8 +40,8 @@ export class Pong{
 		this.ballspeedy = [this.or_speed];
 		this.bonus = undefined;
 		this.which_bonus = -1;
-		this.paddle_right_speed = 10;
-		this.paddle_left_speed = 10;
+		this.paddle_right_speed = 1;
+		this.paddle_left_speed = 1;
 	}
 	reset(){
 		this.ballspeedx = [this.or_speed];
@@ -52,80 +52,87 @@ export class Pong{
 		this.ball.splice(1, this.ball.length - 1);
 		this.bonus = undefined;
 		this.which_bonus = -1;
-		this.paddle_right_speed = 10;
-		this.paddle_left_speed = 10;
+		this.paddle_right_speed = 1;
+		this.paddle_left_speed = 1;
 	}
 
 // frame 
 	updategame(){
-		this.ball.forEach((element, index) => {
-			if (this.bonus === undefined){
-				let x = Math.floor(Math.random() * 1000);
-				if (x < 10){
-					this.generate_bonus();
-				}
+		if (this.bonus === undefined && this.which_bonus !== 5){
+			let x = Math.floor(Math.random() * 1000);
+			if (x < 10){
+				this.generate_bonus();
+			}
+		}
+		for (let index = 0; index < this.ball.length; index++) {
+			const element = this.ball[index];
+			const bound: hit = element.is_out(this.board);
+			if (bound.y){
+				this.ballspeedy[index] *= -1;
+			}
+			if (bound.x){
+				this.ball.splice(index, 1);
+				this.ballspeedx.splice(index, 1);
+				this.ballspeedy.splice(index, 1);
 			}
 			if (element.x > this.board.width / 2){
-				const bound: hit = element.move(this.ballspeedx[index], this.ballspeedy[index], [this.paddleright]);
-				if (bound.x){
-					// console.log('ball hit paddle right hor');
-					// element.rebound_hor(this.ballspeedy[index]);
-					// element.rebound_hor(this.ballspeedy[index]);
+				console.log('before' + JSON.stringify(this.ball));
+				const hit: hit = element.move(this.ballspeedx[index], this.ballspeedy[index], [this.paddleright]);
+				console.log('after' + JSON.stringify(this.ball));
+				if (hit.x){
 					this.ballspeedx[index] *= -1;
 					this.bounce_right(index);
 				}
-				if (bound.y){
-					// element.rebound_vert(this.ballspeedy[index]);
-					// element.rebound_vert(this.ballspeedy[index]);
+				if (hit.y){
 					this.ballspeedy[index] *= -1;
 				}
-				// this.bounce_right(index);
 			}
 			else {
-				const bound: hit = element.move(this.ballspeedx[index], this.ballspeedy[index], [this.paddleleft]);
-				if (bound.x){
-					// element.rebound_hor(this.ballspeedy[index]);
-					// element.rebound_hor(this.ballspeedy[index]);
+				const hit: hit = element.move(this.ballspeedx[index], this.ballspeedy[index], [this.paddleleft]);
+				if (hit.x){
 					this.ballspeedx[index] *= -1;
 					this.bounce_left(index);
 				}
-				if (bound.y){
-					// element.rebound_vert(this.ballspeedy[index]);
-					// element.rebound_vert(this.ballspeedy[index]);
+				if (hit.y){
 					this.ballspeedy[index] *= -1;
 				}
-				// this.bounce_left(index);
 			}
-			const bound: hit = element.is_out(this.board);
-			if (bound.y){
-				// element.rebound_vert(this.ballspeedy[index]);
-				// element.rebound_vert(this.ballspeedy[index]);
-				this.ballspeedy[index] *= -1;
-			}
-		});
+		}
 	}
 
 // bonus gestion
 	generate_bonus(){
-		if (this.bonus)
-			return;
-		else{
-			this.bonus = new Item (Math.floor(Math.random() * this.board.width), Math.floor(Math.random() * this.board.heigth), 10, 10);
-			this.which_bonus = Math.floor(Math.random() * 5);
-		}
+		// if (this.bonus != undefined)
+		// 	return;
+		// else{
+			this.bonus = new Item ((Math.floor(Math.random() * (this.board.width - 40)) + 20), Math.floor(Math.random() * (this.board.heigth - 20)), 20, 20);
+			this.which_bonus = Math.floor(Math.random() * 4);
+			if (this.ball.length > 1 && this.which_bonus === 0){
+				this.which_bonus = Math.floor(Math.random() * 3) + 1;
+			}
+			// this.which_bonus = 0;
+		// }
 	}
 	more_ball(ind: number){
-		const newball = this.ball[0];
+		const newball = new Item(this.ball[0].x, this.ball[0].y, this.ball[0].width, this.ball[0].heigth);
+		newball.or_x = this.ball[0].or_x;
+		newball.or_y = this.ball[0].or_y;
+		newball.or_width = this.ball[0].or_width;
+		newball.or_heigth = this.ball[0].or_heigth;
+
 		const index = this.ball.length;
 		this.ball.push(newball);
+		this.ballspeedx.push([...this.ballspeedx][0]);
+		this.ballspeedy.push([...this.ballspeedy][0]);
 		this.more_downward(index);
 		this.more_downward(index);
+		console.log(JSON.stringify(this.ball) + '\n-------------------------------------------------------------');
 	}
 	paddle_quicker(ind: number){
 		if (ind === 1)
-			this.paddle_left_speed += 10;
+			this.paddle_left_speed += 1;
 		else if (ind === 2)
-			this.paddle_right_speed += 10;
+			this.paddle_right_speed += 1;
 	}
 	paddle_bigger(ind: number){
 		if (ind === 1)
@@ -140,6 +147,7 @@ export class Pong{
 			this.paddleright.heigth -= 10;
 	}
 	activate_bonus(ind: number){
+		this.bonus = undefined;
 		if (this.which_bonus === 0){
 			this.more_ball(ind);
 		}
@@ -155,36 +163,33 @@ export class Pong{
 		else if (this.which_bonus === 4){
 			this.paddle_smaller(ind);
 		}
-		this.bonus = undefined;
-		this.which_bonus = -1;
+		if (this.which_bonus !== 5){
+			this.which_bonus = -1;
+		}
 	}
 
 //paddle move
 	update_right_paddle(x: number, y:number){
-		this.paddleright.move_paddle(x, y, this.ball, 1, this.board);
+		this.paddleright.move_paddle(x * this.paddle_right_speed, y * this.paddle_right_speed, this.ball, 1, this.board);
+		if (this.bonus && this.paddleright.is_in(this.bonus)){
+			this.activate_bonus(2);
+		}
 	}
 	update_left_paddle(x: number, y:number){
-		this.paddleleft.move_paddle(x, y, this.ball, 0, this.board)
+		this.paddleleft.move_paddle(x * this.paddle_left_speed, y * this.paddle_left_speed, this.ball, 0, this.board)
+		if (this.bonus && this.paddleleft.is_in(this.bonus)){
+			this.activate_bonus(1);
+		}
 	}
 
 // movement dynamic
 	quicker(index: number){
-		// if (this.ballspeedx[index] >= this.ballspeedy[index]){
-		// 	if (this.ballspeedy[index] > 0)
-		// 		this.ballspeedy[index]++;
-		// 	else
-		// 		this.ballspeedy[index]--;
-		// }
-		// else{
 			if (this.ballspeedx[index] > 0)
 				this.ballspeedx[index]++;
 			else
 				this.ballspeedx[index]--;
-		// }
 	}
 	bounce_right(index: number){
-		// this.ballspeedx[index] *= -1;
-		// this.ball[index].move_hor(this.ballspeedx[index], [this.paddleright]);
 		const ball = this.ball[index].center();
 		const fifth = this.paddleright.heigth / 5;
 		if (ball.y < this.paddleright.y + fifth){
@@ -205,8 +210,6 @@ export class Pong{
 		this.quicker(index);
 	}
 	bounce_left(index: number){
-		// this.ballspeedx[index] *= -1;
-		// this.ball[index].move_hor(this.ballspeedx[index], [this.paddleleft]);
 		const ball = this.ball[index].center();
 		const fifth = this.paddleleft.heigth / 5;
 		if (ball.y < this.paddleleft.y + fifth){
