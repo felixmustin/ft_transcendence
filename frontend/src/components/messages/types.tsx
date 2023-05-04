@@ -1,8 +1,21 @@
 // types.ts
 
+export interface GameInterface {
+  id: number;
+  player1_id: number;
+  player2_id: number;
+  player1_score: number;
+  player2_score: number;
+}
+
 export interface ProfileInterface {
   id: number;
   username: string;
+  email: string;
+  firstname: string;
+  lastname: string;
+  age: number;
+  games: GameInterface[];
 }
 
 export interface UserInterface {

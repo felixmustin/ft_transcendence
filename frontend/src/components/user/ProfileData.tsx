@@ -3,7 +3,7 @@ import React from 'react'
 type Props = {
   item: {
     field: string;
-    data: string;
+    data: number | undefined;
   };
 }
 

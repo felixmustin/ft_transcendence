@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import { Profile } from 'src/entities/profile.entity';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { Game } from '../entities/game.entity';
 // import { Friends } from '../entities/friends.entity';
 
 @Injectable()
@@ -37,9 +38,15 @@ export class UserService {
   }
   
   async findUserById(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('profile.games', 'games')
+      .where('user.id = :id', { id })
+      .getOne();
+  
     return user;
   }
+  
 
   async findUserByUsername(username: string): Promise<User> {
     const userProfile = await this.findUserProfileByUsername(username)
@@ -52,17 +59,85 @@ export class UserService {
 
   async findUserProfileById(id: number): Promise<Profile> {
     const user = await this.userRepository.createQueryBuilder("user")
-    .leftJoinAndSelect("user.profile", "profile")
-    .where("user.id = :id", { id: id })
-    .getOne();
+      .leftJoinAndSelect("user.profile", "profile")
+      .leftJoinAndSelect("profile.games", "games")
+      .where("user.id = :id", { id: id })
+      .getOne();
+  
     const userProfile = user.profile;
     return userProfile;
   }
+
 
   async findUserByloginName(loginName: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { loginName: loginName} });
     return user;
   }
+
+  async wonGame(id: number, game: Game): Promise<boolean> {
+    return (game.player1_id === id && game.player1_score > game.player2_score) ||
+           (game.player2_id === id && game.player2_score > game.player1_score);
+  }
+  
+  async stompGame(id: number, game: Game): Promise<boolean> {
+    return (game.player1_id === id && game.player1_score > game.player2_score * 2) ||
+           (game.player2_id === id && game.player2_score > game.player1_score * 2);
+  }
+  
+  async findUserFlexProfileById(id: number): Promise<{played: number, won: number, stomp: number, rank: number}> {
+    const games = (await this.findUserProfileById(id)).games;
+    let played = games.length;
+    let won = 0;
+    let stomp = 0;
+  
+    for (const game of games) {
+      if (await this.wonGame(id, game)) {
+        won++;
+      }
+      if (await this.stompGame(id, game)) {
+        stomp++;
+      }
+    }
+  
+    // Fetch all users and their games
+    const users = await this.userRepository.find({ relations: ['profile', 'profile.games'] });
+  
+    // Calculate won games for each user and store them in an array
+    const usersWonGames = await Promise.all(users.map(async (user) => {
+      const gamesWon = (await Promise.all(user.profile.games.map(game => this.wonGame(user.id, game)))).filter(Boolean).length;
+      return { id: user.id, won: gamesWon };
+    }));
+  
+    // Sort users by games won in descending order
+    usersWonGames.sort((a, b) => b.won - a.won);
+  
+    // Find the rank of the user with the given id
+    let rank = usersWonGames.findIndex(user => user.id === id) + 1;
+  
+    return { played, won, stomp, rank };
+  }
+  
+
+  async findUserFlexProfileByUsername(username: string): Promise<{played: number, won: number, stomp: number, rank: number}> {
+    const profile = (await this.findUserProfileByUsername(username));
+    const games = profile.games;
+    let played = games.length;
+    let won = 0;
+    let stomp = 0;
+  
+    for (const game of games) {
+      if (await this.wonGame(profile.id, game)) {
+        won++;
+      }
+      if (await this.stompGame(profile.id, game)) {
+        stomp++;
+      }
+    }
+  
+    let rank = 0;
+    return { played, won, stomp, rank };
+  }
+  
 
   // async findUserByUsername(username: string): Promise<User> {
   //   const userProfile = await this.userProfileRepository.findOne({ where: { username: username} });
@@ -70,15 +145,14 @@ export class UserService {
   // }
 
   async findUserProfileByUsername(username: string): Promise<Profile> {
-    const userProfile = await this.userProfileRepository.findOne({ where: { username: username } });
-
-    // const user = await this.userRepository.createQueryBuilder("user")
-    // .leftJoinAndSelect("user.profile", "profile")
-    // .where("user.username = :username", { username: username })
-    // .getOne();
-    // const userProfile = user.profile;
+    const userProfile = await this.userProfileRepository.createQueryBuilder("profile")
+      .leftJoinAndSelect("profile.games", "games")
+      .where("profile.username = :username", { username: username })
+      .getOne();
+  
     return userProfile;
   }
+  
 
   async find42UserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { user42id: id } });

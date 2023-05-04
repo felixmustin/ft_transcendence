@@ -35,6 +35,19 @@ export class UserController {
     return profiles;
   }
 
+  @Get('profile/flex')
+  @UseGuards(JwtAuthGuard)
+  async getUserFlexProfileById(@Request() req) {
+    const {played, won, stomp, rank} = await this.userService.findUserFlexProfileById(req.user.id);
+    return {played, won, stomp, rank};
+  }
+
+  @Get('profile/flex/:username')
+  @UseGuards(JwtAuthGuard)
+  async getUserFlexProfileByUsername(@Request() req, @Param('username') username: string) {
+    const {played, won, stomp, rank} = await this.userService.findUserFlexProfileByUsername(req.user.id);
+    return {played, won, stomp, rank};
+  }
 
   @Get('profile/:username')
   @UseGuards(JwtAuthGuard)
