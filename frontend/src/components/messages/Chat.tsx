@@ -1,71 +1,110 @@
-import React, { useEffect } from 'react'
-import ChatRoom from './ChatRoom'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import ConvBox from './ConvBox';
-import { ChatRoomInterface } from './types';
-import Loading from '../utils/Loading';
+import React, { useEffect, useState } from 'react';
+import ChatRoom from './ChatRoom';
+import ConvList from './ConvList';
+import { ChatRoomInterface, MessageInterface } from './types';
+import jwtDecode from 'jwt-decode';
+import { Socket, io } from 'socket.io-client';
+import CreateRoom from './CreateRoom';
 
+interface DecodedToken {
+  id: number;
+}
 
 type Props = {
-  item: {
-    accessToken: string | undefined;
-  };
-}
+  accessToken: string | undefined;
+};
 
 const Chat = (props: Props) => {
-
-  const [error, setError] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  const [id, setId] = useState(0);
-  const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);
-
-  const navigate = useNavigate();
-
+  // Socket Connection
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      const auth = 'Bearer ' + props.item.accessToken;
-      const url = 'http://localhost:3001/chatroom/all_my_rooms';
-      try {
-        const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
-        const result = await res.json();
-        setIsLoaded(true);
-        setRooms(result);
-      }
-      catch (error) {
-        setIsLoaded(true);
-        setError(error);
-      }
+    const newSocket = io("http://localhost:3001/chat");
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
     };
-      // if (!token) {
-      //     navigate('/');
-      //   } else {
-          fetchRooms();
-        // }
+  }, []);
 
-    }, []);
+  // Rooms
+  const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);
+  const [createRoom, setCreateRoom] = useState<boolean>(false);
+  // Selected room
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
+  // Get user id from token
+  const userId = props.accessToken
+    ? (jwtDecode(props.accessToken) as DecodedToken).id
+    : 0;
 
-  const onConvBoxClick = (roomId: number) => {
-    setId(roomId);
+  // Fetch rooms
+  const fetchRooms = async () => {
+    const auth = 'Bearer ' + props.accessToken;
+    const url = 'http://localhost:3001/chatroom/all_my_rooms';
+    try {
+      const res = await fetch(url, { method: 'GET', headers: { Authorization: auth } });
+      const result = await res.json();
+      setRooms(result);
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+    }
   };
 
+  useEffect(() => {
+    fetchRooms();
+  }, []);
 
-    return (
-      <div className='flex bg-violet-700 rounded-lg p-2 m-2'>
-        <ChatRoom key={id} roomId={id} />
-        <div className='bg-violet-800 w-1/3 rounded-lg mx-1'>
-          {
-            rooms.map((room) => (
-              <ConvBox key={room.id} room={room} onBoxClick={onConvBoxClick} />
-            ))
-          }
-        </div>
+  // Listen for new_chatroom event
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewChatroom = () => {
+      fetchRooms();
+    };
+
+    socket.on('new_chatroom', handleNewChatroom);
+
+    return () => {
+      socket.off('new_chatroom', handleNewChatroom);
+    };
+  }, [socket]);
+
+  // Handle click on a conversation box
+  const onConvBoxClick = (roomId: number) => {
+    console.log('Clicked on room:', roomId);
+    setSelectedRoomId(roomId);
+  };
+
+  // Create new room
+  const createNewRoom = () => {
+    setCreateRoom(true);
+  }
+
+  return (
+    <div className="flex bg-violet-700 rounded-lg p-2 m-2">
+      <div className="bg-violet-800 w-1/3 rounded-lg mx-1">
+        {!createRoom && <button onClick={createNewRoom}>Create Room</button>}
+        {createRoom && <CreateRoom token={props.accessToken} id={userId} setCreateRoom={setCreateRoom} />}
+        <ConvList
+          rooms={rooms}
+          onRoomSelect={onConvBoxClick}
+          socket={socket}
+          token={props.accessToken}
+          id = {userId}
+        />
       </div>
-    )
+      {selectedRoomId && (
+        <ChatRoom
+          key={selectedRoomId}
+          roomId={selectedRoomId}
+          id={userId}
+          socket={socket}
+        />
+      )}
+    </div>
+  );
+};
 
-}
+export default Chat;
 
-export default Chat

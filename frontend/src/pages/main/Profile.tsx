@@ -9,6 +9,15 @@ import Error from '../../components/utils/Error'
 import DisplayAvatar from '../../components/utils/DisplayAvatar'
 import { getSessionsToken } from '../../sessionsUtils'
 import { tokenForm } from '../../interfaceUtils'
+import { ProfileInterface } from '../../components/messages/types'
+import MatchHistory from '../../components/user/MatchHistory'
+
+interface FlexData {
+  played: number;
+  won: number;
+  stomp: number;
+  rank: number;
+}
 
 type Props = {
   username?: string;
@@ -20,9 +29,10 @@ const Profile = ({ username }: Props) => {
   // Loading management
   const [isLoaded, setIsLoaded] = useState(false);
   // User data retrieved from the API
-  const [profile, setProfile] = useState([]);
+  const [profile, setProfile] = useState<ProfileInterface>();
   const [token, setToken] = useState<tokenForm>();
   const [isTokenSet, setIsTokenSet] = useState(false);
+  const [flexData, setFlexData] = useState<FlexData>();
 
 
   // Navigation
@@ -72,9 +82,48 @@ const Profile = ({ username }: Props) => {
     }
   }, [isTokenSet, username]);
 
+
+  // Fetch user flex data
+  useEffect(() => {
+    const fetchFlexData = async () => {
+      if (!token) {
+        return;
+      }
+      const auth = 'Bearer ' + token.accessToken;
+      const url = username
+        ? `http://localhost:3001/user/profile/flex/${username}`
+        : 'http://localhost:3001/user/profile/flex';
+      try {
+        const response = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
+        const data = await response.json();
+        setFlexData(data);
+      } catch (error) {
+        console.error('Error fetching the conversation:', error);
+      }
+    };
+    fetchFlexData();
+  }, [profile?.id, token, username]);
+
+
   // This needs to be updated to use the API.
   // Handle the launching of a game
   const handleLaunchGame = async () => {
+  };
+
+  const handleBlockUser = async () => {
+    //try {
+    //  const auth = 'Bearer ' + token.accessToken;
+    // // Call the API to add the user as a friend
+    // const res = await fetch(`http://localhost:3001/user/${profile.id}/block`, { method: 'POST', headers: {
+    //  'Authorization': auth,
+    //  },});
+    //  if (res.ok)
+    //    alert("User blocked");
+    //  else if (res.status == 400)
+    //    alert("User already blocked")
+    //} catch (error) {
+    // console.error("Error blocking user:", error);
+    //}
   };
 
   // This needs to be updated to use the API.
@@ -100,8 +149,24 @@ const Profile = ({ username }: Props) => {
   // This needs to be updated to use the API.
   // Handle the sending of a message to the user
   const handleSendMessage = async () => {
-    // Implement sending a message to the user
-    //console.log("Sending a message to user:", profile.username);
+    try {
+      const auth = 'Bearer ' + token.accessToken;
+      const res = await fetch(`http://localhost:3001/chatroom/create/${profile.id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': auth,
+        },
+      });
+  
+      if (res.ok) {
+        const chatRoom = await res.json();
+        navigate(`/chatpage/`);
+      } else {
+        console.error("Error creating chat room:", res.statusText);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   if (error) //error
@@ -120,10 +185,10 @@ const Profile = ({ username }: Props) => {
         <div className='flex justify-evenly'>
           <div className='bg-violet-900 rounded-lg w-[800px] m-5'>
             <div className='flex justify-evenly items-center p-4'>
-            <DisplayAvatar avatar={profile.avatar}/>
+            <DisplayAvatar avatar={profile?.avatar}/>
               <div className='text-center p-3'>
-                <h2 className='text-white text-3xl underline'>{profile.username}</h2>
-                <h2 className='text-white text-2xl underline'>{profile.firstname} {profile.lastname}</h2>
+                <h2 className='text-white text-3xl underline'>{profile?.username}</h2>
+                <h2 className='text-white text-2xl underline'>{profile?.firstname} {profile?.lastname}</h2>
                 {username && (
                   <div className="flex justify-center space-x-4 my-4">
                     <button
@@ -144,16 +209,25 @@ const Profile = ({ username }: Props) => {
                     >
                       Message
                     </button>
+                    <button
+                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    onClick={handleBlockUser}
+                    >
+                    Block
+                    </button>
                   </div>
                 )}
               </div>
             </div>
             <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>
             <div className='grid grid-cols-2 justify-center items-center text-center'>
-              <ProfileData item={{ field: 'GAMES PLAYED', data: '20' }} />
-              <ProfileData item={{ field: 'GAMES WON', data: '11' }} />
-              <ProfileData item={{ field: 'ACHIEVEMENTS', data: '5' }} />
-              <ProfileData item={{ field: 'RANK', data: '1' }} />
+              <ProfileData item={{ field: 'GAMES PLAYED', data: flexData?.played }} />
+              <ProfileData item={{ field: 'GAMES WON', data: flexData?.won }} />
+              <ProfileData item={{ field: 'STOMPS', data: flexData?.stomp }} />
+              <ProfileData item={{ field: 'RANK', data: flexData?.rank }} />
+            </div>
+            <div>
+              <MatchHistory games={profile?.games}/>
             </div>
           </div>
         </div>

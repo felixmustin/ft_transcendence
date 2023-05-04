@@ -3,19 +3,21 @@ import { authenticator } from 'otplib';
 import { User } from '../entities/user.entity';
 import { UserService } from '../user/user.service';
 import { toFileStream } from 'qrcode';
+import { JwtService } from '@nestjs/jwt';
  
 @Injectable()
 export class TwoFactorAuthenticationService {
   constructor (
-    private readonly userService: UserService,
+    private readonly userService: UserService,  
   ) {}
- 
-  public async generateTwoFactorAuthenticationSecret(user: User) {
+
+
+  public async generateTwoFactorAuthenticationSecret(userId: number) {
     const secret = authenticator.generateSecret();
-    const profile = this.userService.findUserProfileById(user.id)
+    const profile = this.userService.findUserProfileById(userId)
     const otpauthUrl = authenticator.keyuri((await profile).email, 'AUTH_APP_NAME', secret);
  
-    const savedUser  = await this.userService.set2FASecret(secret, user.id);
+    const savedUser  = await this.userService.set2FASecret(secret, userId);
     return {
       secret,
       otpauthUrl

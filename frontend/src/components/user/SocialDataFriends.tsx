@@ -1,6 +1,6 @@
 import React from 'react'
-import { getSessionsToken } from '../../sessionsUtils';
 import DisplayAvatar from '../utils/DisplayAvatar'
+import { useNavigate } from 'react-router-dom'
 
 type Props = {
   profile : {
@@ -11,13 +11,19 @@ type Props = {
     lastname: string;
     age: number;
     avatar: {type: string, data: []}
+  },
+  item: {
+    accessToken: string;
   };
+  onChange: () => void;
 }
 
 const SocialDataFriends = (props: Props) => {
 
-  const token = getSessionsToken()
-  const auth = 'Bearer ' + token.accessToken;
+  const auth = 'Bearer ' + props.item.accessToken;
+  const navigate = useNavigate();
+
+
   // This needs to be updated to use the API.
   // Handle the launching of a game
   const handleLaunchGame = () => {
@@ -25,7 +31,24 @@ const SocialDataFriends = (props: Props) => {
 
   // This needs to be updated to use the API.
   // Handle the sending of a message to the user
-  const handleMessage = () => {
+  const handleMessage = async () => {
+    try {
+      const auth = 'Bearer ' + props.item.accessToken;
+      const res = await fetch(`http://localhost:3001/chatroom/create/${props.profile.id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': auth,
+        },
+      });
+  
+      if (res.ok) {
+        navigate(`/chatpage/`);
+      } else {
+        console.error("Error creating chat room:", res.statusText);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   const handleRemove = async () => {
@@ -35,8 +58,10 @@ const SocialDataFriends = (props: Props) => {
             method: 'DELETE', 
             headers: { 'Authorization': auth },
             })
-        if (res.ok)
-            alert("Friendship deleted")
+        if (res.ok) {
+          alert("Friendship deleted")
+          props.onChange()
+        }
     } catch (error) {
         alert(error);
     }

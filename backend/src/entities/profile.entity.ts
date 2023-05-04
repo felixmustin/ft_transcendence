@@ -32,6 +32,9 @@ export class Profile {
   @Column({ type: 'bytea' })
   avatar: Buffer;
 
+  @Column({ default: 0 })
+  gamesWon: number;
+
   // @ManyToMany(() => Game, (game) => game.players)
   // @JoinTable({
   //   name: 'profile_games',

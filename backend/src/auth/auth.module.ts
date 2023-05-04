@@ -6,18 +6,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategy/jwt.startegy';
 import { FortyTwoStrategy } from './strategy/fortytwo.startegy';
-import { TwoFactorAuthenticationController } from './twoFactorAuthentication.controller';
-import { TwoFactorAuthenticationService } from './twoFactorAuthentication.service';
 
 @Module({
   imports: [UserModule, PassportModule, TypeOrmModule.forFeature([User]), JwtModule.register({
-    secret: jwtConstants.secret,
-    signOptions: { expiresIn: '15m' },
-  }),],
-  controllers: [AuthController, TwoFactorAuthenticationController],
-  providers: [AuthService, JwtStrategy, FortyTwoStrategy, TwoFactorAuthenticationService],
+    secret: process.env.JWT_SECRET
+  })],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy,FortyTwoStrategy],
+  exports: [JwtModule],
 })
 export class AuthModule {}

@@ -7,8 +7,8 @@ import { VerifyCallback } from 'passport-jwt';
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     constructor() {
     super({
-      clientID: 'u-s4t2ud-77bf09879c85b0614b043b32b13aafeeca1045661308be6440195c574f88eb76',
-      clientSecret: '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',
+      clientID: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
       callbackURL: 'http://localhost:3001/auth/42/callback',
       profileFields: {
         'id': function (obj) { return String(obj.id); },

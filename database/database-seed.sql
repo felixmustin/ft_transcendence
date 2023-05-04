@@ -8,7 +8,8 @@ CREATE TABLE public.user_profiles
     firstname VARCHAR(255),
     lastname VARCHAR(255),
     age INT,
-    avatar BYTEA
+    avatar BYTEA,
+    gameswon INT,
 );
 
 CREATE TABLE public.game

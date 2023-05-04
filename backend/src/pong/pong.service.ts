@@ -10,6 +10,7 @@ import { UserService } from 'src/user/user.service';
 import { WebSocketServer } from '@nestjs/websockets';
 import { PongGateway } from './pong.gateway';
 import { coordonate } from './game/Pong';
+import { User } from 'src/entities/user.entity';
 
 export type handshake = {
 	uid : string,
@@ -73,6 +74,8 @@ export class PongService {
 	constructor(
 		@InjectRepository(Game)
 		private gameRepository: Repository<Game>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 		private readonly jwtStrategy: JwtStrategy, 
 		private readonly userservice: UserService
 	) {}
@@ -265,6 +268,40 @@ export class PongService {
 
 		return await this.gameRepository.save(game);
 	}
+
+  async addGameToUserProfile(game: Game) {
+    const player1 = await this.userservice.findUserById(game.player1_id);
+    const player2 = await this.userservice.findUserById(game.player2_id);
+  
+    // Create a new game instance and set its properties
+    const newGame = new Game();
+    newGame.player1_id = game.player1_id;
+    newGame.player2_id = game.player2_id;
+    newGame.player1_score = game.player1_score;
+    newGame.player2_score = game.player2_score;
+  
+    // Save the new game to the repository
+    const savedGame = await this.gameRepository.save(newGame);
+  
+    // Add the saved game to both player1 and player2 profile games
+    player1.profile.games.push(savedGame);
+    player2.profile.games.push(savedGame);
+
+    // Update the player1 and player2 profiles if they won the game
+    if (game.player1_score > game.player2_score) {
+      player1.profile.gamesWon++;
+    } else {
+      player2.profile.gamesWon++;
+    }
+
+    // Save the updated profiles
+    await this.userRepository.save(player1);
+    await this.userRepository.save(player2);
+  
+    return savedGame;
+  }
+  
+  
 
 	identifiate(id: string): Profile{
 		return (this.identitymap.get(id));

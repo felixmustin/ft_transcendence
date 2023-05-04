@@ -20,7 +20,7 @@ const Play = () => {
   	// Session and auth
   	useEffect(() => {
 		  if (!isSessionTokenSet()) // '!'token
-			navigate('/');
+		  navigate('/');
 		  else {
 			  async function fetchReq(){
 				  const token = await getSessionsToken();
@@ -29,6 +29,7 @@ const Play = () => {
 				  fetch('http://localhost:3001/user/id/', {method: 'GET', headers: {'Authorization': auth}})
 				  .then(res => res.json())
 				  .then(
+					  
 					  (result) => {
 						  if (result.statusCode === 401)
 						  navigate('/');

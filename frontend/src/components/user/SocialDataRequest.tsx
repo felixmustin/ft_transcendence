@@ -1,5 +1,4 @@
 import React from 'react'
-import { getSessionsToken } from '../../sessionsUtils';
 import DisplayAvatar from '../utils/DisplayAvatar'
 
 type Props = {
@@ -8,12 +7,15 @@ type Props = {
     date: string;
     username: string;
   };
+  item: { accessToken: string; };
+
+  onChange: () => void;
 }
+
 
 const SocialDataRequest = (props: Props) => {
 
-    const token = getSessionsToken()
-    const auth = 'Bearer ' + token.accessToken;
+  const auth = 'Bearer ' + props.item.accessToken;
 
   // This needs to be updated to use the API.
   // Handle the launching of a game
@@ -25,8 +27,10 @@ const SocialDataRequest = (props: Props) => {
             headers: { 'Authorization': auth, 'Content-Type': 'application/json'},
             body:JSON.stringify(props.request)
             })
-        if (res.ok)
+        if (res.ok){
             alert("Request accepted")
+            props.onChange();
+          }
     } catch (error) {
         alert(error);
     }
@@ -34,7 +38,21 @@ const SocialDataRequest = (props: Props) => {
 
   // This needs to be updated to use the API.
   // Handle the sending of a message to the user
-  const handleDecline = () => {
+  const handleDecline = async () => {
+    const url = 'http://localhost:3001/friends/decline/request';
+    try {
+        const res = await fetch(url, {
+            method: 'POST', 
+            headers: { 'Authorization': auth, 'Content-Type': 'application/json'},
+            body:JSON.stringify(props.request)
+            })
+        if (res.ok){
+            alert("Request declined")
+            props.onChange();
+          }
+    } catch (error) {
+        alert(error);
+    }
   };
 
   return (

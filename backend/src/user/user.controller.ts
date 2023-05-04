@@ -22,6 +22,33 @@ export class UserController {
     return userProfile;
   }
 
+  @Post('profiles')
+  async getUsersUsernameByIds(@Body() body: { users: number[] }) {
+    console.log('Received body:', body);
+    let profiles = [];
+    const userIds = body.users;
+    for (let i = 0; i < userIds.length; i++) {
+      let profile = (await this.userService.findUserProfileById(userIds[i])).username;
+      profiles.push(profile);
+    }
+    console.log('Returning profiles:', profiles);
+    return profiles;
+  }
+
+  @Get('profile/flex')
+  @UseGuards(JwtAuthGuard)
+  async getUserFlexProfileById(@Request() req) {
+    const {played, won, stomp, rank} = await this.userService.findUserFlexProfileById(req.user.id);
+    return {played, won, stomp, rank};
+  }
+
+  @Get('profile/flex/:username')
+  @UseGuards(JwtAuthGuard)
+  async getUserFlexProfileByUsername(@Request() req, @Param('username') username: string) {
+    const {played, won, stomp, rank} = await this.userService.findUserFlexProfileByUsername(req.user.id);
+    return {played, won, stomp, rank};
+  }
+
   @Get('profile/:username')
   @UseGuards(JwtAuthGuard)
   async getUserProfileByUsername(@Request() req, @Param('username') username: string) {
@@ -57,6 +84,17 @@ export class UserController {
     return user;
   }
 
+  @Get('username/:id')
+  async getUsernameById(@Param('id') id: number) {
+    const user = await this.userService.findUserById(id);
+    return user.profile.username;
+  }
+
+  @Get('userid/:username')
+  async getUserIdByUsername(@Param('username') username: string) {
+    const user = await this.userService.findUserByUsername(username);
+    return user.id;
+  }
 
   @Put('update/username')
   @UseGuards(JwtAuthGuard)

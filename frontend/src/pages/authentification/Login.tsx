@@ -5,7 +5,6 @@ import { useState } from 'react';
 import TwoFactorAuthentication from '../../components/authentication/TwoFactorAuthentication';
 import Loading from '../../components/utils/Loading';
 import { getSessionsToken, setSessionToken } from '../../sessionsUtils';
-import jwtDecode from 'jwt-decode';
 import { LoginForm, tokenForm } from '../../interfaceUtils';
 
 
@@ -19,7 +18,7 @@ const Login = () => {
 
   // Loading management
   const [isTwoAuthentication, setIsTwoAuthentication] = useState(false);
-  const [token, setToken] = useState<tokenForm>();
+  const [twoAuthToken, setTwoAuthToken] = useState('');
 
   // Used for navigation
   const navigate = useNavigate();
@@ -63,11 +62,10 @@ const Login = () => {
         alert(response.message);
         }
       else {
-        const payload = jwtDecode(response.token.accessToken)
-        if (payload.twoFaEnabled)
-        {
+        console.log(response)
+        if (response.token.access2FAToken) {
           setIsTwoAuthentication(true)
-          setToken(response.token)
+          setTwoAuthToken(response.token.access2FAToken)
         }
         else {
           setSessionToken(response.token)
@@ -78,14 +76,16 @@ const Login = () => {
   };
 
 
-  if (isTwoAuthentication)
-    return <TwoFactorAuthentication item={token!}/>
-  else {
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
     <div className='hidden sm:block'>
       <img className='w-full h-full object-cover' src={ loginImg } />
     </div>
+    {isTwoAuthentication ?
+    <div className="relative w-[200px] py-2">
+      <TwoFactorAuthentication item={twoAuthToken}/>
+    </div>
+    : null}
     <div className='bg-gradient-to-tl from-violet-900 via-slate-900 to-slate-900 flex flex-col justify-center'>
       <form className='max-w-[400px] w-full mx-auto bg-gray-900 p-8 px-8 rounded-lg shadow-lg shadow-slate-900/30' onSubmit={handleSubmit}>
         <h2 className='text-4xl dark:text-white font-bold text-center'>SIGN IN</h2>
@@ -121,7 +121,6 @@ const Login = () => {
     </div>
   </div>
   )
-}
 }
 
 export default Login

@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { getSessionsToken } from '../../sessionsUtils';
 import SocialDataFriends from './SocialDataFriends';
 import SocialDataRequest from './SocialDataRequest';
-
 import Error from '../../components/utils/Error'
-
 
 type Props = {
   item: {
-    accessToken: string | undefined;
+    accessToken: string;
   };
 }
 
 const FriendList = (props: Props) => {
 
     const [error, setError] = useState(null);
-    // User data retrieved from the API
     const [friends, setFriends] = useState([]);
     const [requestList, setRequestList] = useState([]);
-
-    const navigate = useNavigate();
+    const [change, onChange] = useState(false);
 
     const auth = 'Bearer ' + props.item.accessToken;
 
@@ -50,9 +44,20 @@ const FriendList = (props: Props) => {
               }
             };
         
-            fetchFriends();
-            fetchRequestList();
-          }, []);
+            // if (!token) {
+            //   navigate('/');
+            // } else {
+              fetchFriends();
+              fetchRequestList();
+            // }
+          }, [change]);
+
+    const handleChange = () => {
+      if (change)
+        onChange(false)
+      else
+        onChange(true)
+    };
 
 
   if (error) // error
@@ -67,7 +72,7 @@ const FriendList = (props: Props) => {
             </div>
             <div className='bg-violet-700 rounded-lg p-2 m-2'>
               {Object.entries(requestList).map(([key, request]) => (
-                    <SocialDataRequest key={key} request={request} />
+                    <SocialDataRequest key={key} request={request} item={{ accessToken: props.item.accessToken }} onChange={handleChange}/>
                 ))}
             </div>
           </>
@@ -77,7 +82,7 @@ const FriendList = (props: Props) => {
         </div>
         <div className='bg-violet-700 rounded-lg p-2 m-2'>
             {Object.entries(friends).map(([key, profile]) => (
-                <SocialDataFriends key={key} profile={profile} />
+                <SocialDataFriends key={key} profile={profile} item={{ accessToken: props.item.accessToken }} onChange={handleChange}/>
             ))}
         </div>
       </div>

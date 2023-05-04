@@ -2,9 +2,12 @@ import React, { useState } from 'react'
 import Logo from '../../assets/Logo.png'
 import Disconnect from '../authentication/Disconnect';
 import { useNavigate } from 'react-router-dom'
+import { tokenForm } from '../../interfaceUtils';
 
 
-type Props = {}
+type Props = {
+  item: tokenForm;
+}
 
 const Navbar = (props: Props) => {
 
@@ -45,7 +48,7 @@ const Navbar = (props: Props) => {
       <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/settings">Settings</a></li>
       <div className="relative">
         <button onClick={displayDisconnectBox} className='w-[100px] py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg'>Log Out</button>
-        {open ? <Disconnect /> : null}
+        {open ? <Disconnect item={props.item} /> : null}
       </div>
     </ul>
   </nav>
