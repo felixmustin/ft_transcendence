@@ -16,7 +16,7 @@ interface UserData {
 type Props = {
   room: ChatRoomInterface;
   onBoxClick: (roomId: number) => void;
-  socket: Socket | null;
+  socket: Socket | undefined;
   token: string | undefined;
   id: number;
 };

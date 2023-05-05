@@ -5,6 +5,7 @@ import Chat from '../../components/messages/Chat';
 import { tokenForm } from '../../interfaceUtils'
 import { useNavigate } from 'react-router-dom'
 import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
+import SocketContextComponent from '../../context/ComponentSocket';
 
 type Props = {};
 
@@ -28,7 +29,7 @@ const ChatPage = (props: Props) => {
     else
       getToken();
   }, []);
-
+  const chat = <Chat accessToken={token?.accessToken} />;
   return (
     <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
       <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
@@ -36,7 +37,12 @@ const ChatPage = (props: Props) => {
           <Navbar />
         </div>
       </div>
-      {token && <Chat accessToken={token.accessToken} />}
+      {token ? (
+						<SocketContextComponent children={chat} token={token.accessToken} adress="http://localhost:3001/chat" />
+					) : (
+						<p>Loading...</p>
+					)}
+      {/* {token && <Chat accessToken={token.accessToken} />} */}
     </div>
   );
 };

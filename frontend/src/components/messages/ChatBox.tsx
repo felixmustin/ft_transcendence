@@ -7,7 +7,7 @@ import { Socket } from 'socket.io-client';
 type Props = {
   roomId?: number;
   id: number;
-  socket: Socket | null;
+  socket: Socket | undefined;
 };
 
 const ChatBox = ({ roomId, id, socket }: Props) => {

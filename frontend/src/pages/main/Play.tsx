@@ -59,7 +59,7 @@ const Play = () => {
 			<div className="flex justify-evenly">
 				<div className="grid grid-cols-2 w-full">
 				{token ? (
-						<SocketContextComponent children={matchmaking} token={token.accessToken} />
+						<SocketContextComponent children={matchmaking} token={token.accessToken} adress="ws://127.0.0.1:3001/play" />
 					) : (
 						<p>Loading...</p>
 					)}

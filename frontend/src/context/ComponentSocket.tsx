@@ -5,29 +5,16 @@ import { getSessionsToken } from '../sessionsUtils';
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
 	token: string | undefined;
-}
-
-type handshake = {
-	uid: string,
-	users: string[],
-}
-type token = {
-	token : string,
-}
-type auth = {
-	reconnectionAttempts: number,
-	reconnectionDelay: number,
-	autoConnect: boolean,
-	auth: token 
+	adress: string;
 }
 
 const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = (props) => {
-	const {children, token } = props;
+	const {children, token, adress } = props;
 
 	const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
 	const [loading, setloading ] = useState(true);
 
-	const socket = useSocket('ws://127.0.0.1:3001/play', {
+	const socket = useSocket(adress, {
 		reconnectionAttempts: 5,
 		reconnectionDelay: 5000,
 		autoConnect: false,
@@ -90,10 +77,12 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 	const sendhandshake = () => {
 		socket.emit('handshake');
 		console.log('sending handshake');
-		socket.on('handshake-response', (data: handshake) =>{
-			console.log('handshake-reponse received with ' + data.uid + ' | ' + data.users);
+		socket.on('handshake-response', (get: string) =>{
+			const data = JSON.parse(get);
+			// console.log('handshake-reponse received with ' + data.uid + ' | ' + data.users);
 			SocketDispatch({type : 'update_uid', payload : data.uid});
 			SocketDispatch({type: 'update_users', payload: data.users});
+			SocketDispatch({type: 'update_data', payload: get});
 		});
 	};
 	useEffect(() => {

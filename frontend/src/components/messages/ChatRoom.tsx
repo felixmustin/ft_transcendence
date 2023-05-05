@@ -8,7 +8,7 @@ import Participants from './Participants';
 type Props = {
   roomId: number;
   id: number;
-  socket: Socket | null;
+  socket: Socket | undefined;
 };
 
 const ChatRoom = ({ roomId, id, socket }: Props) => {

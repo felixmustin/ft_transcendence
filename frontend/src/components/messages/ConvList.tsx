@@ -6,7 +6,7 @@ import { Socket } from 'socket.io-client';
 type Props = {
   rooms: ChatRoomInterface[];
   onRoomSelect: (roomId: number) => void;
-  socket: Socket | null;
+  socket: Socket | undefined;
   token: string | undefined;
   id: number;
 }

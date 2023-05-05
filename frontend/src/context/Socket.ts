@@ -5,15 +5,17 @@ export interface ISocketContextState {
 	socket : Socket | undefined ;
 	uid : string;
 	users : string[];
+	data : string;
 }
 
 export const defaultSocketContextState: ISocketContextState = {
 	socket : undefined, 
 	uid : '',
 	users : [],
+	data : '',
 }
 
-export type TSocketContextActions = 'update_socket' | 'update_uid' | 'update_users' | 'delete_user';
+export type TSocketContextActions = 'update_socket' | 'update_uid' | 'update_users' | 'delete_user' | 'update_data';
 
 export type TSocketContextPayload = string | string[] | Socket;
 
@@ -34,6 +36,8 @@ export const SocketReducer = (state : ISocketContextState, action: ISocketContex
 			return { ...state, users : action.payload as string[]};
 		case 'delete_user':
 			return { ...state, users : state.users.filter((uid) => uid !== action.payload as string)};
+		case 'update_data':
+			return { ...state, data : action.payload as string};
 		default :
 			return { ...state };
 	}
