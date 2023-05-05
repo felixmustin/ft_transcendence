@@ -49,23 +49,63 @@ const CreateRoom = ({ token, id, setCreateRoom }: Props) => {
 
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Room name:</label>
-        <input type="text" id="name" name="name" onChange={handleNameChange}/>
-        <label htmlFor="mode">Room mode:</label>
-        <input type="text" id="mode" name="mode" onChange={handleModeChange}/>
-        { (roomMode === 'private' || roomMode === 'protected') &&
+    <div className="bg-gradient-to-tl from-violet-900 via-black to-black p-6 rounded-lg shadow-lg m-2">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="password">Room password:</label>
-          <input type="text" id="password" name="password" onChange={handlePassChange}/>
+          <label htmlFor="name" className="block text-sm text-white font-medium">
+            Room name:
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            onChange={handleNameChange}
+            className="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
+          />
         </div>
-        }
-        <button type='submit'>Create</button>
-        <button onClick={() => setCreateRoom(false)}>Cancel</button>
+        <div>
+          <label htmlFor="mode" className="block text-sm text-white font-medium">
+            Room mode:
+          </label>
+          <input
+            type="text"
+            id="mode"
+            name="mode"
+            onChange={handleModeChange}
+            className="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
+          />
+        </div>
+        {(roomMode === 'private' || roomMode === 'protected') && (
+          <div>
+            <label htmlFor="password" className="block text-sm text-white font-medium">
+              Room password:
+            </label>
+            <input
+              type="text"
+              id="password"
+              name="password"
+              onChange={handlePassChange}
+              className="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
+            />
+          </div>
+        )}
+        <div className="flex justify-between">
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-500"
+          >
+            Create
+          </button>
+          <button
+            onClick={() => setCreateRoom(false)}
+            className="px-4 py-2 rounded-md text-white bg-red-600 hover:bg-red-500"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
-  )
+  );
 }
 
 export default CreateRoom

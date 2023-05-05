@@ -27,7 +27,7 @@ const SendMessage = ({ roomId, id, socket }: Props) => {
   console.log('SendMessage:', roomId);
 
   return (
-    <div className='h-10'>
+    <div className='h-10 mt-auto'>
       <form className='containerWrap flex' onSubmit={handleSubmit}>
         <input
           className='rounded-lg bg-gray-600 focus:border-blue-500 focus:bg-gray-800 focus:outline-none w-5/6 h-10 px-2'

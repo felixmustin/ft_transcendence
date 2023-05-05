@@ -266,7 +266,7 @@ export class PongService {
 		game.player1_score = scoreData.player1_score;
 		game.player2_score = scoreData.player2_score;
 
-		return await this.gameRepository.save(game);
+		return await this.addGameToUserProfile(game);
 	}
 
   async addGameToUserProfile(game: Game) {

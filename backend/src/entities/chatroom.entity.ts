@@ -12,6 +12,7 @@ import {
   } from 'typeorm';
   import { User } from './user.entity';
   import { Message } from './message.entity';
+import { Mute } from './mute.entity';
 
   export enum ChatRoomMode {
     PUBLIC = 'public',
@@ -66,4 +67,23 @@ import {
 
     @OneToMany(() => Message, (message) => message.chatroom, {onDelete: 'CASCADE'})
     messages: Message[];
+
+    @ManyToMany(() => User)
+    @JoinTable({
+      name: 'chatroom_admins',
+      joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
+      inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    })
+    admin: User[];
+
+    @ManyToMany(() => User)
+    @JoinTable({
+      name: 'chatroom_blocked_users',
+      joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
+      inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    })
+    blocked: User[];
+
+    @OneToMany(() => Mute, (mute) => mute.chatroom, { onDelete: 'CASCADE' })
+    muted: Mute[];
   }

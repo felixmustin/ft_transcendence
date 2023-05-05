@@ -144,6 +144,46 @@ CREATE TABLE public.chatroom_participants
         ON DELETE CASCADE
 );
 
+CREATE TABLE public.chatroom_admins
+(
+    chatroom_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY(chatroom_id, user_id),
+    FOREIGN KEY (chatroom_id)
+        REFERENCES public.chatroom(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (user_id)
+        REFERENCES public.Users(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE public.chatroom_blocked_users
+(
+    chatroom_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY(chatroom_id, user_id),
+    FOREIGN KEY (chatroom_id)
+        REFERENCES public.chatroom(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (user_id)
+        REFERENCES public.Users(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE public.mute
+(
+    chatroom_id INT NOT NULL,
+    user_id INT NOT NULL,
+    time_muted TIMESTAMPTZ,
+    PRIMARY KEY(chatroom_id, user_id),
+    FOREIGN KEY (chatroom_id)
+        REFERENCES public.chatroom(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (user_id)
+        REFERENCES public.Users(id)
+        ON DELETE CASCADE
+);
+
 ALTER TABLE public.Users OWNER TO myUsername;
 ALTER TABLE public.user_profiles OWNER TO myUsername;
 ALTER TABLE public.friends OWNER TO myUsername;
@@ -152,5 +192,8 @@ ALTER TABLE public.user_profiles_games OWNER TO myUsername;
 ALTER TABLE public.chatroom OWNER TO myUsername;
 ALTER TABLE public.message OWNER TO myUsername;
 ALTER TABLE public.chatroom_participants OWNER TO myUsername;
+ALTER TABLE public.chatroom_admins OWNER TO myUsername;
+ALTER TABLE public.chatroom_blocked_users OWNER TO myUsername;
+ALTER TABLE public.mute OWNER TO myUsername;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO myUsername;

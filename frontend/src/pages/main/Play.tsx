@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getSessionsToken, isSessionTokenSet } from "../../sessionsUtils";
 import { tokenForm } from "../../interfaceUtils";
 import { useNavigate } from "react-router-dom";
+import Ladder from "../../components/game/Ladder";
 
 const Play = () => {
 	const [token, setToken] = useState<tokenForm>();
@@ -63,6 +64,7 @@ const Play = () => {
 					) : (
 						<p>Loading...</p>
 					)}
+          <Ladder />
 				</div>
 			</div>
 		</div>

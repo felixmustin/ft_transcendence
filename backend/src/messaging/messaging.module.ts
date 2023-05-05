@@ -10,9 +10,10 @@ import { User } from 'src/entities/user.entity';
 import { ChatGateway } from './chat/chat.gateway';
 import { UserService } from 'src/user/user.service';
 import { Profile } from 'src/entities/profile.entity';
+import { Mute } from 'src/entities/mute.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Message, ChatRoom, User, Profile])],
+  imports: [TypeOrmModule.forFeature([Message, ChatRoom, User, Profile, Mute])],
   providers: [MessageService, ChatRoomService, UserService, ChatGateway],
   controllers: [MessageController, ChatRoomController]
 })

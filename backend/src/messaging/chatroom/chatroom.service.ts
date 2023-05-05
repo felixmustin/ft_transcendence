@@ -36,6 +36,7 @@ export class ChatRoomService {
       // Create a new ChatRoom entity with the fetched users as participants
       const chatRoom = this.chatRoomRepository.create({
         participants: [user1, user2],
+        admin: [user1, user2],
       });
       await this.chatRoomRepository.save(chatRoom);
     }
@@ -57,6 +58,7 @@ export class ChatRoomService {
       mode: mode as ChatRoomMode,
       password_hash: (mode === ChatRoomMode.PROTECTED || mode === ChatRoomMode.PRIVATE) ? password : null,
       participants: [user],
+      admin: [user],
     });
     await this.chatRoomRepository.save(chatRoom);
     return chatRoom;
@@ -84,6 +86,7 @@ export class ChatRoomService {
 
     const chatRoom = this.chatRoomRepository.create({
       participants: [user],
+      admin: [user],
     });
     await this.chatRoomRepository.save(chatRoom);
     return chatRoom;

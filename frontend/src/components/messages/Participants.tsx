@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import { UserInterface } from './types';
+import React, { useEffect, useState } from 'react';
+import SingleParticipant from './SingleParticipant';
+import { ChatRoomInterface, UserInterface } from './types';
 
 type Props = {
   roomId: number;
   id: number;
-}
+};
 
 const Participants = ({ roomId, id }: Props) => {
-
   const [users, setUsers] = useState<UserInterface[]>([]);
+  const [room, setRoom] = useState<ChatRoomInterface>();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -24,17 +25,26 @@ const Participants = ({ roomId, id }: Props) => {
   }, [roomId]);
 
 
-  return (
-    <div>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <a href={`http://localhost:3000/profile/${user.profile.username}`}>{user.profile.username}</a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
+  useEffect(() => {
+    const fetchGame = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/chatroom/room/${roomId}`);
+        const data = await response.json();
+        setRoom(data);
+      } catch (error) {
+        console.error('Error fetching the conversation:', error);
+      }
+    };
+    fetchGame();
+  }, [roomId]);
 
-export default Participants
+  return (
+    <div className="overflow-x-scroll whitespace-nowrap my-2">
+      {users.map((user) => (
+        <SingleParticipant key={user.id} user={user} currentUserId={id} room={room} />
+      ))}
+    </div>
+  );
+};
+
+export default Participants;

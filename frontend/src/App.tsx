@@ -17,6 +17,7 @@ function ProfileWrapper() {
   }
 
 function App() {
+
   return (
     // <SocketContext.Provider value={socket}>
     <BrowserRouter>

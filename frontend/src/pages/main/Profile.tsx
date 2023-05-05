@@ -108,6 +108,7 @@ const Profile = ({ username }: Props) => {
   // This needs to be updated to use the API.
   // Handle the launching of a game
   const handleLaunchGame = async () => {
+    navigate
   };
 
   const handleBlockUser = async () => {
@@ -226,8 +227,9 @@ const Profile = ({ username }: Props) => {
               <ProfileData item={{ field: 'STOMPS', data: flexData?.stomp }} />
               <ProfileData item={{ field: 'RANK', data: flexData?.rank }} />
             </div>
+            <hr className="w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900" />
             <div>
-              <MatchHistory games={profile?.games}/>
+              <MatchHistory games={profile?.games} currentId={profile?.id}/>
             </div>
           </div>
         </div>

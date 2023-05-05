@@ -126,13 +126,21 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
   }, [socket, room.id]);
 
   return (
-    <div className="flex bg-green-300 my-1 rounded-lg" onClick={handleClick}>
-      <div className="w-1/3">
-        <img src={login} className="rounded-full h-10 w-10" />
-        <div className="justify-center text-center text-black">{groupName}</div>
+    <div
+      className="flex items-center justify-between bg-gradient-to-tl from-violet-900 via-black to-black my-2 p-2 rounded-lg"
+      onClick={handleClick}
+    >
+      <div className="flex items-center">
+        <img src={login} className="rounded-full h-10 w-10 mr-2" />
+        <div className="justify-center text-center text-white">{groupName}</div>
       </div>
-      <div className="w-2/3 text-center text-black">{lastMessage?.content}</div>
-      <button onClick={deleteRoom}>X</button>
+      <div className="flex-grow text-center text-white">{lastMessage?.content}</div>
+      <button
+        onClick={deleteRoom}
+        className="bg-red-500 text-black font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+      >
+        X
+      </button>
     </div>
   );
 };

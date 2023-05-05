@@ -84,7 +84,7 @@ const Chat = (props: Props) => {
   return (
     <div className="flex bg-violet-700 rounded-lg p-2 m-2">
       <div className="bg-violet-800 w-1/3 rounded-lg mx-1">
-        {!createRoom && <button onClick={createNewRoom}>Create Room</button>}
+        {!createRoom && <button className='m-2' onClick={createNewRoom}>Create Room</button>}
         {createRoom && <CreateRoom token={props.accessToken} id={userId} setCreateRoom={setCreateRoom} />}
         <ConvList
           rooms={rooms}
