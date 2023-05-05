@@ -5,6 +5,7 @@ import { ChatRoomInterface, MessageInterface } from './types';
 import jwtDecode from 'jwt-decode';
 import { Socket, io } from 'socket.io-client';
 import CreateRoom from './CreateRoom';
+import SocketContext from '../../context/Socket';
 
 interface DecodedToken {
   id: number;
@@ -16,16 +17,17 @@ type Props = {
 
 const Chat = (props: Props) => {
   // Socket Connection
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const { SocketState, SocketDispatch } = React.useContext(SocketContext);
+  const socket = SocketState.socket;
 
-  useEffect(() => {
-    const newSocket = io("http://localhost:3001/chat");
-    setSocket(newSocket);
+  // useEffect(() => {
+  //   const newSocket = io("http://localhost:3001/chat");
+  //   setSocket(newSocket);
 
-    return () => {
-      newSocket.close();
-    };
-  }, []);
+  //   return () => {
+  //     newSocket.close();
+  //   };
+  // }, []);
 
   // Rooms
   const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);

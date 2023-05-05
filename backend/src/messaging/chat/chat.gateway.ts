@@ -65,6 +65,15 @@ export class ChatGateway
       console.error('sendMessage error:', error);
     }
   }
+  @SubscribeMessage('handshake')
+  async handshake(client: Socket, payload: string){
+    const response = {
+      uid: client.id,
+      users: [],
+      data: '' // you can put anything you want here with JSON.stringify
+    }
+    client.emit('handshake-response', response);
+  }
 }
 
 

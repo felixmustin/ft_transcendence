@@ -4,7 +4,7 @@ import { Socket } from 'socket.io-client';
 type Props = {
   roomId: number;
   id: number;
-  socket: Socket | null;
+  socket: Socket | undefined;
 };
 
 const SendMessage = ({ roomId, id, socket }: Props) => {
