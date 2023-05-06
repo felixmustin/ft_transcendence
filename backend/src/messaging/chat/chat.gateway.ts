@@ -9,6 +9,7 @@ import {
 import { MessageService } from "../message/message.service";
 import { ChatRoomService } from "../chatroom/chatroom.service";
 import { Server, Socket } from "socket.io";
+import { handshake } from "src/pong/pong.service";
 
 @WebSocketGateway({ namespace: "/chat" })
 export class ChatGateway
@@ -67,7 +68,7 @@ export class ChatGateway
   }
   @SubscribeMessage('handshake')
   async handshake(client: Socket, payload: string){
-    const response = {
+    const response : handshake = {
       uid: client.id,
       users: [],
       data: '' // you can put anything you want here with JSON.stringify

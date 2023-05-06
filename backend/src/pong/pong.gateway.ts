@@ -36,6 +36,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const shake: handshake = {
 			uid : uid,
 			users: users,
+			data: '',
 		}
 		console.log("responding to handshake");
   		client.emit('handshake-response', shake);

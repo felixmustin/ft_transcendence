@@ -15,6 +15,7 @@ import { User } from 'src/entities/user.entity';
 export type handshake = {
 	uid : string,
 	users: string[],
+	data: string,
 }
 export type token = {
 	token : string,

@@ -7,7 +7,11 @@ export interface ISocketContextComponentProps extends PropsWithChildren {
 	token: string | undefined;
 	adress: string;
 }
-
+export type handshake = {
+	uid : string,
+	users: string[],
+	data: string,
+}
 const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = (props) => {
 	const {children, token, adress } = props;
 
@@ -77,12 +81,12 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 	const sendhandshake = () => {
 		socket.emit('handshake');
 		console.log('sending handshake');
-		socket.on('handshake-response', (get: string) =>{
-			const data = JSON.parse(get);
+		socket.on('handshake-response', (data: handshake) =>{
+			// const data = JSON.parse(get);
 			// console.log('handshake-reponse received with ' + data.uid + ' | ' + data.users);
 			SocketDispatch({type : 'update_uid', payload : data.uid});
 			SocketDispatch({type: 'update_users', payload: data.users});
-			SocketDispatch({type: 'update_data', payload: get});
+			SocketDispatch({type: 'update_data', payload: data.data});
 		});
 	};
 	useEffect(() => {
