@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {Room} from './room';
 import { Server } from 'socket.io';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,12 +7,9 @@ import { Repository } from 'typeorm';
 import { Profile } from 'src/entities/profile.entity';
 import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
 import { UserService } from 'src/user/user.service';
-import { WebSocketServer, WsException } from '@nestjs/websockets';
-import { PongGateway } from './pong.gateway';
+import { WsException } from '@nestjs/websockets';
 import { coordonate } from './game/Pong';
 import { User } from 'src/entities/user.entity';
-import { number, string } from 'joi';
-import { Socket } from 'dgram';
 
 export type handshake = {
 	uid : string,
@@ -96,14 +93,6 @@ export class PongService {
 	}
 
 	logout(client: any, server: Server){
-		// for (const [key, room] of this.maproom.entries()){
-		// 	client.leave(key);
-		// 	room.disconnect(client.id);
-		// }
-		// for (const [key, room] of this.privateroom.entries()){
-		// 	client.leave(key);
-		// 	room.disconnect(client.id);
-		// }
 		const roomID = this.getClientRoom(client);
 		console.log('llogout called with : ' + client.id);
 		console.log('gives : ' + roomID);
@@ -129,12 +118,10 @@ export class PongService {
 
 	paddelupdate(client:any, data: PaddleMove){
 		const room = this.get_room(data.roomID);
-		// console.log('received : ' + JSON.stringify(data));
 		room?.update_paddle(data.paddle, client.id);
 	}
 
 	async find_match(client: any, data: string, server: Server){
-		//connecting to room
 		const room = this.looking_room(this.maproom, server);
 		client.join(room);
 		this.addClientToRoom(client.id, room);
@@ -191,15 +178,12 @@ export class PongService {
 			this.addClientToRoom(client.id, roomID);
 			this.privateroom.get(roomID).connect(data);
 		}
-		// console.log('room ' + room);
 		const score: ScoreProps = {
-			// error exception username 
 			player1: this.identifiate(this.privateroom.get(roomID).idp1)?.username,
 			player2: this.identifiate(this.privateroom.get(roomID).idp2)?.username,
 			score1: 0,
 			score2: 0,
 		}
-		// console.log('check');
 		const datamatch: matchdata = {
 			roomID: roomID,
 			score: score,
@@ -208,11 +192,9 @@ export class PongService {
 		client.emit('room_created', datamatch)
 	}
 	join_room(client: any, data: string, server: Server){
-		//join private room
 		const room = this.get_room(data);
 		client.join(data);
 		this.addClientToRoom(client.id, data);
-		// console.log('join room : ' + JSON.stringify(room));
 		room.connect(client.id);
 		const score: ScoreProps = {
 			player1: this.identifiate(room.idp1).username,
@@ -225,7 +207,6 @@ export class PongService {
 			score: score,
 			player: 2,
 		}
-		// console.log('join room 2');
 		server.to(room.id).emit('match_found', datamatch);
 	}
 	looking_room(map: Map<string, Room>, server: Server): string {
@@ -260,16 +241,6 @@ export class PongService {
 	}
 
 	get_room(roomID: string): Room{
-		// if (isNaN(Number(room.charAt(0)))) {
-		// 	console.log('id : ' + room + ' found room : ' + this.maproom.get(room)?.id);
-		// 	// console.log('The first character is a letter');
-		// 	return this.maproom.get(room);
-		// } 
-		// else {
-		// 	console.log('id : ' + room + ' found room : ' + this.privateroom.get(room)?.id);
-		// 	// console.log('The first character is a number');
-		// 	return this.privateroom.get(room);
-		// }
 		let room = this.maproom.get(roomID);
 		if (!room){
 			room = this.privateroom.get(roomID);
