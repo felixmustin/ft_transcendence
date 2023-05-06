@@ -136,15 +136,15 @@ export class Pong{
 	}
 	paddle_bigger(ind: number){
 		if (ind === 1)
-			this.paddleleft.heigth += 10;
+			this.paddleleft.heigth += 20;
 		else if (ind === 2)
-			this.paddleright.heigth += 10;
+			this.paddleright.heigth += 20;
 	}
 	paddle_smaller(ind: number){
-		if (ind === 1)
-			this.paddleleft.heigth -= 10;
-		else if (ind === 2)
-			this.paddleright.heigth -= 10;
+		if (ind === 2)
+			this.paddleleft.heigth -= 20;
+		else if (ind === 1)
+			this.paddleright.heigth -= 20;
 	}
 	activate_bonus(ind: number){
 		this.bonus = undefined;

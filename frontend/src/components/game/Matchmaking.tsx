@@ -50,9 +50,7 @@ function Matchmaking() {
       }
     };
     SocketState.socket?.on('room_created', onRoom_created);
-    // Unsubscribe from the "matchmaking" channel when the component unmounts
     return () => {
-    //   SocketState.socket?.emit('unsubscribe', 'matchmaking');
       SocketState.socket?.off('room_created', onRoom_created);
       SocketState.socket?.off('match_found', onMatchFound);
     };

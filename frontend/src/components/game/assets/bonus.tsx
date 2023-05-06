@@ -28,7 +28,6 @@ export class GameboardIcon extends Component <GameboardIconProps> {
 		if (bonus === undefined || which_bonus === -1 || which_bonus === 5){
 			return null;
 		}
-		console.log(JSON.stringify(this.props));
 		return (
 			<div className="gameboard-icon">
 				<img src={icon} alt="Gameboard Icon" style={{ 

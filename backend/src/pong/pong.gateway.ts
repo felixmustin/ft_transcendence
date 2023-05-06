@@ -13,6 +13,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	handleDisconnect(client: any) {
 		this.pongService.logout(client);
+		this.pongService.desidentifiate(client.id);
 	}
 	afterInit(server: any) {
 		console.log("websocket initialized");
@@ -52,5 +53,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('join_room')
 	async join_room(client: any, data: string) {
 		this.pongService.join_room(client, data, this.server);
+	}
+	@SubscribeMessage('rematch')
+	async rematch(client: any, data: string){
+		console.log('rematch received');
+		this.pongService.rematch(client, data);
+	}
+	@SubscribeMessage('quit')
+	async quit(client: any, data: string){
+		this.pongService.logout(client);
 	}
 }

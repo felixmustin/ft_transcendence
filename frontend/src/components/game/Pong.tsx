@@ -154,12 +154,13 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 	  handleKeyUp = (event: KeyboardEvent) => {
 		this.keysPressed.delete(event.key);
 	  };
-	  rematch_handler(){
+	  rematch_handler = () => {
+		console.log('room id ' + this.props.roomID);
 		this.props.socket.emit('rematch', this.props.roomID);
-	  }
-	  quit_handler(){
+	  };
+	  quit_handler = () => {
 		this.props.socket.emit('quit');
-	  }
+	  };
 	render () {
 		return (
 		<div>
@@ -172,7 +173,12 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 					</div>
 					<div>press 'c' to play or 'v' to pause<br />press 'w' to go up and 's' to go down<br />press'a' to go left and 'd' to go right</div>
 			</div>
-			
+			{(this.score.score1 >= 10 || this.score.score2 >= 10) && (
+			<>
+				<button onClick={this.rematch_handler}>Restart Game</button>
+				<button onClick={this.quit_handler}>End Game</button>
+			</>
+		)}
 		</div>
 		);
 	}

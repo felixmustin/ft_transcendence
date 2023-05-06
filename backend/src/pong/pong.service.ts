@@ -11,6 +11,8 @@ import { WebSocketServer } from '@nestjs/websockets';
 import { PongGateway } from './pong.gateway';
 import { coordonate } from './game/Pong';
 import { User } from 'src/entities/user.entity';
+import { number } from 'joi';
+import { Socket } from 'dgram';
 
 export type handshake = {
 	uid : string,
@@ -88,7 +90,7 @@ export class PongService {
 			this.identitymap.set(client.id, user);
 		  } catch (error) {
 			console.log('Error occurred during login:', error);
-			server.close(client);
+			// client.close();
 		  }
 	}
 
@@ -104,26 +106,23 @@ export class PongService {
 	}
 
 	play(client: any, data: playpause){
-		const room = data.roomID;
-		if (this.maproom.get(room)){
-			this.maproom.get(room).play();}
+		const room = this.get_room(data.roomID);
+		if (client.id === room?.idp1 || client.id === room?.idp2){
+			room?.play();}
 	}
 
 	pause(client: any, data: playpause){
-		const room = data.roomID;
-		if (this.maproom.get(room)){
-			this.maproom.get(room).pause();}
+		const room = this.get_room(data.roomID);
+		if (client.id === room?.idp1 || client.id === room?.idp2){
+			room?.pause();}
 	}
 
 	paddelupdate(client:any, data: PaddleMove){
-		const room = data.roomID;
+		const room = this.get_room(data.roomID);
 		// console.log('received : ' + JSON.stringify(data));
-		this.maproom.get(room).update_paddle(data.paddle, client.id);
+		room?.update_paddle(data.paddle, client.id);
 	}
 
-	// setServer(server: Server) {
-	// 	this.server = server;
-	//   }
 	async find_match(client: any, data: string, server: Server){
 		//connecting to room
 		const room = this.looking_room(this.maproom, server);
@@ -144,8 +143,8 @@ export class PongService {
 		await waitForPlayer2;
 		//collect info
 		const score: ScoreProps = {
-			player1: this.identifiate(this.maproom.get(room).idp1).username,
-			player2: this.identifiate(this.maproom.get(room).idp2).username,
+			player1: this.identifiate(this.maproom.get(room).idp1)?.username,
+			player2: this.identifiate(this.maproom.get(room).idp2)?.username,
 			score1: 0,
 			score2: 0,
 		};
@@ -158,24 +157,38 @@ export class PongService {
 	}
 	create_room(client: any, data: string, server: Server){
 		//create private room
-		let room = this.generateRandomKey();
-		while (this.privateroom.has(room)) {
-			room = this.generateRandomKey();
+		let found: boolean = false;
+		let roomID: string = '';
+		for (const [key, value] of this.privateroom.entries()) {
+			if (value.players === 0) {
+			  client.join(value.id);
+			  value.connect(data);
+			  found = true;
+			  console.log('found empty room');
+			  break ;
+			}
+		  }
+		if (!found){
+			roomID = this.generateRandomKey();
+			while (this.privateroom.has(roomID)) {
+				roomID = this.generateRandomKey();
+			}
+			this.privateroom.set(roomID, new Room(roomID, server, this));
+			console.log('send data ');
+			client.join(roomID);
+			this.privateroom.get(roomID).connect(data);
 		}
-		this.privateroom.set(room, new Room(room, server, this));
-		console.log('send data ');
-		client.join(room);
-		this.privateroom.get(room).connect(data);
-		console.log('room ' + room);
+		// console.log('room ' + room);
 		const score: ScoreProps = {
-			player1: this.identifiate(this.privateroom.get(room).idp1).username,
-			player2: this.identifiate(this.privateroom.get(room).idp2).username,
+			// error exception username 
+			player1: this.identifiate(this.privateroom.get(roomID).idp1)?.username,
+			player2: this.identifiate(this.privateroom.get(roomID).idp2)?.username,
 			score1: 0,
 			score2: 0,
 		}
-		console.log('check');
+		// console.log('check');
 		const datamatch: matchdata = {
-			roomID: room,
+			roomID: roomID,
 			score: score,
 			player: 1,
 		}
@@ -183,23 +196,23 @@ export class PongService {
 	}
 	join_room(client: any, data: string, server: Server){
 		//join private room
-		const room = data;
-		client.join(room);
-		console.log('join room 1')
-		this.privateroom.get(room).connect(client.id);
+		const room = this.get_room(data);
+		client.join(data);
+		// console.log('join room : ' + JSON.stringify(room));
+		room.connect(client.id);
 		const score: ScoreProps = {
-			player1: this.identifiate(this.privateroom.get(room).idp1).username,
-			player2: this.identifiate(this.privateroom.get(room).idp2).username,
+			player1: this.identifiate(room.idp1).username,
+			player2: this.identifiate(room.idp2).username,
 			score1: 0,
 			score2: 0,
 		}
 		const datamatch: matchdata = {
-			roomID: room,
+			roomID: room.id,
 			score: score,
 			player: 2,
 		}
-		console.log('join room 2');
-		server.to(room).emit('match_found', datamatch);
+		// console.log('join room 2');
+		server.to(room.id).emit('match_found', datamatch);
 	}
 	looking_room(map: Map<string, Room>, server: Server): string {
 		for (const [key, value] of map.entries()) {
@@ -223,10 +236,9 @@ export class PongService {
 		return key;
 	  }
 
-	disconnecting(map: Map<string, Room>, rooms: string[]){
-		rooms.forEach(element => {
-			map[element].players--;
-		});
+	disconnecting(client: any, id: string){
+		const room = this.get_room(id);
+		room.disconnect(client.id);
 	}
 
 	getClientRoom(client: any) {
@@ -246,6 +258,23 @@ export class PongService {
 		return null;
 	}
 
+	get_room(roomID: string): Room{
+		// if (isNaN(Number(room.charAt(0)))) {
+		// 	console.log('id : ' + room + ' found room : ' + this.maproom.get(room)?.id);
+		// 	// console.log('The first character is a letter');
+		// 	return this.maproom.get(room);
+		// } 
+		// else {
+		// 	console.log('id : ' + room + ' found room : ' + this.privateroom.get(room)?.id);
+		// 	// console.log('The first character is a number');
+		// 	return this.privateroom.get(room);
+		// }
+		let room = this.maproom.get(roomID);
+		if (!room){
+			room = this.privateroom.get(roomID);
+		}
+		return room;
+	}
 	wait_player2(room: Room){
 		
 	}
@@ -270,41 +299,47 @@ export class PongService {
 		return await this.addGameToUserProfile(game);
 	}
 
-  async addGameToUserProfile(game: Game) {
-    const player1 = await this.userservice.findUserById(game.player1_id);
-    const player2 = await this.userservice.findUserById(game.player2_id);
-  
-    // Create a new game instance and set its properties
-    const newGame = new Game();
-    newGame.player1_id = game.player1_id;
-    newGame.player2_id = game.player2_id;
-    newGame.player1_score = game.player1_score;
-    newGame.player2_score = game.player2_score;
-  
-    // Save the new game to the repository
-    const savedGame = await this.gameRepository.save(newGame);
-  
-    // Add the saved game to both player1 and player2 profile games
-    player1.profile.games.push(savedGame);
-    player2.profile.games.push(savedGame);
+  	async addGameToUserProfile(game: Game) {
+  	  const player1 = await this.userservice.findUserById(game.player1_id);
+  	  const player2 = await this.userservice.findUserById(game.player2_id);
+	
+  	  // Create a new game instance and set its properties
+  	  const newGame = new Game();
+  	  newGame.player1_id = game.player1_id;
+  	  newGame.player2_id = game.player2_id;
+  	  newGame.player1_score = game.player1_score;
+  	  newGame.player2_score = game.player2_score;
+	
+  	  // Save the new game to the repository
+  	  const savedGame = await this.gameRepository.save(newGame);
+	
+  	  // Add the saved game to both player1 and player2 profile games
+  	  player1.profile.games.push(savedGame);
+  	  player2.profile.games.push(savedGame);
 
-    // Update the player1 and player2 profiles if they won the game
-    if (game.player1_score > game.player2_score) {
-      player1.profile.gamesWon++;
-    } else {
-      player2.profile.gamesWon++;
-    }
+  	  // Update the player1 and player2 profiles if they won the game
+  	  if (game.player1_score > game.player2_score) {
+  	    player1.profile.gamesWon++;
+  	  } else {
+  	    player2.profile.gamesWon++;
+  	  }
 
-    // Save the updated profiles
-    await this.userRepository.save(player1);
-    await this.userRepository.save(player2);
-  
-    return savedGame;
-  }
-  
-  
-
+  	  // Save the updated profiles
+  	  await this.userRepository.save(player1);
+  	  await this.userRepository.save(player2);
+	
+  	  return savedGame;
+  	}
+	rematch(client: any, roomID:string){
+		console.log('rematch service');
+		const room = this.get_room(roomID);
+		console.log('rooom id service is ' + room.id);
+		room.rematch_handler(client.id);
+	}
 	identifiate(id: string): Profile{
 		return (this.identitymap.get(id));
+	}
+	desidentifiate(id:string){
+		this.identitymap.delete(id);
 	}
 }

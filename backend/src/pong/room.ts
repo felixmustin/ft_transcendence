@@ -34,12 +34,15 @@ export class Room {
 	idp2: string;
 	idspect: string[];
 	room_complete: Function;
+	rematch: string;
   
 	constructor(id: string, server: Server, private readonly PongService : PongService) {
 	  this.id = id;
 	  this.server = server;
+	  this.idspect = [];
 	  this.playpause = false;
 	  this.finished = false;
+	  this.rematch = '';
 	  this.players = 0;
 	  this.score1 = 0;
 	  this.score2 = 0;
@@ -50,11 +53,12 @@ export class Room {
 	}
 
 	connect(id: string){
-		this.players++;
-		if (this.players === 1){
+		if (this.players === 0){
+			this.players++;
 			this.idp1 = id;
 		}
-		else if (this.players === 2){
+		else if (this.players === 1){
+			this.players++;
 			this.idp2 = id;
 			this.room_complete();
 		}
@@ -78,7 +82,6 @@ export class Room {
 		}
 		else if (this.idspect && this.idspect.includes(id)){
 			console.log('user : ' + id + " disconnected from room : " + this.id);
-			this.players--;
 		}
 	}
 
@@ -114,7 +117,7 @@ export class Room {
 		if (this.score1 >= 10 || this.score2 >= 10){
 			this.finished = true;
 			this.post_score_db();
-			this.reset_game();
+			// this.reset_game();
 		}
 	}
 	
@@ -124,6 +127,14 @@ export class Room {
 		this.state.reset();
 		this.score1 = 0;
 		this.score2 = 0;
+		this.server.to(this.id).emit('updateState', this.gen_game_state());
+		const data: ScoreProps = {
+			player1 : this.PongService.identifiate(this.idp1).username,
+			player2 : this.PongService.identifiate(this.idp2).username,
+			score1 : this.score1,
+			score2 : this.score2,
+		}
+		this.server.to(this.id).emit('score', JSON.stringify(data));
 	}
 
 	check_goal(index: number){
@@ -188,27 +199,15 @@ export class Room {
 		}
 	}
 	update_left_paddle(coor: coordonate){
-		//horizontal check 
-		// if (this.state.paddleleft.x + coor.x > 0 && this.state.paddleleft.x + this.state.paddleleft.width + coor.x < this.state.board.width / 2){
-		// 	//vertical check
-		// 	if (this.state.paddleleft.y + coor.y > 0 && this.state.paddleleft.y + this.state.paddleleft.heigth + coor.y < this.state.board.heigth){
-				this.state.update_left_paddle(coor.x, coor.y);
-		// 	}
-		// }
+		this.state.update_left_paddle(coor.x, coor.y);
 	}
 
 	update_right_paddle(coor: coordonate){
-		//horizontal check
-		// if (this.state.paddleright.x + coor.x > this.state.board.width / 2 && this.state.paddleright.x + this.state.paddleright.width + coor.x < this.state.board.width){
-		// 	//vertical check
-		// 	if (this.state.paddleright.y + coor.y > 0 && this.state.paddleright.y + this.state.paddleright.heigth + coor.y < this.state.board.heigth){
-				this.state.update_right_paddle(coor.x, coor.y);
-		// 	}
-		// }
+		this.state.update_right_paddle(coor.x, coor.y);
 	}
 
 	play(){
-		if (this.playpause === false && this.players == 2){
+		if (this.playpause === false && this.players == 2 && !this.finished){
 			this.playpause = true;
 			this.intervalid = setInterval( () => {
 				this.update_game_emit()
@@ -222,4 +221,13 @@ export class Room {
 			clearInterval(this.intervalid);
 		}
 	}
+	rematch_handler(id :string){
+		if (this.rematch === '' && (id === this.idp1 || id === this.idp2)){
+			this.rematch = id;
+		}
+		else if ((id === this.idp1 && this.rematch === this.idp2) || (id === this.idp2 && this.rematch === this.idp1)){
+			this.reset_game();
+		}
+	}
+
   }
