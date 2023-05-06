@@ -154,6 +154,12 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 	  handleKeyUp = (event: KeyboardEvent) => {
 		this.keysPressed.delete(event.key);
 	  };
+	  rematch_handler(){
+		this.props.socket.emit('rematch', this.props.roomID);
+	  }
+	  quit_handler(){
+		this.props.socket.emit('quit');
+	  }
 	render () {
 		return (
 		<div>
