@@ -30,7 +30,7 @@ const Login = () => {
      await fetch('http://localhost:3001/user/id', {
       method: 'Get',
       headers: {
-      'Authorization': 'Bearer ' + sessionToken.accessToken,
+      'Authorization': 'Bearer ' + sessionToken?.accessToken,
       },
     }).then(res => res.json()
     ).then(response => {

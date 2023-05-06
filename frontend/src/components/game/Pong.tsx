@@ -166,6 +166,7 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 					</div>
 					<div>press 'c' to play or 'v' to pause<br />press 'w' to go up and 's' to go down<br />press'a' to go left and 'd' to go right</div>
 			</div>
+			
 		</div>
 		);
 	}
