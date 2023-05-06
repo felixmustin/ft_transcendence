@@ -7,11 +7,11 @@ import { Repository } from 'typeorm';
 import { Profile } from 'src/entities/profile.entity';
 import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
 import { UserService } from 'src/user/user.service';
-import { WebSocketServer } from '@nestjs/websockets';
+import { WebSocketServer, WsException } from '@nestjs/websockets';
 import { PongGateway } from './pong.gateway';
 import { coordonate } from './game/Pong';
 import { User } from 'src/entities/user.entity';
-import { number } from 'joi';
+import { number, string } from 'joi';
 import { Socket } from 'dgram';
 
 export type handshake = {
@@ -73,6 +73,7 @@ export class PongService {
 	private maproom: Map < string, Room > = new Map();
 	private privateroom: Map < string, Room > = new Map();
 	private identitymap: Map < string, Profile > = new Map();
+	private idroomap: Map <string, string[]> = new Map();
 
 	constructor(
 		@InjectRepository(Game)
@@ -90,7 +91,7 @@ export class PongService {
 			this.identitymap.set(client.id, user);
 		  } catch (error) {
 			console.log('Error occurred during login:', error);
-			// client.close();
+			throw new WsException('Unauthorized');
 		  }
 	}
 
@@ -103,11 +104,15 @@ export class PongService {
 		// 	client.leave(key);
 		// 	room.disconnect(client.id);
 		// }
-		for (let roomID = this.getClientRoom(client); roomID; roomID = this.getClientRoom(client)){
-			const room = this.get_room(roomID);
-			room.disconnect(client.id);
+		const roomID = this.getClientRoom(client);
+		console.log('llogout called with : ' + client.id);
+		console.log('gives : ' + roomID);
+		for (let i = 0; i < roomID?.length; i++){
+			const room = this.get_room(roomID[i]);
+			room?.disconnect(client.id);
 			client.leave(roomID);
 		}
+		this.idroomap.delete(client.id);
 	}
 
 	play(client: any, data: playpause){
@@ -132,6 +137,7 @@ export class PongService {
 		//connecting to room
 		const room = this.looking_room(this.maproom, server);
 		client.join(room);
+		this.addClientToRoom(client.id, room);
 		this.maproom.get(room).connect(data);
 		// wait for oponent
 		let player = 0;
@@ -167,6 +173,7 @@ export class PongService {
 		for (const [key, value] of this.privateroom.entries()) {
 			if (value.players === 0) {
 			  client.join(value.id);
+			  this.addClientToRoom(client.id, value.id);
 			  value.connect(data);
 			  found = true;
 			  console.log('found empty room');
@@ -181,6 +188,7 @@ export class PongService {
 			this.privateroom.set(roomID, new Room(roomID, server, this));
 			console.log('send data ');
 			client.join(roomID);
+			this.addClientToRoom(client.id, roomID);
 			this.privateroom.get(roomID).connect(data);
 		}
 		// console.log('room ' + room);
@@ -203,6 +211,7 @@ export class PongService {
 		//join private room
 		const room = this.get_room(data);
 		client.join(data);
+		this.addClientToRoom(client.id, data);
 		// console.log('join room : ' + JSON.stringify(room));
 		room.connect(client.id);
 		const score: ScoreProps = {
@@ -246,21 +255,8 @@ export class PongService {
 		room.disconnect(client.id);
 	}
 
-	getClientRoom(client: any): string {
-		// Get the Set object containing the IDs of all the rooms that the client is in
-		const clientRooms: [] = client.rooms;
-	  
-		// Loop over the IDs in the Set object
-		for (let roomId of clientRooms) {
-		  // If the ID is not the ID of the client, it must be the ID of the room that the client is in
-		  if (roomId !== client.id) {
-			// Return the name of the room
-			return roomId;
-		  }
-		}
-	  
-		// If we get here, the client is not in any rooms
-		return null;
+	getClientRoom(client: any): string[] {
+		return this.idroomap.get(client.id);
 	}
 
 	get_room(roomID: string): Room{
@@ -347,4 +343,17 @@ export class PongService {
 	desidentifiate(id:string){
 		this.identitymap.delete(id);
 	}
+	addClientToRoom(clientId: string, roomId: string) {
+		const clientsInRoom = this.idroomap.get(clientId);
+		if (clientsInRoom && !clientsInRoom.includes(roomId)){
+			clientsInRoom.push(roomId);
+		}
+		else if (!clientsInRoom){
+			console.log('map entry created for ' + clientId + ' with ' + roomId);
+			const key = clientId;
+			const entry = [roomId];
+			this.idroomap.set(key, entry);
+		}
+	}
+	  
 }

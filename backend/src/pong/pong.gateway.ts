@@ -1,6 +1,8 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WsException } from '@nestjs/websockets';
 import { PongService, matchdata, ScoreProps, PaddleMove, handshake, playpause } from './pong.service';
 import { Server, Socket } from 'socket.io';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
+import { UseGuards } from '@nestjs/common';
 
 @WebSocketGateway( { namespace:'/play', cors: true })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {

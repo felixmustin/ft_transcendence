@@ -131,8 +131,8 @@ export class Room {
 		this.score2 = 0;
 		this.server.to(this.id).emit('updateState', this.gen_game_state());
 		const data: ScoreProps = {
-			player1 : this.PongService.identifiate(this.idp1).username,
-			player2 : this.PongService.identifiate(this.idp2).username,
+			player1 : this.PongService.identifiate(this.idp1)?.username,
+			player2 : this.PongService.identifiate(this.idp2)?.username,
 			score1 : this.score1,
 			score2 : this.score2,
 		}

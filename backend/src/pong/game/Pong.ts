@@ -83,6 +83,7 @@ export class Pong{
 				}
 				if (hit.y){
 					this.ballspeedy[index] *= -1;
+					this.quicker(index);
 				}
 			}
 			else {
@@ -93,6 +94,7 @@ export class Pong{
 				}
 				if (hit.y){
 					this.ballspeedy[index] *= -1;
+					this.quicker(index);
 				}
 			}
 		}
@@ -184,8 +186,16 @@ export class Pong{
 	quicker(index: number){
 			if (this.ballspeedx[index] > 0)
 				this.ballspeedx[index]++;
-			else
+			else if (this.ballspeedx[index] < 0)
 				this.ballspeedx[index]--;
+			else {
+				if (this.ball[index].x > this.board.width / 2){
+					this.ballspeedx[index]--;
+				}
+				else{
+					this.ballspeedx[index]++;
+				}
+			}
 	}
 	bounce_right(index: number){
 		const ball = this.ball[index].center();
