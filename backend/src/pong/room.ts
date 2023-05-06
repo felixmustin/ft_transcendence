@@ -73,12 +73,14 @@ export class Room {
 			this.reset_game();
 			this.idp1 = '';
 			this.players--;
+			this.server.to(this.id).emit('quit');
 		}
 		else if (id === this.idp2){
 			console.log('user : ' + id + " disconnected from room : " + this.id);
 			this.reset_game();
 			this.idp2 = '';
 			this.players--;
+			this.server.to(this.id).emit('quit');
 		}
 		else if (this.idspect && this.idspect.includes(id)){
 			console.log('user : ' + id + " disconnected from room : " + this.id);

@@ -50,7 +50,13 @@ function Matchmaking() {
       }
     };
     SocketState.socket?.on('room_created', onRoom_created);
+    const onquithandler = () => {
+      setMatch(null);
+      setwaiting(0);
+    }
+    SocketState.socket?.on('quit', onquithandler);
     return () => {
+      SocketState.socket?.off('quit', onquithandler);
       SocketState.socket?.off('room_created', onRoom_created);
       SocketState.socket?.off('match_found', onMatchFound);
     };

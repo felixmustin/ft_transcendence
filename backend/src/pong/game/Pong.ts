@@ -76,9 +76,7 @@ export class Pong{
 				this.ballspeedy.splice(index, 1);
 			}
 			if (element.x > this.board.width / 2){
-				console.log('before' + JSON.stringify(this.ball));
 				const hit: hit = element.move(this.ballspeedx[index], this.ballspeedy[index], [this.paddleright]);
-				console.log('after' + JSON.stringify(this.ball));
 				if (hit.x){
 					this.ballspeedx[index] *= -1;
 					this.bounce_right(index);

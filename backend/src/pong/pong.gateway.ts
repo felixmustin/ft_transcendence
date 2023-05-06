@@ -12,7 +12,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.pongService.login(client, this.server);
 	}
 	handleDisconnect(client: any) {
-		this.pongService.logout(client);
+		this.pongService.logout(client, this.server);
 		this.pongService.desidentifiate(client.id);
 	}
 	afterInit(server: any) {
@@ -61,6 +61,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	@SubscribeMessage('quit')
 	async quit(client: any, data: string){
-		this.pongService.logout(client);
+		this.pongService.logout(client, this.server);
+		
 	}
 }

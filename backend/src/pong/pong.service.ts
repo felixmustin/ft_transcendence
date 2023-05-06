@@ -94,14 +94,19 @@ export class PongService {
 		  }
 	}
 
-	logout(client: any){
-		for (const [key, room] of this.maproom.entries()){
-			client.leave(key);
+	logout(client: any, server: Server){
+		// for (const [key, room] of this.maproom.entries()){
+		// 	client.leave(key);
+		// 	room.disconnect(client.id);
+		// }
+		// for (const [key, room] of this.privateroom.entries()){
+		// 	client.leave(key);
+		// 	room.disconnect(client.id);
+		// }
+		for (let roomID = this.getClientRoom(client); roomID; roomID = this.getClientRoom(client)){
+			const room = this.get_room(roomID);
 			room.disconnect(client.id);
-		}
-		for (const [key, room] of this.privateroom.entries()){
-			client.leave(key);
-			room.disconnect(client.id);
+			client.leave(roomID);
 		}
 	}
 
@@ -241,7 +246,7 @@ export class PongService {
 		room.disconnect(client.id);
 	}
 
-	getClientRoom(client: any) {
+	getClientRoom(client: any): string {
 		// Get the Set object containing the IDs of all the rooms that the client is in
 		const clientRooms: [] = client.rooms;
 	  
