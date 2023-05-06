@@ -39,6 +39,7 @@ export interface ChatRoomInterface {
     created_at: Date;
     updated_at: Date;
     messages: MessageInterface[];
+    admin: UserInterface[];
   }
   
   export interface MessageInterface {

@@ -25,7 +25,7 @@ const Ladder = (props: Props) => {
       <div className="bg-violet-900 rounded-lg w-[600px] items-center m-5">
         <h1 className="text-center text-4xl p-3 mt-2">Ladder</h1>
         <hr className="w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900" />
-        <div className="overflow-y-auto max-h-[400px]">
+        <div className="overflow-y-auto max-h-[420px]">
           <div className="flex justify-center items-center text-center text-xl underline p-2">
             <p className="w-1/3 text-left ml-4">RANK</p>
             <p className="w-1/3">USERNAME</p>

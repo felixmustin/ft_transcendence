@@ -37,14 +37,19 @@ const MatchResume = ({ game, currentUserId }: Props) => {
       const scoreDifference = currentUserScore - opponentScore;
 
       if (scoreDifference > 0) {
-        setOutcome(scoreDifference >= 6 ? 'Stomped' : 'Won');
+        setOutcome(scoreDifference >= 6 ? 'Stomp' : 'Won');
       } else {
         setOutcome('Lost');
       }
     }
   }, [game, currentUserId]);
 
-  const backgroundColor = outcome === 'Won' ? 'bg-green-500' : outcome === 'Lost' ? 'bg-red-500' : 'bg-yellow-400';
+  const backgroundColor = outcome === 'Won' ? 'bg-green-500' : outcome === 'Lost' ? 'bg-red-500' : 'bg-gradient-to-tl from-yellow-400 via-yellow-400 to-white';
+
+  const currentPlayerName = game?.player1_id === currentUserId ? player1 : player2;
+  const opponentName = game?.player1_id === currentUserId ? player2 : player1;
+  const currentPlayerScore = game?.player1_id === currentUserId ? game?.player1_score : game?.player2_score;
+  const opponentScore = game?.player1_id === currentUserId ? game?.player2_score : game?.player1_score;
 
   return (
     <div className={`p-3 my-2 rounded-lg ${backgroundColor}`}>
@@ -57,10 +62,10 @@ const MatchResume = ({ game, currentUserId }: Props) => {
           )}
         </div>
         <div className="flex-grow text-center text-black font-medium">
-          Match between {player1} and {player2}
+          <span>Match between </span><span className='font-bold'>{currentPlayerName}</span><span> and </span><span className='font-bold'>{opponentName}</span>
         </div>
         <div className='text-black'>
-          Score: {game?.player1_score} - {game?.player2_score}
+          Score: {currentPlayerScore} - {opponentScore}
         </div>
       </div>
     </div>

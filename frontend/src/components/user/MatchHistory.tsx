@@ -10,8 +10,8 @@ type Props = {
 const MatchHistory = ({ games, currentId }: Props) => {
   return (
     <div className="p-4 m-2 rounded-lg">
-      <h2 className="text-2xl underline font-semibold mb-4">Match History</h2>
-      {games && games.map((game) => (
+      <h2 className="text-3xl underline font-bold mb-4 ml-4">Match History</h2>
+      {games && games.slice().reverse().map((game) => (
         <MatchResume key={game?.id} game={game} currentUserId={currentId}/>
       ))}
     </div>

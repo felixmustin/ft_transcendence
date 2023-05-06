@@ -98,7 +98,23 @@ export class ChatRoomService {
   }
 
   async getChatRoomById(roomId: number): Promise<ChatRoom> {
-    const chatRoom = await this.chatRoomRepository.findOne({ where: { id: roomId }, relations: ['messages'] });
+    const chatRoom = await this.chatRoomRepository.findOne({
+      where: { id: roomId },
+      relations: [
+        'messages',
+        'admin',
+        'participants',
+        'last_message',
+        'last_user',
+        'blocked',
+        'muted',
+      ],
+    });
+    if (!chatRoom) {
+      console.log('Chatroom not found');
+    } else {
+      console.log('Chatroom found');
+    }
     return chatRoom;
   }
 

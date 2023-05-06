@@ -31,6 +31,7 @@ const Participants = ({ roomId, id }: Props) => {
         const response = await fetch(`http://localhost:3001/chatroom/room/${roomId}`);
         const data = await response.json();
         setRoom(data);
+        console.log(data);
       } catch (error) {
         console.error('Error fetching the conversation:', error);
       }
@@ -40,7 +41,7 @@ const Participants = ({ roomId, id }: Props) => {
 
   return (
     <div className="overflow-x-scroll whitespace-nowrap my-2">
-      {users.map((user) => (
+      {room && users.map((user) => (
         <SingleParticipant key={user.id} user={user} currentUserId={id} room={room} />
       ))}
     </div>

@@ -48,7 +48,7 @@ const ChatBox = ({ roomId, id, socket }: Props) => {
   }, [socket, roomId]);
 
   return (
-    <div className="overflow-y-auto">
+    <div className="overflow-y-auto h-[30rem] max-h-[30rem]">
       {messages.map((message) => (
         <Message key={message.id} message={message} currentUserId={id} />
       ))}

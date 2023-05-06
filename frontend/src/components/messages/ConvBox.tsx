@@ -132,7 +132,7 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
     >
       <div className="flex items-center">
         <img src={login} className="rounded-full h-10 w-10 mr-2" />
-        <div className="justify-center text-center text-white">{groupName}</div>
+        <div className="justify-center text-center text-white pl-2">{groupName}</div>
       </div>
       <div className="flex-grow text-center text-white">{lastMessage?.content}</div>
       <button
