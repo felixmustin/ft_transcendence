@@ -8,6 +8,11 @@ export interface GameInterface {
   player2_score: number;
 }
 
+// export interface ProfileInterface {
+//   id: number;
+//   username: string;
+// }
+
 export interface ProfileInterface {
   id: number;
   username: string;
@@ -15,27 +20,28 @@ export interface ProfileInterface {
   firstname: string;
   lastname: string;
   age: number;
+  avatar: Buffer;
   games: GameInterface[];
-}
-
-export interface UserInterface {
-  id: number;
-  statusid: number;
-  profile: ProfileInterface;
-  blocklist: UserInterface[];
+  // statusid: number;
+  // profile: ProfileInterface;
+  // blocklist: UserInterface[];
 }
 
 export interface ChatRoomInterface {
     id: number;
     name: string | null;
-    image: string | null;
-    participants: UserInterface;
+    image: {
+      type: string,
+      data: []
+    };
+    admins: number[];
+    participants: ProfileInterface[];
     mode: string; // Change this to the ChatRoomMode enum if you have it in your frontend code
     password_hash: string | null;
     last_message_id: number | null;
     last_message: MessageInterface | null;
-    last_user_id: number | null;
-    last_user: UserInterface | null;
+    last_profile_id: number | null;
+    last_profile: ProfileInterface | null;
     created_at: Date;
     updated_at: Date;
     messages: MessageInterface[];
@@ -46,7 +52,7 @@ export interface ChatRoomInterface {
     id: number;
     content: string;
     chatroom_id: number;
-    user_id: number;
-    user: UserInterface;
+    profile_id: number;
+    profile: ProfileInterface;
     created_at: string;
   }

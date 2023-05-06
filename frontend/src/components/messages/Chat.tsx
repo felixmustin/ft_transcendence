@@ -5,6 +5,7 @@ import { ChatRoomInterface, MessageInterface } from './types';
 import jwtDecode from 'jwt-decode';
 import { Socket, io } from 'socket.io-client';
 import CreateRoom from './CreateRoom';
+import ChatRoomSettings from './ChatRoomSettings';
 import SocketContext from '../../context/Socket';
 
 interface DecodedToken {
@@ -34,6 +35,8 @@ const Chat = (props: Props) => {
   const [createRoom, setCreateRoom] = useState<boolean>(false);
   // Selected room
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const [selectedRoomIdSettings, setSelectedRoomIdSettings] = useState(false);
+
 
   // Get user id from token
   const userId = props.accessToken
@@ -73,9 +76,11 @@ const Chat = (props: Props) => {
   }, [socket]);
 
   // Handle click on a conversation box
-  const onConvBoxClick = (roomId: number) => {
+  const onConvBoxClick = (roomId: number, settingBool: boolean) => {
     console.log('Clicked on room:', roomId);
+
     setSelectedRoomId(roomId);
+    setSelectedRoomIdSettings(settingBool);
   };
 
   // Create new room
@@ -88,6 +93,7 @@ const Chat = (props: Props) => {
       <div className="bg-violet-800 w-1/3 rounded-lg mx-1">
         {!createRoom && <button className='m-2' onClick={createNewRoom}>Create Room</button>}
         {createRoom && <CreateRoom token={props.accessToken} id={userId} setCreateRoom={setCreateRoom} />}
+        
         <ConvList
           rooms={rooms}
           onRoomSelect={onConvBoxClick}
@@ -96,14 +102,26 @@ const Chat = (props: Props) => {
           id = {userId}
         />
       </div>
-      {selectedRoomId && (
-        <ChatRoom
+      {selectedRoomId && 
+        selectedRoomIdSettings ? (
+          <ChatRoomSettings
           key={selectedRoomId}
+          room={rooms.find((room) => room.id === selectedRoomId)}
+          id={userId}
+          socket={socket}
+          token={props.accessToken}
+        />
+      ) 
+      : selectedRoomId ?
+      <ChatRoom
+          key={selectedRoomId}
+          room={rooms.find((room) => room.id === selectedRoomId)}
           roomId={selectedRoomId}
           id={userId}
           socket={socket}
         />
-      )}
+      :
+      null}
     </div>
   );
 };

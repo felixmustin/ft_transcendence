@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getSessionsToken } from '../../sessionsUtils';
+import { getAccessSessionsPayload, getSessionsToken } from '../../sessionsUtils';
 import { useNavigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 import { Code2FA } from '../../interfaceUtils';
@@ -22,7 +22,7 @@ const Setting2FA = (props: Props) => {
   const navigate = useNavigate();
  
   useEffect(() => {
-    const payload = (jwtDecode(props.item.accessToken!))
+    const payload = getAccessSessionsPayload();
      if (payload) {
         if (payload.twoFaEnabled == true) {
           setActivateButton("Desactivate 2FA");

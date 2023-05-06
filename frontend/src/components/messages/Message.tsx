@@ -7,7 +7,7 @@ type Props = {
 };
 
 const Message = ({ message, currentUserId }: Props) => {
-  const isCurrentUser = message.user_id === currentUserId;
+  const isCurrentUser = message.profile_id === currentUserId;
 
   return (
     <div
@@ -15,7 +15,7 @@ const Message = ({ message, currentUserId }: Props) => {
     >
       <div>
         {!isCurrentUser && (
-          <p className="text-gray-600 text-sm mb-1">{message.user.profile.username}</p>
+          <p className="text-gray-600 text-sm mb-1">{message.profile.username}</p>
         )}
         <div
           className={`inline-block bg-${

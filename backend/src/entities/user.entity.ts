@@ -41,11 +41,5 @@ export class User {
   @OneToOne(() => Profile, { cascade: true })
   @JoinColumn({ name: 'profileid' })
   profile: Profile;
-
-  @ManyToMany(() => ChatRoom, (chatroom) => chatroom.participants)
-  chatrooms: ChatRoom[];
-
-  @OneToMany(() => Message, (message) => message.user)
-  messages: Message[];
 }
 

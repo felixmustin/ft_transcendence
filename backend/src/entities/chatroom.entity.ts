@@ -10,8 +10,8 @@ import {
     JoinColumn,
     JoinTable,
   } from 'typeorm';
-  import { User } from './user.entity';
   import { Message } from './message.entity';
+import { Profile } from './profile.entity';
 import { Mute } from './mute.entity';
 
   export enum ChatRoomMode {
@@ -28,16 +28,19 @@ import { Mute } from './mute.entity';
     @Column({ nullable: true })
     name: string;
 
-    @Column({ nullable: true })
-    image: string;
+    @Column({ type: 'bytea' })
+    image: Buffer;
 
-    @ManyToMany(() => User, (user) => user.chatrooms)
+    @Column({ type: 'integer', array: true, default: [] })
+    admins: number[];
+
+    @ManyToMany(() => Profile, (profile) => profile.chatrooms)
     @JoinTable({
       name: 'chatroom_participants',
       joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
-      inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+      inverseJoinColumn: { name: 'profile_id', referencedColumnName: 'id' },
     })
-    participants: User[];
+     participants: Profile[];
 
     @Column({ type: 'enum', enum: ChatRoomMode, default: ChatRoomMode.PRIVATE })
     mode: ChatRoomMode;
@@ -53,11 +56,11 @@ import { Mute } from './mute.entity';
     last_message: Message;
 
     @Column({ nullable: true })
-    last_user_id: number;
+    last_profile_id: number;
 
-    @ManyToOne(() => User)
-    @JoinColumn({ name: 'last_user_id' })
-    last_user: User;
+    @ManyToOne(() => Profile)
+    @JoinColumn({ name: 'last_profile_id' })
+    last_profile: Profile;
 
     @CreateDateColumn()
     created_at: Date;
@@ -68,21 +71,21 @@ import { Mute } from './mute.entity';
     @OneToMany(() => Message, (message) => message.chatroom, {onDelete: 'CASCADE'})
     messages: Message[];
 
-    @ManyToMany(() => User)
-    @JoinTable({
-      name: 'chatroom_admins',
-      joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
-      inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    })
-    admin: User[];
+    // @ManyToMany(() => User)
+    // @JoinTable({
+    //   name: 'chatroom_admins',
+    //   joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
+    //   inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    // })
+    // admin: User[];
 
-    @ManyToMany(() => User)
-    @JoinTable({
-      name: 'chatroom_blocked_users',
-      joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
-      inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    })
-    blocked: User[];
+    // @ManyToMany(() => User)
+    // @JoinTable({
+    //   name: 'chatroom_blocked_users',
+    //   joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
+    //   inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    // })
+    // blocked: User[];
 
     @OneToMany(() => Mute, (mute) => mute.chatroom, { onDelete: 'CASCADE' })
     muted: Mute[];

@@ -95,9 +95,7 @@ export class AuthService {
   
   async generateAccessToken(user: User) {
     const payload = { id: user.id, twoFaEnabled: user.is2faenabled/* , expiresIn: '1m' */};
-    console.log("OK")
-    console.log(process.env.JWT_SECRET)
-    const accessToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET, expiresIn: '1m' });
+    const accessToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET, expiresIn: '5m' });
 
     this.userService.changeStatus(user, 1);
     const refreshToken = await this.generateRefreshToken(user)
@@ -107,7 +105,7 @@ export class AuthService {
 
   async generateRefreshToken(user: User) {
     const payload = { id: user.id/* , expiresIn: '7d' */};
-    const refreshToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET, expiresIn: '7d'})
+    const refreshToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET, expiresIn: '1d'})
 
     user.refreshtoken = refreshToken
     await this.userRepository.save(user)

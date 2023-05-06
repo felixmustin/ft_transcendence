@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { ChatRoomInterface, MessageInterface, ProfileInterface } from './types';
-import login from '../../assets/login.jpg'
+import { IoSettingsSharp } from 'react-icons/io5';
+import { Buffer } from 'buffer';
+
+
 
 interface UpdateLastMessageData {
   roomId: number;
@@ -15,7 +18,7 @@ interface UserData {
 
 type Props = {
   room: ChatRoomInterface;
-  onBoxClick: (roomId: number) => void;
+  onBoxClick: (roomId: number, settingBool: boolean) => void;
   socket: Socket | undefined;
   token: string | undefined;
   id: number;
@@ -25,10 +28,14 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
   const [lastMessage, setLastMessage] = useState<MessageInterface | null>(null);
   const [users, setUsers] = useState<number[]>([]);
   const [usersnames, setUsernames] = useState<string[]>([]);
-  const [groupName, setGroupName] = useState<string>('Group');
+  const [groupName, setGroupName] = useState<string>(room.name!);
 
-  const handleClick = () => {
-    onBoxClick(room.id);
+  const handleClickConv = () => {
+    onBoxClick(room.id, false);
+  };
+
+  const handleClickSetting = () => {
+    onBoxClick(room.id, true);
   };
 
   const fetchLastMessage = async () => {
@@ -49,9 +56,7 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
     try {
       const res = await fetch(url, { method: 'GET', headers: { Authorization: auth } });
       const result = await res.json();
-      console.log('fetchUsersId result:', result);
       setUsers(result);
-      console.log('Users state:', users);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -76,18 +81,17 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
     }
   };
 
-  const deleteRoom = async () => {
-    const auth = 'Bearer ' + token;
-    const url = 'http://localhost:3001/chatroom/' + room.id;
-    try {
-      const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth } });
-      const result = await res.json();
-      console.log('deleteRoom result:', result);
-    } catch (error) {
-      console.error('Error deleting room:', error);
-    }
-  };
-
+  // const deleteRoom = async () => {
+  //   const auth = 'Bearer ' + token;
+  //   const url = 'http://localhost:3001/chatroom/' + room.id;
+  //   try {
+  //     const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth } });
+  //     const result = await res.json();
+  //     console.log('deleteRoom result:', result);
+  //   } catch (error) {
+  //     console.error('Error deleting room:', error);
+  //   }
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,22 +129,33 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
     };
   }, [socket, room.id]);
 
-  return (
-    <div
-      className="flex items-center justify-between bg-gradient-to-tl from-violet-900 via-black to-black my-2 p-2 rounded-lg"
-      onClick={handleClick}
-    >
-      <div className="flex items-center">
-        <img src={login} className="rounded-full h-10 w-10 mr-2" />
-        <div className="justify-center text-center text-white pl-2">{groupName}</div>
+  const img = Buffer.from(room.image.data).toString('base64')
+  return  (
+    <div className="flex justify-between items-center bg-green-300 my-1 rounded-lg px-4 py-2">
+    <div className="flex items-center w-2/3" onClick={handleClickConv}>
+
+    <div> 
+        <p className='relative'>
+            {room.image && (
+            <img
+                src={`data:image/png;base64,${img}`}
+                alt="User Avatar"
+                className="rounded-full w-[50px] h-[50px]"
+            />
+            )}
+        </p>
+    </div>
+
+      <div className="text-black">
+      <div className="justify-center text-center text-lg font-bold">{groupName}</div>
+      <div className="w-2/3 text-center text-sm">{lastMessage?.content}</div>
       </div>
-      <div className="flex-grow text-center text-white">{lastMessage?.content}</div>
-      <button
-        onClick={deleteRoom}
-        className="bg-red-500 text-black font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-      >
-        X
-      </button>
+
+    </div>
+    <div>
+    <IoSettingsSharp className="justify-center text-center cursor-pointer" size="1.5em"
+                          onClick={() => handleClickSetting()} />
+    </div>
     </div>
   );
 };

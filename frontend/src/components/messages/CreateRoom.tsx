@@ -17,9 +17,9 @@ const CreateRoom = ({ token, id, setCreateRoom }: Props) => {
     setRoomName(value);
   };
 
-  const handleModeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = event.target;
-    setRoomMode(value);
+  const handleModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedMode = event.target.value;
+    setRoomMode(selectedMode);
   };
 
   const handlePassChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,12 +35,10 @@ const CreateRoom = ({ token, id, setCreateRoom }: Props) => {
       name: roomName,
       mode: roomMode || 'public',
       password: roomPassword,
-
     }
     try {
       const res = await fetch(url, { method: 'POST', headers: { Authorization: auth, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const result = await res.json();
-      console.log(result);
       setCreateRoom(false);
     } catch (error) {
       console.error('Error creating room:', error);
@@ -51,44 +49,22 @@ const CreateRoom = ({ token, id, setCreateRoom }: Props) => {
   return (
     <div className="bg-gradient-to-tl from-violet-900 via-black to-black p-6 rounded-lg shadow-lg m-2">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm text-white font-medium">
-            Room name:
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            onChange={handleNameChange}
-            className="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
-          />
-        </div>
-        <div>
-          <label htmlFor="mode" className="block text-sm text-white font-medium">
-            Room mode:
-          </label>
-          <input
-            type="text"
-            id="mode"
-            name="mode"
-            onChange={handleModeChange}
-            className="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
-          />
-        </div>
-        {(roomMode === 'private' || roomMode === 'protected') && (
-          <div>
-            <label htmlFor="password" className="block text-sm text-white font-medium">
-              Room password:
-            </label>
-            <input
-              type="text"
-              id="password"
-              name="password"
-              onChange={handlePassChange}
-              className="mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 bg-white text-black"
-            />
-          </div>
-        )}
+        <label htmlFor="name" className="block text-sm text-white font-medium">Room name:</label>
+        <input type="text" id="name" name="name" onChange={handleNameChange}/>
+          
+        <label htmlFor="mode" className="block text-sm text-white font-medium">Room mode:</label>
+        <select id="mode" name="mode" onChange={handleModeChange}>
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+          <option value="protected">Protected</option>
+        </select>
+        
+        { (roomMode === 'protected') &&
+      <div>
+        <label htmlFor="password">Room password:</label>
+        <input type="text" id="password" name="password" onChange={handlePassChange}/>
+      </div>
+        }
         <div className="flex justify-between">
           <button
             type="submit"

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { getSessionsToken } from '../../sessionsUtils';
 import DisplayAvatar from '../utils/DisplayAvatar';
+import { FaPen } from 'react-icons/fa';
+
 
 type Props = {
   item: {
@@ -197,8 +199,6 @@ const SettingProfile = (props: Props) => {
               <div className='flex flex-col space-y-4'>
                  <div className='mx-auto'>
                     <DisplayAvatar avatar={profile.avatar}/>
-                  {/* </div>
-                  <div className='mx-auto'> */}
                     <label
                       htmlFor='avatar'
                       className="relative inset-0 cursor-pointer">
@@ -214,7 +214,9 @@ const SettingProfile = (props: Props) => {
                     />
                   </div>
                   <div className='flex justify-between items-start'>
-                    <h1 > Username : 
+                    <h1 className="flex items-center"
+                        onBlur={() => setEditUsername(false)} > 
+                    <span>Username : </span>
                       {editUsername ?
                      
                         <input type="text" 
@@ -225,19 +227,23 @@ const SettingProfile = (props: Props) => {
                                 handleUpdateUsername();
                             }
                           }}
-                          onBlur={() => setEditUsername(false)}
-                        />
-                          :
+                          autoFocus
+                        /> :
                         <>
-                          {profile.username}
-                          <button className="ml-2"  onClick={() => setEditUsername(true)}>Edit</button>
+                          <span className="ml-2">{profile.username}</span>
+                          <FaPen 
+                            className="ml-2 cursor-pointer"
+                            onClick={() => setEditUsername(true)}
+                          />
                         </>
                       }
                     </h1>
                   </div>
 
                   <div className='flex justify-between items-start' >
-                    <h1> Email : 
+                    <h1 className="flex items-center"
+                        onBlur={() => setEditEmail(false)} >
+                    <span>Email : </span>
                       {editEmail ?
                         <input type="text" 
                           value={newEmail} 
@@ -247,18 +253,23 @@ const SettingProfile = (props: Props) => {
                                 handleUpdateEmail();
                             }
                           }}
-                          onBlur={() => setEditEmail(false)}
+                          autoFocus
                         /> :
                         <>
-                          {profile.email}
-                          <button className="ml-2"  onClick={() => setEditEmail(true)}>Edit</button>
+                           <span className="ml-2">{profile.email}</span>
+                           <FaPen 
+                            className="ml-2 cursor-pointer"
+                            onClick={() => setEditEmail(true)}
+                          />
                         </>
                       }
                     </h1>
                  </div>
 
                  <div className='flex justify-between items-start'>
-                    <h1> Firstname : 
+                    <h1 className="flex items-center"
+                        onBlur={() => setEditFirstname(false)} >
+                    <span>Firstname : </span>
                       {editFirstname ?
                         <input type="text" 
                           value={newFirstname} 
@@ -268,18 +279,23 @@ const SettingProfile = (props: Props) => {
                                 handleUpdateFirstname();
                             }
                           }}
-                          onBlur={() => setEditFirstname(false)}
+                          autoFocus
                         /> :
                         <>
-                          {profile.firstname}
-                          <button className="ml-2" onClick={() => setEditFirstname(true)}>Edit</button>
+                          <span >{profile.firstname}</span>
+                          <FaPen 
+                            className="ml-2 cursor-pointer"
+                            onClick={() => setEditFirstname(true)}
+                          />
                         </>
                       }
                     </h1>
                   </div>
 
                   <div className='flex justify-between items-start'>
-                    <h1> Lastname : 
+                    <h1 className="flex items-center"
+                        onBlur={() => setEditLastname(false)} > 
+                    <span>Lastname : </span>
                       {editLastname ?
                         <input type="text" 
                           value={newLastname} 
@@ -289,11 +305,14 @@ const SettingProfile = (props: Props) => {
                                 handleUpdateLastname();
                             }
                           }}
-                          onBlur={() => setEditLastname(false)}
+                          autoFocus
                         /> :
                         <>
-                          {profile.lastname}
-                          <button className="ml-2" onClick={() => setEditLastname(true)}>Edit</button>
+                          <span >{profile.lastname}</span>
+                          <FaPen 
+                            className="ml-2 cursor-pointer"
+                            onClick={() => setEditLastname(true)}
+                          />
                         </>
                       }
                     </h1>

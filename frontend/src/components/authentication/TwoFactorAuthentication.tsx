@@ -41,7 +41,7 @@ const TwoFactorAuthentication = (props: Props) => {
         }
       else {
         setSessionToken(response.token)
-        navigate('/profile');
+        navigate('/play');
       } 
       });
     };

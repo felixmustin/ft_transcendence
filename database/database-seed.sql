@@ -98,15 +98,15 @@ CREATE TABLE public.message
     id SERIAL PRIMARY KEY,
     content TEXT,
     chatroom_id INT,
-    user_id INT,
+    profile_id INT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_chatroom
     FOREIGN KEY (chatroom_id)
     REFERENCES chatroom(id)
     ON DELETE CASCADE,
-    CONSTRAINT fk_user
-    FOREIGN KEY (user_id)
-    REFERENCES Users(id)
+    CONSTRAINT fk_profile
+    FOREIGN KEY (profile_id)
+    REFERENCES user_profiles(id)
     ON DELETE CASCADE
 );
 
@@ -114,33 +114,35 @@ CREATE TABLE public.chatroom
 (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NULL,
-    image VARCHAR(255) NULL,
+    image BYTEA,
+    admins INTEGER[] DEFAULT ARRAY[]::INTEGER[],
+    -- participants JSONB DEFAULT '[]'::jsonb,
     mode chatroommode NOT NULL DEFAULT 'private',
     password_hash VARCHAR(255) NULL,
     last_message_id INT NULL,
-    last_user_id INT NULL,
+    last_profile_id INT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_last_message
         FOREIGN KEY (last_message_id)
         REFERENCES message(id)
         ON DELETE SET NULL,
-    CONSTRAINT fk_last_user
-        FOREIGN KEY (last_user_id)
-        REFERENCES Users(id)
+    CONSTRAINT fk_last_profile
+        FOREIGN KEY (last_profile_id)
+        REFERENCES user_profiles(id)
         ON DELETE SET NULL
 );
 
 CREATE TABLE public.chatroom_participants
 (
     chatroom_id INT NOT NULL,
-    user_id INT NOT NULL,
-    PRIMARY KEY(chatroom_id, user_id),
+    profile_id INT NOT NULL,
+    PRIMARY KEY(chatroom_id, profile_id),
     FOREIGN KEY (chatroom_id)
         REFERENCES public.chatroom(id)
         ON DELETE CASCADE,
-    FOREIGN KEY (user_id)
-        REFERENCES public.Users(id)
+    FOREIGN KEY (profile_id)
+        REFERENCES public.user_profiles(id)
         ON DELETE CASCADE
 );
 

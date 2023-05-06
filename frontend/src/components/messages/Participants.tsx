@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SingleParticipant from './SingleParticipant';
-import { ChatRoomInterface, UserInterface } from './types';
+import { ChatRoomInterface, ProfileInterface } from './types';
 
 type Props = {
   roomId: number;
@@ -8,7 +8,7 @@ type Props = {
 };
 
 const Participants = ({ roomId, id }: Props) => {
-  const [users, setUsers] = useState<UserInterface[]>([]);
+  const [users, setUsers] = useState<ProfileInterface[]>([]);
   const [room, setRoom] = useState<ChatRoomInterface>();
 
   useEffect(() => {

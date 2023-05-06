@@ -41,6 +41,8 @@ const Profile = ({ username }: Props) => {
   useEffect(() => {
     async function getToken() {
       const sessionToken = await getSessionsToken();
+      if (!sessionToken)
+        navigate('/')
       setToken(sessionToken);
       setIsTokenSet(true)
     }
@@ -179,7 +181,7 @@ const Profile = ({ username }: Props) => {
       <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
         <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
           <div className="xl:max-w-[1280px] w-full">
-            <Navbar />
+            <Navbar item={token}/>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Message from './Message';
-import { ChatRoomInterface, MessageInterface, UserInterface } from './types';
+import { ChatRoomInterface, MessageInterface } from './types';
 import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 
@@ -13,7 +13,7 @@ type Props = {
 const ChatBox = ({ roomId, id, socket }: Props) => {
 
   const [messages, setMessages] = useState<MessageInterface[]>([]);
-  const [blocklist, setBlocklist] = useState<UserInterface[]>([]);
+  // const [blocklist, setBlocklist] = useState<UserInterface[]>([]);
 
   useEffect(() => {
     if (!socket) return;
@@ -48,7 +48,7 @@ const ChatBox = ({ roomId, id, socket }: Props) => {
   }, [socket, roomId]);
 
   return (
-    <div className="overflow-y-auto h-[30rem] max-h-[30rem]">
+    <div className="overflow-y-auto h-[25rem] max-h-[25rem]">
       {messages.map((message) => (
         <Message key={message.id} message={message} currentUserId={id} />
       ))}

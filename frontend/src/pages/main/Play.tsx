@@ -54,7 +54,7 @@ const Play = () => {
 				<div>
 			<div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
         		<div className="xl:max-w-[1280px] w-full">
-					<Navbar />
+					<Navbar item={token}/>
 				</div>
 			</div>
 			<div className="flex justify-evenly">
