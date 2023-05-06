@@ -46,7 +46,7 @@ const Log42Page = () => {
               if (response.username != usernameTmp && response.username != null) {
                 setSessionToken(parseTok)
                 Cookies.remove("token");
-                navigate('/profile')
+                navigate('/play')
               }
               else 
                 setNeedUsername(true)
@@ -94,7 +94,7 @@ const Log42Page = () => {
         } else {
           setSessionToken(token)
           Cookies.remove("token");
-          navigate("/profile");
+          navigate("/play");
         }
       });
   };

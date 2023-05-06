@@ -25,13 +25,23 @@ const Login = () => {
   // Function responsible for redirecting the user to the signup page
   const gotoSignUpPage = () => navigate("/signup");
 
+  const check_auth = async () => {
+    const sessionToken = await getSessionsToken();
+     await fetch('http://localhost:3001/user/id', {
+      method: 'Get',
+      headers: {
+      'Authorization': 'Bearer ' + sessionToken.accessToken,
+      },
+    }).then(res => res.json()
+    ).then(response => {
+      if (response.statusCode >= 400) {}
+      else
+        navigate("/play")
+  })
+}
+
   useEffect(() => {
-    async function getToken() {
-      const sessionToken = await getSessionsToken();
-      if (sessionToken)
-        navigate("/profile")
-    }
-    getToken();
+    check_auth()
   }, []);
 
   /*
@@ -69,7 +79,7 @@ const Login = () => {
         }
         else {
           setSessionToken(response.token)
-          navigate("/profile");
+          navigate("/play");
         }
       } 
       });

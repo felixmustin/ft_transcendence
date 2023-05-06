@@ -56,6 +56,12 @@ export class UserController {
     return userProfile;
   }
 
+  @Get('ladder')
+  async getLadder() {
+    const ladder = await this.userService.getLadder();
+    return ladder;
+  }
+
   @Delete('delete')
   @UseGuards(JwtAuthGuard)
   async deleteUser(@Request() req) {

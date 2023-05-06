@@ -68,6 +68,39 @@ export class UserService {
     return userProfile;
   }
 
+  async getLadder(): Promise<{ username: string; won: number }[]> {
+    // Fetch all users with their profiles and games
+    const users = await this.userRepository.find({
+      relations: ['profile', 'profile.games'],
+    });
+  
+    // Map the users to an array of objects containing username and number of games won
+    const ladder = await Promise.all(
+      users.map(async (user) => {
+        const games = user.profile.games;
+        let won = 0;
+  
+        // Calculate the number of games won
+        for (const game of games) {
+          if (await this.wonGame(user.id, game)) {
+            won++;
+          }
+        }
+  
+        return {
+          username: user.profile.username,
+          won,
+        };
+      })
+    );
+  
+    // Sort the ladder array based on the number of games won (descending order)
+    const sortedLadder = ladder.sort((a, b) => b.won - a.won);
+  
+    return sortedLadder;
+  }
+  
+  
 
   async findUserByloginName(loginName: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { loginName: loginName} });

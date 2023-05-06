@@ -5,6 +5,7 @@ import Chat from '../../components/messages/Chat';
 import { tokenForm } from '../../interfaceUtils'
 import { useNavigate } from 'react-router-dom'
 import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
+import Loading from '../../components/utils/Loading';
 import SocketContextComponent from '../../context/ComponentSocket';
 
 type Props = {};
@@ -34,7 +35,7 @@ const ChatPage = (props: Props) => {
     <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
       <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
         <div className="xl:max-w-[1280px] w-full">
-          <Navbar />
+          <Navbar item={token}/>
         </div>
       </div>
       {token ? (

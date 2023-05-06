@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Message from './Message';
-import { ChatRoomInterface, MessageInterface, UserInterface } from './types';
+import { ChatRoomInterface, MessageInterface } from './types';
 import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 
@@ -13,7 +13,7 @@ type Props = {
 const ChatBox = ({ roomId, id, socket }: Props) => {
 
   const [messages, setMessages] = useState<MessageInterface[]>([]);
-  const [blocklist, setBlocklist] = useState<UserInterface[]>([]);
+  // const [blocklist, setBlocklist] = useState<UserInterface[]>([]);
 
   useEffect(() => {
     if (!socket) return;
@@ -29,23 +29,6 @@ const ChatBox = ({ roomId, id, socket }: Props) => {
     };
     fetchConversation();
   }, [socket, roomId]);
-
-  //useEffect(() => {
-  //  const fetchBlocklist = async () => {
-  //    try {
-  //      const response = await fetch(`http://localhost:3001/user/${id}/blocklist`);
-  //      const data = await response.json();
-  //      setBlocklist(data);
-  //    } catch (error) {
-  //      console.error('Error fetching the blocklist:', error);
-  //    }
-  //  };
-  //  fetchBlocklist();
-  //}, [id]);
-
-  //const isUserBlocked = (userId: number) => {
-  //  return blocklist.some((user) => user.id === userId);
-  //};
 
   useEffect(() => {
     if (!socket || !roomId) return;
@@ -65,7 +48,7 @@ const ChatBox = ({ roomId, id, socket }: Props) => {
   }, [socket, roomId]);
 
   return (
-    <div className="pb-44 pt-20 overflow-y-scroll max-h-[calc(30vh-100px)]">
+    <div className="overflow-y-auto h-[25rem] max-h-[25rem]">
       {messages.map((message) => (
         <Message key={message.id} message={message} currentUserId={id} />
       ))}
@@ -74,4 +57,3 @@ const ChatBox = ({ roomId, id, socket }: Props) => {
 };
 
 export default ChatBox;
-

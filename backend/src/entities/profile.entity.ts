@@ -1,5 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { Game } from './game.entity';
+import { ChatRoom } from './chatroom.entity';
+import { Message } from './message.entity';
 
 @Entity({ name: "user_profiles" })
 export class Profile {
@@ -31,6 +33,12 @@ export class Profile {
 
   @Column({ type: 'bytea' })
   avatar: Buffer;
+
+  @ManyToMany(() => ChatRoom, (chatroom) => chatroom.participants)
+  chatrooms: ChatRoom[];
+
+  @OneToMany(() => Message, (message) => message.profile)
+  messages: Message[];
 
   @Column({ default: 0 })
   gamesWon: number;
