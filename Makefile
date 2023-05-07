@@ -73,5 +73,4 @@ save:
 .PHONY: all re down clean save
 
 # socket general
-# fix private room
 # useguard gateway

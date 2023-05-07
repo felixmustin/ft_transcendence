@@ -13,6 +13,7 @@ function Matchmaking() {
   const { SocketState, SocketDispatch } = React.useContext(SocketContext);
   const [match, setMatch] = useState<GamePongProps | null>(null);
   const [waiting, setwaiting] = useState<number>(0);
+  const [bonus, setbonus] = useState<boolean>(true);
 
   useEffect(() => {
     // Subscribe to the "matchmaking" channel when the component mounts
@@ -65,14 +66,14 @@ function Matchmaking() {
   const handleFindMatch = () => {
     setwaiting(1);
     // Emit a "find_match" event with the user's UID
-    SocketState.socket?.emit('find_match', SocketState.uid);
+    SocketState.socket?.emit('find_match', bonus);
   };
 
   const handleCreateRoom = () => {
     setwaiting(2);
     console.log('create room');
     // Emit a "create_room" event with the user's UID
-    SocketState.socket?.emit('create_room', SocketState.uid);
+    SocketState.socket?.emit('create_room', bonus);
   };
 
   const handleJoinRoom = (room :string) => {
@@ -80,6 +81,9 @@ function Matchmaking() {
     // Emit a "join_room" event with the user's UID
     SocketState.socket?.emit('join_room', room);
   };
+  const handleBonus = () => {
+    setbonus(!bonus);
+  }
 
   const join_room = () => {
     setwaiting(3);
@@ -87,13 +91,17 @@ function Matchmaking() {
 
   return (
 	<div>
-	<h1>Matchmaking</h1>
+    <h1>Welcome to the Game</h1>
 	{!match && !waiting && (
 	  <>
 		<button onClick={handleFindMatch}>Find Match</button>
 		<button onClick={handleCreateRoom}>Create Room</button>
 		<button onClick={join_room}>Join Room</button>
+    <button onClick={handleBonus}>
+        {bonus ? 'bonus activated' : 'bonus desactivated'}
+      </button>
 	  </>
+    
 	)}
 	{match && !waiting && <GamePong {...match} />}
   {!match && waiting === 1 && 'waiting...'}

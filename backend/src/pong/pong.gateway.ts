@@ -45,11 +45,13 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   		client.emit('handshake-response', shake);
 	}
 	@SubscribeMessage('find_match')
-	async find_match(client: any, data: string) {
+	async find_match(client: any, data: boolean) {
+		console.log('received find reqquest  with : ' + data);
 		this.pongService.find_match(client, data, this.server);
 	}
 	@SubscribeMessage('create_room')
-	async create_room(client: any, data: string) {
+	async create_room(client: any, data: boolean) {
+		console.log('received create reqquest  with : ' + data);
 		this.pongService.create_room(client, data, this.server);
 	}
 	@SubscribeMessage('join_room')

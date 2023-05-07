@@ -58,7 +58,7 @@ export class Pong{
 
 // frame 
 	updategame(){
-		if (this.bonus === undefined && this.which_bonus !== 5){
+		if (this.bonus === undefined && this.which_bonus !== 5 && this.which_bonus !== -100){
 			let x = Math.floor(Math.random() * 1000);
 			if (x < 10){
 				this.generate_bonus();

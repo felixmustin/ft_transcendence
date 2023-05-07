@@ -121,11 +121,11 @@ export class PongService {
 		room?.update_paddle(data.paddle, client.id);
 	}
 
-	async find_match(client: any, data: string, server: Server){
-		const room = this.looking_room(this.maproom, server);
+	async find_match(client: any, data: boolean, server: Server){
+		const room = this.looking_room(data, server);
 		client.join(room);
 		this.addClientToRoom(client.id, room);
-		this.maproom.get(room).connect(data);
+		this.maproom.get(room).connect(client.id);
 		// wait for oponent
 		let player = 0;
 		const waitForPlayer2 = new Promise((resolve) => {
@@ -153,7 +153,7 @@ export class PongService {
 		};
 		client.emit('match_found', datamatch);
 	}
-	create_room(client: any, data: string, server: Server){
+	create_room(client: any, data: boolean, server: Server){
 		//create private room
 		let found: boolean = false;
 		let roomID: string = '';
@@ -161,7 +161,8 @@ export class PongService {
 			if (value.players === 0) {
 			  client.join(value.id);
 			  this.addClientToRoom(client.id, value.id);
-			  value.connect(data);
+			  value.connect(client.id);
+			  value.setbonus(data);
 			  found = true;
 			  console.log('found empty room');
 			  break ;
@@ -176,7 +177,8 @@ export class PongService {
 			console.log('send data ');
 			client.join(roomID);
 			this.addClientToRoom(client.id, roomID);
-			this.privateroom.get(roomID).connect(data);
+			this.privateroom.get(roomID).connect(client.id);
+			this.privateroom.get(roomID).setbonus(data);
 		}
 		const score: ScoreProps = {
 			player1: this.identifiate(this.privateroom.get(roomID).idp1)?.username,
@@ -209,24 +211,25 @@ export class PongService {
 		}
 		server.to(room.id).emit('match_found', datamatch);
 	}
-	looking_room(map: Map<string, Room>, server: Server): string {
-		for (const [key, value] of map.entries()) {
-		  if (value.players === 1) {
+	looking_room(bonus: boolean, server: Server): string {
+		for (const [key, value] of this.maproom.entries()) {
+		  if (value.players === 1 && value.bonus === bonus ) {
 			return key;
 		  }
 		}
-		for (const [key, value] of map.entries()) {
+		for (const [key, value] of this.maproom.entries()) {
 		  if (value.players === 0) {
+			value.setbonus(bonus);
 			return key;
 		  }
 		}
 		// If no available room found, create a new room with a unique key
 		let key = Math.random().toString(36).substr(2, 9);
-		while (map.has(key)) {
+		while (this.maproom.has(key)) {
 			key = Math.random().toString(36).substr(2, 9);
 		}
 		const newRoom = new Room(key, server, this);
-		map.set(key, newRoom);
+		this.maproom.set(key, newRoom);
 		console.log('created room : ' + key);
 		return key;
 	  }

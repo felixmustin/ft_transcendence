@@ -35,6 +35,7 @@ export class Room {
 	idspect: string[];
 	room_complete: Function;
 	rematch: string;
+	bonus : boolean;
   
 	constructor(id: string, server: Server, private readonly PongService : PongService) {
 	  this.id = id;
@@ -50,6 +51,7 @@ export class Room {
 	  this.room_complete = () => {
         console.log('room_complete');
       }
+	  this.bonus = true;
 	}
 
 	connect(id: string){
@@ -231,5 +233,13 @@ export class Room {
 			this.reset_game();
 		}
 	}
-
+	setbonus(bonus: boolean){
+		this.bonus = bonus;
+		if (!bonus){
+			this.state.which_bonus = -100;
+		}
+		else{
+			this.state.which_bonus = -1;
+		}
+	}
   }
