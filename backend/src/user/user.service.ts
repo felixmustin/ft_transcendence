@@ -234,12 +234,6 @@ export class UserService {
     return await this.userProfileRepository.remove(userProfile)//await this.userRepository.remove(user);
   }
 
-  async changeStatus(user: User, statusId: number)
-  {
-    user.statusid = statusId;
-    return await this.userRepository.save(user);
-  }
-
   async updateUsername(id: number, newUsername: string): Promise<Profile> {
     const alreadyProfile = await this.findUserProfileByUsername(newUsername);
     if (alreadyProfile)

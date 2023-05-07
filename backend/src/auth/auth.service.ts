@@ -63,7 +63,6 @@ export class AuthService {
     newUser.loginName = createUserDto.loginName;
     const hashedPassword = await this.hashPassword(createUserDto.wordpass);
     newUser.wordpass = hashedPassword;
-    newUser.statusid = 0;
     const user = await this.userService.createUser(newUser);
     return this.generateAccessToken(user);
   }
@@ -97,7 +96,7 @@ export class AuthService {
     const payload = { id: user.id, twoFaEnabled: user.is2faenabled/* , expiresIn: '1m' */};
     const accessToken = this.jwtService.sign(payload, { secret: process.env.JWT_SECRET, expiresIn: '5m' });
 
-    this.userService.changeStatus(user, 1);
+    // this.userService.changeStatus(user, 1);
     const refreshToken = await this.generateRefreshToken(user)
 
     return { accessToken, refreshToken };
@@ -167,7 +166,6 @@ export class AuthService {
   async logInWith42(reqUser: any) {
       const newUser = new User();
       newUser.user42id = reqUser.id;
-      newUser.statusid = 0;
       const user = await this.userService.createUser(newUser);
       const defaultAvatar = "./assets/default-avatar.png"
       const savedProfile = await this.userService.createUserProfile('', reqUser.email, reqUser.firstName, reqUser.lastName, 0, defaultAvatar);

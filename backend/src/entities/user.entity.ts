@@ -32,9 +32,6 @@ export class User {
   @Column({ unique: true, nullable: true })
   user42id: number;
 
-  @Column({ default: 0 })
-  statusid: number;
-
   @Column({ unique: true, nullable: true })
   refreshtoken: string;
 

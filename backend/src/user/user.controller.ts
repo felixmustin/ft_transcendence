@@ -71,8 +71,8 @@ export class UserController {
   @Put('disconnect')
   @UseGuards(JwtAuthGuard)
   async disconnectUser(@Req() req) {
-    const user = await this.userService.findUserById(req.user.id)
-    return await this.userService.changeStatus(user, 0);
+    // const user = await this.userService.findUserProfileById(req.user.id)
+    // return await this.userService.changeStatus(user, 0);
   }
 
   @Post('profiles/avatar')
@@ -130,5 +130,10 @@ export class UserController {
   // public async updateUserProfile( @Param() param, @Body() body) {
   //     const users = await this.usersServices.update(param.ID, body);
   // }
+  @Get('noguard/:id')
+  public async getUserByIdNoGuard(@Param('id') id: number) {
+    const user = await this.userService.findUserById(id);
+    return user;
+  }
 
 }

@@ -1,5 +1,5 @@
 import './index.css'
-import { BrowserRouter, Routes, Route, Outlet, useParams } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Outlet, useParams, useNavigate } from 'react-router-dom'
 import Login from './pages/authentification/Login'
 import Signup from './pages/authentification/Signup'
 import Profile from './pages/main/Profile'
@@ -9,6 +9,10 @@ import UserInfo from './components/authentication/UserInfo'
 import Settings from './pages/main/Settings'
 import Play from './pages/main/Play'
 import ChatPage from './pages/main/ChatPage'
+import SocketContextComponent from './context/ComponentSocket'
+import { useEffect, useState } from 'react'
+import { tokenForm } from './interfaceUtils'
+import { getSessionsToken } from './sessionsUtils'
 // import {SocketContext, socket} from './context/Socket';
 
 function ProfileWrapper() {
@@ -17,14 +21,21 @@ function ProfileWrapper() {
   }
 
 function App() {
+  const [token, setToken] = useState<tokenForm>();
+  // const navigate = useNavigate();
 
-  return (
-    // <SocketContext.Provider value={socket}>
+  useEffect(() => {
+    async function getToken() {
+      const sessionToken = await getSessionsToken();
+      // if (!sessionToken)
+      //   navigate('/')
+      setToken(sessionToken);
+    }
+    getToken();
+  }, []);
+  const site = (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/log42page' element={<Log42Page/>} />
         <Route path="/profile/*" element={<ProfileWrapper />}>
           <Route index element={<Profile />} />
           <Route path=":username" element={<Outlet />} />
@@ -35,8 +46,20 @@ function App() {
         <Route path='/chatpage' element={<ChatPage />} />
       </Routes>
     </BrowserRouter>
-    // </SocketContext.Provider>
-  )
+  );
+  if (token){
+  return (<SocketContextComponent token={token.accessToken} adress="ws://127.0.0.1:3001/" children={site}/>)}
+  else
+  return (
+          
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path='/signup' element={<Signup />} />
+        <Route path='/log42page' element={<Log42Page/>} />
+        </Routes>
+    </BrowserRouter>
+          )
 }
 
 export default App

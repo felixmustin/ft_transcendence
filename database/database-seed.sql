@@ -10,6 +10,7 @@ CREATE TABLE public.user_profiles
     age INT,
     avatar BYTEA,
     gameswon INT,
+    statusid INT,
 );
 
 CREATE TABLE public.game
@@ -40,7 +41,6 @@ CREATE TABLE public.Users
     secret2fa VARCHAR(255),
     is2faenabled BOOLEAN,
     user42id INT,
-    statusid INT,
     refreshtoken VARCHAR(255),
     profileId INT,
     CONSTRAINT fk_profile
