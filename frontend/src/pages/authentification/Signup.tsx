@@ -7,7 +7,7 @@ import { LoginForm, tokenForm } from '../../interfaceUtils';
 import { getSessionsToken } from '../../sessionsUtils';
 
 
-const Signup = () => {
+const Signup = ({setoken}) => {
 
   // Initializing the values and preparing the functions to handle the form
   const [LoginForm, setLoginForm] = useState<LoginForm>({
@@ -26,8 +26,9 @@ const Signup = () => {
   useEffect(() => {
     async function getToken() {
       const sessionToken = await getSessionsToken();
-      if (sessionToken)
-        navigate("/play")
+      if (sessionToken){
+        setoken(sessionToken);
+        navigate("/play");}
     }
     getToken();
   }, []);
@@ -59,15 +60,15 @@ const Signup = () => {
         if (response.statusCode >= 400) {
           alert(response.message);
         } else {
-          setAuthentication(true)
-          setToken(response.token)
+          setAuthentication(true);
+          setToken(response.token);
         }
       });
   };
 
 
   if (isAuthenticated)
-    return <UserInfo item={token!}/>
+    return <UserInfo item={token!} setoken={setoken}/>
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
     <div className='hidden sm:block'>

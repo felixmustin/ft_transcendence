@@ -8,7 +8,7 @@ import { getSessionsToken, setSessionToken } from '../../sessionsUtils';
 import { LoginForm, tokenForm } from '../../interfaceUtils';
 
 
-const Login = () => {
+const Login = ({setoken}) => {
 
   // Initializing the values and preparing the functions to handle the form
   const [LoginForm, setLoginForm] = useState<LoginForm>({
@@ -35,8 +35,10 @@ const Login = () => {
     }).then(res => res.json()
     ).then(response => {
       if (response.statusCode >= 400) {}
-      else
+      else{
+        setoken(sessionToken);
         navigate("/play")
+      }
   })
 }
 
@@ -78,7 +80,8 @@ const Login = () => {
           setTwoAuthToken(response.token.access2FAToken)
         }
         else {
-          setSessionToken(response.token)
+          setSessionToken(response.token);
+          setoken(response.token);
           navigate("/play");
         }
       } 

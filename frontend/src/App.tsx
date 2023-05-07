@@ -54,9 +54,9 @@ function App() {
           
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/log42page' element={<Log42Page/>} />
+        <Route path="/" element={<Login setoken={setToken} />} />
+        <Route path='/signup' element={<Signup setoken={setToken} />} />
+        <Route path='/log42page' element={<Log42Page setoken={setToken} />} />
         </Routes>
     </BrowserRouter>
           )

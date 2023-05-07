@@ -6,7 +6,8 @@ import { setSessionToken } from '../../sessionsUtils';
 import { SignupForm, tokenForm } from '../../interfaceUtils';
 
 type Props = {
-  item: tokenForm
+  item: tokenForm,
+  setoken: any, 
 }
 
 const UserInfo = (props: Props) => {
@@ -43,7 +44,8 @@ const UserInfo = (props: Props) => {
         body: JSON.stringify(SignupForm),
       }).then(response => {
           if (response.ok) {
-            setSessionToken(props.item)
+            setSessionToken(props.item);
+            props.setoken(props.item);
             navigate('/play');
           }  else if (response.status === 401){
               alert('Please login first');}

@@ -7,7 +7,7 @@ import { setSessionToken } from '../../sessionsUtils';
 import { UsernameInput, tokenForm } from '../../interfaceUtils';
 import TwoFactorAuthentication from '../../components/authentication/TwoFactorAuthentication';
 
-const Log42Page = () => {
+const Log42Page = ({setoken}) => {
 
   // Initialize form values
   const [UsernameInput, setUsernameInput] = useState<UsernameInput>({
@@ -44,8 +44,9 @@ const Log42Page = () => {
             } else {
               const usernameTmp = "Default" + response.id;
               if (response.username != usernameTmp && response.username != null) {
-                setSessionToken(parseTok)
+                setSessionToken(parseTok);
                 Cookies.remove("token");
+                setoken(parseTok);
                 navigate('/play')
               }
               else 
@@ -92,8 +93,9 @@ const Log42Page = () => {
           alert(response.message);
           navigate("/");
         } else {
-          setSessionToken(token)
+          setSessionToken(token);
           Cookies.remove("token");
+          setoken(token);
           navigate("/play");
         }
       });
