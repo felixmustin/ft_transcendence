@@ -45,4 +45,5 @@ export class Profile {
 
   @Column({ default: 0 })
   statusid: number;
+
 }

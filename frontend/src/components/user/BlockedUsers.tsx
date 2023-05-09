@@ -13,11 +13,12 @@ const BlockedUsers = (props: Props) => {
 
   useEffect(() => {
     const fetchBlocked = async () => {
-      const url = 'http://localhost:3001/profile/blocked';
+      const url = 'http://localhost:3001/user/blocked';
       const auth = 'Bearer ' + props.accessToken;
       try {
         const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
         const result = await res.json();
+        console.log(result);
         if (res.ok)
           setBlocked(result);
       } catch (error : any) {
@@ -34,7 +35,7 @@ const BlockedUsers = (props: Props) => {
       </div>
       <div className='bg-violet-700 rounded-lg p-2 m-2'>
           {Object.entries(blocked).map(([key, profile]) => (
-              <SingleBlocked key={key} profile={profile}/>
+              <SingleBlocked key={key} profile={profile} token={props.accessToken}/>
           ))}
       </div>
     </div>

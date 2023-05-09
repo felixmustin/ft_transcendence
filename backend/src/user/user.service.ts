@@ -46,7 +46,7 @@ export class UserService {
   
     return user;
   }
-  
+
 
   async findUserByUsername(username: string): Promise<User> {
     const userProfile = await this.findUserProfileByUsername(username)
@@ -99,8 +99,58 @@ export class UserService {
   
     return sortedLadder;
   }
+
+  async blockUser(currentUserId: number, userToBlockId: number): Promise<void> {
+    if (currentUserId === userToBlockId) {
+      throw new BadRequestException('You cannot block yourself');
+    }
+    const currentUser = await this.findUserById(currentUserId);
+    if (!currentUser) {
+      throw new NotFoundException('Current user not found');
+    }
+    if (currentUser.blocked.includes(userToBlockId)) {
+      throw new BadRequestException('User already blocked');
+    }
+    currentUser.blocked.push(userToBlockId);
+    await this.userRepository.save(currentUser);
+  }
+
   
-  
+  async getBlockedUsers(currentUserId: number): Promise<Profile[]> {
+    const currentUser = await this.findUserById(currentUserId);
+    if (!currentUser) {
+      throw new NotFoundException('Current user not found');
+    }
+    console.log(currentUser);
+    if (!currentUser.blocked) {
+      return [];
+    }
+    const blockedProfils = [] as Profile[];
+    for (const blockedUserId of currentUser.blocked) {
+      blockedProfils.push(await this.findUserProfileById(blockedUserId));
+    }
+    return blockedProfils;
+  }
+
+  async getBlockedUsersList(currentUserId: number): Promise<number[]> {
+    const user = await this.findUserById(currentUserId);
+    return user.blocked;
+  }
+
+
+  async unblockUser(currentUserId: number, toUnblockId: number): Promise<void> {
+    const currentUser = await this.findUserById(currentUserId);
+    const toUnblockUser = await this.findUserById(toUnblockId);
+    if (!currentUser || !toUnblockUser) {
+      throw new NotFoundException('User not found');
+    }
+    console.log('Blocked list: ', currentUser.blocked);
+    if (!currentUser.blocked.includes(toUnblockId)) {
+      throw new BadRequestException('User not blocked');
+    }
+    currentUser.blocked = currentUser.blocked.filter((id) => id !== toUnblockId);
+    await this.userRepository.save(currentUser);
+  }
 
   async findUserByloginName(loginName: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { loginName: loginName} });
@@ -152,25 +202,32 @@ export class UserService {
   
 
   async findUserFlexProfileByUsername(username: string): Promise<{played: number, won: number, stomp: number, rank: number}> {
-    const profile = (await this.findUserProfileByUsername(username));
-    const games = profile.games;
-    let played = games.length;
+    const profile = await this.findUserProfileByUsername(username);
+    if (!profile) {
+      throw new Error(`No user found with username ${username}`);
+    }
+    
+    let played = 0;
     let won = 0;
     let stomp = 0;
-  
-    for (const game of games) {
-      if (await this.wonGame(profile.id, game)) {
-        won++;
-      }
-      if (await this.stompGame(profile.id, game)) {
-        stomp++;
+    let rank = 0;
+
+    if (profile.games) {
+      const games = profile.games;
+      played = games.length;
+      for (const game of games) {
+        if (await this.wonGame(profile.id, game)) {
+          won++;
+        }
+        if (await this.stompGame(profile.id, game)) {
+          stomp++;
+        }
       }
     }
-  
-    let rank = 0;
     return { played, won, stomp, rank };
-  }
-  
+}
+
+
 
   // async findUserByUsername(username: string): Promise<User> {
   //   const userProfile = await this.userProfileRepository.findOne({ where: { username: username} });

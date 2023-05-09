@@ -90,25 +90,24 @@ function Matchmaking() {
   }
 
   return (
-	<div>
-    <h1>Welcome to the Game</h1>
-	{!match && !waiting && (
-	  <>
-		<button onClick={handleFindMatch}>Find Match</button>
-		<button onClick={handleCreateRoom}>Create Room</button>
-		<button onClick={join_room}>Join Room</button>
-    <button onClick={handleBonus}>
-        {bonus ? 'bonus activated' : 'bonus desactivated'}
-      </button>
-	  </>
-    
-	)}
-	{match && !waiting && <GamePong {...match} />}
-  {!match && waiting === 1 && 'waiting...'}
-  {match && waiting === 2 && 'waiting friend ' + match.roomID}
-  {!match && waiting === 3  && <FormJoinRoom onSubmit={handleJoinRoom}/>}
-  </div>
-);
+    <div className="bg-violet-700 flex flex-col justify-center items-center m-5 p-5 rounded-lg">
+      <div className="text-3xl font-bold mb-10 text-white"><p>Welcome to the Game</p></div>
+      {!match && !waiting && (
+      <div className="space-y-4">
+        <button className='w-[200px] m-2 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={handleFindMatch}>Find Match</button>
+        <button className='w-[200px] m-2 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={handleCreateRoom}>Create Room</button>
+        <button className='w-[200px] m-2 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={join_room}>Join Room</button>
+        <button className='w-[200px] m-2 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={handleBonus}>
+          {bonus ? 'bonus activated' : 'bonus desactivated'}
+        </button>
+      </div>
+      )}
+      {match && !waiting && <GamePong {...match} />}
+      {!match && waiting === 1 && <p className='text-white'>waiting...</p>}
+      {match && waiting === 2 && <p className='text-white'>waiting friend {match.roomID}</p>}
+      {!match && waiting === 3  && <FormJoinRoom onSubmit={handleJoinRoom}/>}
+    </div>
+  );
 }
 
 export default Matchmaking;

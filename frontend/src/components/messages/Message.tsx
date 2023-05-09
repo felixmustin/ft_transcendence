@@ -4,10 +4,17 @@ import { MessageInterface } from './types';
 type Props = {
   message: MessageInterface;
   currentUserId: number;
+  blocked: number[];
 };
 
-const Message = ({ message, currentUserId }: Props) => {
+const Message = ({ message, currentUserId, blocked }: Props) => {
   const isCurrentUser = message.profile_id === currentUserId;
+  const isBlocked = blocked.includes(message.profile_id);
+
+  // If the sender is blocked, don't display the message
+  if (isBlocked) {
+    return null; // Or return some placeholder component if you prefer
+  }
 
   return (
     <div
@@ -30,4 +37,3 @@ const Message = ({ message, currentUserId }: Props) => {
 };
 
 export default Message;
-

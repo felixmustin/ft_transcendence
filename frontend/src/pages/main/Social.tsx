@@ -44,7 +44,7 @@ const Social = (props: Props) => {
 
         <div className="flex justify-evenly">
           <div className='bg-violet-900 w-[800px] rounded-lg m-5'>
-            <div className='flex justify-between text-center text-violet-300 text-3xl p-5' >
+            <div className='flex justify-between text-center text-white text-3xl p-5' >
               {/* Add tabs for Friends and Blocked */}
               <div className='mx-5' onClick={() => setCurrentTab('Friends')} style={{cursor: 'pointer'}}>Friends</div>
               <span>|</span>

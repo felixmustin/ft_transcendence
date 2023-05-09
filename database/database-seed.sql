@@ -43,6 +43,7 @@ CREATE TABLE public.Users
     user42id INT,
     refreshtoken VARCHAR(255),
     profileId INT,
+    blocked INT[],
     CONSTRAINT fk_profile
     FOREIGN KEY (profileId)
     REFERENCES user_profiles(id)

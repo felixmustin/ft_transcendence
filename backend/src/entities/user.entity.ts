@@ -33,5 +33,8 @@ export class User {
   @OneToOne(() => Profile, { cascade: true })
   @JoinColumn({ name: 'profileid' })
   profile: Profile;
+
+  @Column({ type: 'integer', array: true, default: '{}' })
+  blocked: number[];
 }
 

@@ -110,6 +110,7 @@ const Chat = (props: Props) => {
           roomId={selectedRoomId}
           id={userId}
           socket={socket}
+          token={props.accessToken}
         />
       :
       null}
