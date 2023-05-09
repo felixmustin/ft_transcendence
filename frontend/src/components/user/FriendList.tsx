@@ -5,7 +5,7 @@ import Error from '../../components/utils/Error'
 
 type Props = {
   item: {
-    accessToken: string;
+    accessToken: string | undefined;
   };
 }
 

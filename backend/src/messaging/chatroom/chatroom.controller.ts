@@ -44,14 +44,12 @@ export class ChatRoomController {
   @Post('addMember')
   @UseGuards(JwtAuthGuard)
   async addMemberToChatRoom(@Request() req: any, @Body() { roomId, username }: { roomId: number, username: string }) {
-    console.log({ roomId, username })
     return await this.chatRoomService.addMemberToChatRoom(roomId, username, req.user.id)
   }
 
   @Post('addAdmin')
   @UseGuards(JwtAuthGuard)
   async addAdminToChatRoom(@Request() req: any, @Body() { roomId, username }: { roomId: number, username: string }) {
-    console.log({ roomId })
     return await this.chatRoomService.addAdminToChatRoom(roomId, username, req.user.id)
   }
 
@@ -141,7 +139,6 @@ export class ChatRoomController {
   @Get(':roomId/all/users/')
   async getUsersByChatRoomId(@Param('roomId') roomId: number) {
     const result = await this.chatRoomService.getProfilesByChatRoomId(roomId);
-    console.log('getUsersByChatRoomId result:', result);
     return result;
   }
 }

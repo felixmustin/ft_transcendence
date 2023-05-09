@@ -176,7 +176,6 @@ export class AuthService {
   }
 
   async signUpWith42(reqUser: any, username: string) {
-    console.log(reqUser)
     const userProfile = await this.userService.findUserProfileById(reqUser.id);
     const userNotFinished = (await this.UserNotFinished(username))
     if ((! await this.isUsernameInUse(username) ) || userNotFinished) {

@@ -3,10 +3,12 @@ import Logo from '../../assets/Logo.png'
 import Disconnect from '../authentication/Disconnect';
 import { useNavigate } from 'react-router-dom'
 import { tokenForm } from '../../interfaceUtils';
+import { noti_payload, notifications } from '../../App';
+import SocketContext from '../../context/Socket';
 
 
 type Props = {
-  item: tokenForm;
+  item: tokenForm | undefined;
 }
 
 const Navbar = (props: Props) => {
@@ -14,6 +16,26 @@ const Navbar = (props: Props) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
+
+  //notif hanler
+  const [message_notif, setmessage_notif] = useState(false);
+  const [game_notif, setgame_notif] = useState(false);
+  const [friend_notif, setfriend_notif] = useState(false);
+	const { SocketState, SocketDispatch } = React.useContext(SocketContext);
+	const notif_handler = (notif: notifications) => {
+    for (let i = 0; i < notif?.notifs?.length; i++){
+      if (notif.notifs[i].type === 'game'){
+        setgame_notif(true);
+      }
+      else if (notif.notifs[i].type === 'message'){
+        setmessage_notif(true);
+      }
+      else if (notif.notifs[i].type === 'friend'){
+        setfriend_notif(true);
+      }
+    }
+	}
+	SocketState.socket?.on('notification', notif_handler);
 
   const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && search.trim()) {
@@ -39,11 +61,11 @@ const Navbar = (props: Props) => {
       onKeyDown={handleSearch}
     />
     <ul className="list-none sm:flex hidden justify-end items-center flex-1">
-      <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/play">Play</a></li>
+      <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/play">Play{game_notif && <span className="ml-1 rounded-full w-2 h-2 bg-red-500 inline-block"></span>}</a></li>
       <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/profile">Profile</a></li>
       {/*<li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/ladder">Ladder</a></li>*/}
-      <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/social">Social</a></li>
-      <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/chatpage">Chat</a></li>
+      <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/social">Social{friend_notif && <span className="ml-1 rounded-full w-2 h-2 bg-red-500 inline-block"></span>}</a></li>
+      <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/chatpage">Chat{message_notif && <span className="ml-1 rounded-full w-2 h-2 bg-red-500 inline-block"></span>}</a></li>
       {/*<li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/chat">Chat</a></li>*/}
       <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/settings">Settings</a></li>
       <div className="relative">

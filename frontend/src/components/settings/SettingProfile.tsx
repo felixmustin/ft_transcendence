@@ -71,7 +71,6 @@ const SettingProfile = (props: Props) => {
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Avatar uploaded successfully:", data);
             setUpdatedProfile(data);
           })
           .catch((error) => {
@@ -104,7 +103,6 @@ const SettingProfile = (props: Props) => {
       })
       .then(res => res.json())
       .then((result) => {
-          console.log(result);
           setProfile(prevProfile => ({...prevProfile, username: newUsername}));
           setEditUsername(false);
       })
@@ -130,7 +128,6 @@ const SettingProfile = (props: Props) => {
     })
     .then(res => res.json())
     .then((result) => {
-        console.log(result);
         setProfile(prevProfile => ({...prevProfile, email: newEmail}));
         setEditEmail(false);
     })
@@ -155,7 +152,6 @@ const SettingProfile = (props: Props) => {
     })
     .then(res => res.json())
     .then((result) => {
-        console.log(result);
         setProfile(prevProfile => ({...prevProfile, firstname: newFirstname}));
         setEditFirstname(false);
     })
@@ -181,7 +177,6 @@ const SettingProfile = (props: Props) => {
     })
     .then(res => res.json())
     .then((result) => {
-        console.log(result);
         setProfile(prevProfile => ({...prevProfile, lastname: newLastname}));
         setEditLastname(false);
     })

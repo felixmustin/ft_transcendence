@@ -83,7 +83,6 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 
 	constructor (props: any){
 		super(props);
-		console.log("gamepong uid : " + this.props.uid);
 		const paddlesize: coordonate = {
 			x: 20,
 			y: 80,
@@ -100,7 +99,6 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 		this.handleKeyUp = this.handleKeyUp.bind(this);
 	}
 	componentDidMount(): void {
-		console.log('in room : ' + this.props.roomID);
 		document.addEventListener("keydown", this.handleKeyDown);
 		document.addEventListener("keyup", this.handleKeyUp);
     	this.props.socket.on('updateState', (data: GameState) => {
@@ -155,7 +153,6 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 		this.keysPressed.delete(event.key);
 	  };
 	  rematch_handler = () => {
-		console.log('room id ' + this.props.roomID);
 		this.props.socket.emit('rematch', this.props.roomID);
 	  };
 	  quit_handler = () => {

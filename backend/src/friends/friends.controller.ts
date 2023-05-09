@@ -33,21 +33,18 @@ export class FriendsController {
   @Post('send/request')
   @UseGuards(JwtAuthGuard)
   async addFriends(@Request() req, @Body() body) {
-    console.log(body)
    return  await this.friendsService.addFriendsWithUsername(req.user.id, body.username)
   }
 
   @Post('accept/request')
   @UseGuards(JwtAuthGuard)
   async acceptFriends(@Request() req, @Body() body) {
-    console.log(body)
    return  await this.friendsService.acceptFriends(body.username, req.user.id)
   }
 
   @Post('decline/request')
   @UseGuards(JwtAuthGuard)
   async declineFriends(@Request() req, @Body() body) {
-    console.log(body)
     return await this.friendsService.declineRequest(body.username, req.user.id);
   }
 

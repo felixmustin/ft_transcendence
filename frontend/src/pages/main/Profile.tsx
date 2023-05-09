@@ -55,7 +55,7 @@ const Profile = ({ username }: Props) => {
   // the API will return different data.
   useEffect(() => {
     const fetchData = async () => {
-      const auth = 'Bearer ' + token.accessToken;
+      const auth = 'Bearer ' + token?.accessToken;
       const url = username
         ? `http://localhost:3001/user/profile/${username}`
         : 'http://localhost:3001/user/profile';
@@ -133,7 +133,7 @@ const Profile = ({ username }: Props) => {
   // Handle the adding of a friend
   const handleAddFriend = async () => {
     try {
-      const auth = 'Bearer ' + token.accessToken;
+      const auth = 'Bearer ' + token?.accessToken;
      // Call the API to add the user as a friend
      const res = await fetch(`http://localhost:3001/friends/send/request`, { method: 'POST', headers: {
       'Authorization': auth,
@@ -153,8 +153,8 @@ const Profile = ({ username }: Props) => {
   // Handle the sending of a message to the user
   const handleSendMessage = async () => {
     try {
-      const auth = 'Bearer ' + token.accessToken;
-      const res = await fetch(`http://localhost:3001/chatroom/create/${profile.id}`, {
+      const auth = 'Bearer ' + token?.accessToken;
+      const res = await fetch(`http://localhost:3001/chatroom/create/${profile?.id}`, {
         method: 'POST',
         headers: {
           'Authorization': auth,

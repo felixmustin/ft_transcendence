@@ -18,7 +18,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.pongService.desidentifiate(client.id);
 	}
 	afterInit(server: any) {
-		console.log("websocket initialized");
 	}
 	@SubscribeMessage('playPong')
 	async playPong(client: any, data: playpause) {
@@ -41,17 +40,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			users: users,
 			data: '',
 		}
-		console.log("responding to handshake");
   		client.emit('handshake-response', shake);
 	}
 	@SubscribeMessage('find_match')
 	async find_match(client: any, data: boolean) {
-		console.log('received find reqquest  with : ' + data);
 		this.pongService.find_match(client, data, this.server);
 	}
 	@SubscribeMessage('create_room')
 	async create_room(client: any, data: boolean) {
-		console.log('received create reqquest  with : ' + data);
 		this.pongService.create_room(client, data, this.server);
 	}
 	@SubscribeMessage('join_room')
@@ -60,7 +56,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	@SubscribeMessage('rematch')
 	async rematch(client: any, data: string){
-		console.log('rematch received');
 		this.pongService.rematch(client, data);
 	}
 	@SubscribeMessage('quit')

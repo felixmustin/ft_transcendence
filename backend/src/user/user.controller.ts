@@ -24,14 +24,12 @@ export class UserController {
 
   @Post('profiles')
   async getUsersUsernameByIds(@Body() body: { users: number[] }) {
-    console.log('Received body:', body);
     let profiles = [];
     const userIds = body.users;
     for (let i = 0; i < userIds.length; i++) {
       let profile = (await this.userService.findUserProfileById(userIds[i])).username;
       profiles.push(profile);
     }
-    console.log('Returning profiles:', profiles);
     return profiles;
   }
 

@@ -13,7 +13,23 @@ import SocketContextComponent from './context/ComponentSocket'
 import { useEffect, useState } from 'react'
 import { tokenForm } from './interfaceUtils'
 import { getSessionsToken } from './sessionsUtils'
+import { type } from 'os'
 // import {SocketContext, socket} from './context/Socket';
+export type notification = {
+	type: string,
+	origin: string,
+	target: string,
+	data: string,
+}
+export type notifications = {
+  name: string,
+  notifs: notification[],
+}
+export type noti_payload = {
+	type: string,
+	target: string | undefined,
+	data: string | undefined,
+}
 
 function ProfileWrapper() {
     const { username } = useParams<{ username?: string }>();

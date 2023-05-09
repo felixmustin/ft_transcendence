@@ -24,8 +24,6 @@ const SendMessage = ({ roomId, id, socket }: Props) => {
   };
   
 
-  console.log('SendMessage:', roomId);
-
   return (
     <div className='h-10 mt-auto'>
       <form className='containerWrap flex' onSubmit={handleSubmit}>

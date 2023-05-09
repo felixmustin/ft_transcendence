@@ -57,8 +57,6 @@ export class MessageController {
   //      createMessageDto.senderId, createMessageDto.targetId
   //    );
   //  }
-  //  console.log(`Sender ID: ${createMessageDto.senderId}`);
-  //  console.log(`Conversation ID: ${chatRoom.id}`);
   //  return await this.messageService.createMessage(chatRoom.id, createMessageDto.senderId, createMessageDto.content);
   //}
 

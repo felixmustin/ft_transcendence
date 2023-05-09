@@ -126,7 +126,6 @@ export class Pong{
 		this.ballspeedy.push([...this.ballspeedy][0]);
 		this.more_downward(index);
 		this.more_downward(index);
-		console.log(JSON.stringify(this.ball) + '\n-------------------------------------------------------------');
 	}
 	paddle_quicker(ind: number){
 		if (ind === 1)

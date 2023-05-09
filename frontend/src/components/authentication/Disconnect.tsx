@@ -5,7 +5,7 @@ import Loading from '../utils/Loading';
 import { tokenForm } from '../../interfaceUtils';
 
 type Props = {
-  item: tokenForm
+  item: tokenForm | undefined;
 }
 
 const Disconnect = (props: Props) => {
@@ -15,7 +15,7 @@ const Disconnect = (props: Props) => {
 
   const disconnect = () => {
     let url = 'http://localhost:3001/user/disconnect/'
-    let auth = 'Bearer ' + props.item.accessToken;
+    let auth = 'Bearer ' + props.item?.accessToken;
     fetch(url, {
       method: 'PUT',
       headers: {'Authorization': auth}
@@ -31,7 +31,7 @@ const Disconnect = (props: Props) => {
 
   const deleteAcc = () => {
     let url = 'http://localhost:3001/user/delete/'
-    let auth = 'Bearer ' + props.item.accessToken;
+    let auth = 'Bearer ' + props.item?.accessToken;
     fetch(url, {
       method: 'DELETE',
       headers: {'Authorization': auth}

@@ -49,7 +49,6 @@ export class Room {
 	  this.score2 = 0;
 	  this.state = new(Pong);
 	  this.room_complete = () => {
-        console.log('room_complete');
       }
 	  this.bonus = true;
 	}
@@ -71,21 +70,18 @@ export class Room {
 
 	disconnect(id: string){
 		if (id === this.idp1){
-			console.log('user : ' + id + " disconnected from room : " + this.id);
 			this.reset_game();
 			this.idp1 = '';
 			this.players--;
 			this.server.to(this.id).emit('quit');
 		}
 		else if (id === this.idp2){
-			console.log('user : ' + id + " disconnected from room : " + this.id);
 			this.reset_game();
 			this.idp2 = '';
 			this.players--;
 			this.server.to(this.id).emit('quit');
 		}
 		else if (this.idspect && this.idspect.includes(id)){
-			console.log('user : ' + id + " disconnected from room : " + this.id);
 		}
 	}
 

@@ -47,7 +47,6 @@ const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
   //   try {
   //     const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth } });
   //     const result = await res.json();
-  //     console.log('deleteRoom result:', result);
   //   } catch (error) {
   //     console.error('Error deleting room:', error);
   //   }
@@ -90,7 +89,6 @@ const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
       const auth = 'Bearer ' + token;
 
       for (const participant of room.participants) {
-        console.log(participant)
         if (addAdminUsername.username == participant.username) {
           await fetch('http://localhost:3001/chatroom/addAdmin', {
           method: 'POST',

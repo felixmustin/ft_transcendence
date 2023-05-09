@@ -74,7 +74,6 @@ const Login = ({setoken}) => {
         alert(response.message);
         }
       else {
-        console.log(response)
         if (response.token.access2FAToken) {
           setIsTwoAuthentication(true)
           setTwoAuthToken(response.token.access2FAToken)

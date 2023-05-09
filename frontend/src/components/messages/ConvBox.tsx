@@ -68,7 +68,6 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
     try {
       const res = await fetch(url, { method: 'POST', headers: { Authorization: auth, 'Content-Type': 'application/json' }, body: JSON.stringify({ users: users }) });
       const result = await res.json();
-      console.log('fetchUsersnames result:', result);
       setUsernames(result);
       if (room.name) setGroupName(room.name);
       else if (users.length === 2) {
@@ -87,7 +86,6 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
   //   try {
   //     const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth } });
   //     const result = await res.json();
-  //     console.log('deleteRoom result:', result);
   //   } catch (error) {
   //     console.error('Error deleting room:', error);
   //   }
@@ -108,7 +106,6 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
     };
 
     if (users.length > 0) {
-    console.log('Users state before fetching usernames:', users);
     fetchNamesAndSetGroupName();
   }
   }, [users]);

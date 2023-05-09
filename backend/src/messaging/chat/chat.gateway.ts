@@ -24,34 +24,28 @@ export class ChatGateway
   server: Server;
 
   afterInit(server: Server) {
-    console.log("ChatGateway initialized");
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage("join_room")
   handleJoinRoom(client: Socket, roomId: number) {
     client.join(roomId.toString());
-    console.log(`Client ${client.id} joined room ${roomId}`);
   }
 
   @SubscribeMessage("leave_room")
   handleLeaveRoom(client: Socket, roomId: number) {
     client.leave(roomId.toString());
-    console.log(`Client ${client.id} left room ${roomId}`);
   }
 
   @SubscribeMessage('send_message')
   async sendMessage(client: Socket, payload: { chatroomId: number; senderId: number, content: string }): Promise<void> {
     try {
       const { chatroomId, senderId, content } = payload;
-      console.log('sendMessage payload:', chatroomId, senderId, content );
       if (!chatroomId) {
         console.error('sendMessage error: chatroomId is undefined');
         return;

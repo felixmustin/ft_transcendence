@@ -31,7 +31,6 @@ const Participants = ({ roomId, id }: Props) => {
         const response = await fetch(`http://localhost:3001/chatroom/room/${roomId}`);
         const data = await response.json();
         setRoom(data);
-        console.log(data);
       } catch (error) {
         console.error('Error fetching the conversation:', error);
       }

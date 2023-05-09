@@ -1,6 +1,10 @@
 import React from 'react'
 import DisplayAvatar from '../utils/DisplayAvatar'
 import { useNavigate } from 'react-router-dom'
+// import { useHistory } from 'react-router-dom';
+import Matchmaking from '../game/Matchmaking';
+import SocketContext from '../../context/Socket';
+import { noti_payload } from '../../App';
 
 type Props = {
   profile : {
@@ -22,11 +26,22 @@ const SocialDataFriends = (props: Props) => {
 
   const auth = 'Bearer ' + props.item.accessToken;
   const navigate = useNavigate();
+  // const history = useHistory();
 
 
   // This needs to be updated to use the API.
   // Handle the launching of a game
+  const { SocketState, SocketDispatch } = React.useContext(SocketContext);
   const handleLaunchGame = () => {
+    const payload: noti_payload = {
+      type: 'game',
+      target: undefined, //myself
+      data: props.profile.username, //real target
+    };
+    SocketState.socket?.emit('send-notif', payload);
+    navigate('/play');
+    // history.push('/play');
+    // Matchmaking.handleCreateRoom();
   };
 
   // This needs to be updated to use the API.

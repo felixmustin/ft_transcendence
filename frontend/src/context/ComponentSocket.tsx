@@ -28,7 +28,6 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 	});
 
 	useEffect(() =>{
-		console.log('token is ' + token);
 		// connection
 		socket.connect();
 
@@ -80,22 +79,17 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 	};
 	const sendhandshake = () => {
 		socket.emit('handshake');
-		console.log('sending handshake');
 		socket.on('handshake-response', (data: handshake) =>{
-			// const data = JSON.parse(get);
-			// console.log('handshake-reponse received with ' + data.uid + ' | ' + data.users);
 			SocketDispatch({type : 'update_uid', payload : data.uid});
 			SocketDispatch({type: 'update_users', payload: data.users});
 			SocketDispatch({type: 'update_data', payload: data.data});
 		});
 	};
 	useEffect(() => {
-		console.log("in socket context : " + SocketState.uid);
 		setloading(false);
 	}, [SocketState.uid]);
 	
 	if (loading) return <p>loading socket IO ...</p>
-	console.log('in socket rendering : ' + SocketState.uid);
 	return (
 		<SocketContextProvider value = {{SocketState, SocketDispatch}}>
 			{children}

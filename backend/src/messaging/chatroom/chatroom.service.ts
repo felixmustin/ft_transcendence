@@ -212,8 +212,6 @@ export class ChatRoomService {
     .innerJoin('chatroom.participants', 'user', 'user.id = :userId', { userId: user.profile.id })
     .getMany();
   
-    console.log("Here")
-    console.log(chatRooms)
     return chatRooms;
   }
 

@@ -48,7 +48,6 @@ const SettingRoomField = (props: Props) => {
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Image uploaded successfully:", data);
             setUpdatedRoom(data);
           })
           .catch((error) => {
@@ -91,7 +90,6 @@ const SettingRoomField = (props: Props) => {
         alert('Please enter a password for the protected mode.');
         return;
       }
-      console.log(newRoomMode)
       
       const auth = 'Bearer ' + props.token
       fetch('http://localhost:3001/chatroom/update/mode', {

@@ -1,16 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WsException } from '@nestjs/websockets';
-import { Server } from 'http';
+import { WebSocketServer, WsException } from '@nestjs/websockets';
+import { not } from 'joi';
+import { Server } from 'socket.io';
 import { JwtStrategy } from 'src/auth/strategy/jwt.startegy';
 import { Profile } from 'src/entities/profile.entity';
 import { User } from 'src/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 
+export type notification = {
+	type: string,
+	origin: string,
+	target: string,
+	data: string,
+}
+
+export type notifications = {
+	name: string,
+	notifs: notification[],
+  }
+
+export type noti_payload = {
+	type: string,
+	target: string | undefined,
+	data: string | undefined,
+}
+
 @Injectable()
 export class StatusService {
-	private identitymap: Map < string, Profile > = new Map();
+	private id_to_profile: Map < string, Profile > = new Map();
+	private profile_to_id: Map < string, string > = new Map();
+	private notification: Map < string, notification[]> = new Map();
 	// private connected: Set<Profile> = new Set();
 
 	constructor(
@@ -18,26 +39,133 @@ export class StatusService {
 		private readonly userservice: UserService,
 		@InjectRepository(Profile)
     	private userRepository: Repository<Profile>,
-	) {}
-	async login(client: any, server: Server){
+		) {}
+	async login(client: any){
 		try {
 			const id = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
 			const user: Profile = await this.userservice.findUserProfileById(id.id);
 			user.statusid = 1;
 			await this.userRepository.save(user);
-			this.identitymap.set(client.id, user);
-			console.log('logged ' + user.username);
+			// this.identitymap.set(client.id, user);
+			this.register_user(client.id, user);
 		} catch (error) {
-			console.log('Error occurred during login:', error);
 			throw new WsException('Unauthorized');
 		}
 	}
 
-	async logout(client: any, server: Server){
-		console.log('delogged ' + this.identitymap.get(client.id).username);
-		const user = this.identitymap.get(client.id)
+	async logout(client: any){
+		const user = this.id_to_profile.get(client.id)
 		user.statusid = 0;
 		await this.userRepository.save(user);
-		this.identitymap.delete(client.id);
+		// this.identitymap.delete(client.id);
+		this.delete_id(client.id);
+	}
+	delete_self_notif(user: Profile){
+		const notif = this.notification.get(user.username)
+		if (notif){
+			for (let i = 0; i < notif.length; i++){
+				if (notif[i].target === user.username){
+					notif.splice(i, 1);
+				}
+			}
+		}
+		this.notification.set(user.username, notif);
+	}
+	delete_game_notif(client: any){
+		const user = this.id_to_profile.get(client.id);
+		const notif = this.notification.get(user.username)
+		if (notif){
+			for (let i = 0; i < notif.length; i++){
+				if (notif[i].type === 'game'){
+					notif.splice(i, 1);
+				}
+			}
+		}
+		this.notification.set(user.username, notif);
+	}
+	delete_message_notif(client:any){
+		const user = this.id_to_profile.get(client.id);
+		const notif = this.notification.get(user.username)
+		if (notif){
+			for (let i = 0; i < notif.length; i++){
+				if (notif[i].type === 'message'){
+					notif.splice(i, 1);
+				}
+			}
+		}
+		this.notification.set(user.username, notif);
+	}
+	delete_friend_notif(client: any){
+		const user = this.id_to_profile.get(client.id);
+		const notif = this.notification.get(user.username)
+		if (notif){
+			for (let i = 0; i < notif.length; i++){
+				if (notif[i].type === 'friend'){
+					notif.splice(i, 1);
+				}
+			}
+		}
+		this.notification.set(user.username, notif);
+	}
+	set_notification(client:any, notif: noti_payload){
+		const user = this.id_to_profile.get(client.id);
+		if (notif.target !== user.username && notif.type === 'game'){
+			this.delete_self_notif(user);
+		}
+		const not: notification = {
+			origin: user.username,
+			type: notif.type,
+			target: notif.target ? notif.target : this.id_to_profile.get(client.id).username,
+			data: notif.data,
+		}
+		if (this.notification.has(notif.target)){
+			const table = this.notification.get(notif.target);
+			table.push(not);
+			this.notification.set(notif.target, table);
+		}
+		else{
+			this.notification.set(not.target, [not]);
+		}
+	}
+	get_notification(client: any){
+		const user = this.id_to_profile.get(client.id);
+		const notifs = this.notification.get(user.username);
+		client.emit('notification', notifs);
+	}
+	register_user(id : string, user: Profile){
+		this.id_to_profile.set(id, user);
+		this.profile_to_id.set(user.username, id);
+	}
+	delete_id(id: string){
+		const user = this.id_to_profile.get(id);
+		this.id_to_profile.delete(id);
+		this.profile_to_id.delete(user.username);
+		this.notification.delete(user.username);
+	}
+	delete_user(user: Profile){
+		const id = this.profile_to_id.get(user.username);
+		this.notification.delete(user.username);
+		this.profile_to_id.delete(user.username);
+		this.id_to_profile.delete(id);
+	}
+	build_noti(user: string): notifications {
+		const ret: notifications = {
+			name: user,
+			notifs: this.notification.get(user),
+		}
+		return ret;
+	}
+	async emitNotifications(server: Server){
+		for (const [key, value] of this.notification) {
+			if (!value.length){
+				this.notification.delete(key);
+			}
+			else{
+				const id = this.profile_to_id.get(key);
+				const noti = this.build_noti(key);
+				server.to(id).emit('notification', noti);
+				console.log('emiting notif to ' + key);
+			}
+		}
 	}
 }

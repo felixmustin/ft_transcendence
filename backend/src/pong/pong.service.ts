@@ -87,15 +87,12 @@ export class PongService {
 			const user: Profile = await this.userservice.findUserProfileById(id.id);
 			this.identitymap.set(client.id, user);
 		  } catch (error) {
-			console.log('Error occurred during login:', error);
 			throw new WsException('Unauthorized');
 		  }
 	}
 
 	logout(client: any, server: Server){
 		const roomID = this.getClientRoom(client);
-		console.log('llogout called with : ' + client.id);
-		console.log('gives : ' + roomID);
 		for (let i = 0; i < roomID?.length; i++){
 			const room = this.get_room(roomID[i]);
 			room?.disconnect(client.id);
@@ -164,7 +161,6 @@ export class PongService {
 			  value.connect(client.id);
 			  value.setbonus(data);
 			  found = true;
-			  console.log('found empty room');
 			  break ;
 			}
 		  }
@@ -174,15 +170,14 @@ export class PongService {
 				roomID = this.generateRandomKey();
 			}
 			this.privateroom.set(roomID, new Room(roomID, server, this));
-			console.log('send data ');
 			client.join(roomID);
 			this.addClientToRoom(client.id, roomID);
 			this.privateroom.get(roomID).connect(client.id);
 			this.privateroom.get(roomID).setbonus(data);
 		}
 		const score: ScoreProps = {
-			player1: this.identifiate(this.privateroom.get(roomID).idp1)?.username,
-			player2: this.identifiate(this.privateroom.get(roomID).idp2)?.username,
+			player1: this.identifiate(this.privateroom.get(roomID)?.idp1)?.username,
+			player2: this.identifiate(this.privateroom.get(roomID)?.idp2)?.username,
 			score1: 0,
 			score2: 0,
 		}
@@ -230,7 +225,6 @@ export class PongService {
 		}
 		const newRoom = new Room(key, server, this);
 		this.maproom.set(key, newRoom);
-		console.log('created room : ' + key);
 		return key;
 	  }
 
@@ -306,9 +300,7 @@ export class PongService {
   	  return savedGame;
   	}
 	rematch(client: any, roomID:string){
-		console.log('rematch service');
 		const room = this.get_room(roomID);
-		console.log('rooom id service is ' + room.id);
 		room.rematch_handler(client.id);
 	}
 	identifiate(id: string): Profile{
@@ -323,7 +315,6 @@ export class PongService {
 			clientsInRoom.push(roomId);
 		}
 		else if (!clientsInRoom){
-			console.log('map entry created for ' + clientId + ' with ' + roomId);
 			const key = clientId;
 			const entry = [roomId];
 			this.idroomap.set(key, entry);

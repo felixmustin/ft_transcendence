@@ -77,7 +77,6 @@ const Chat = (props: Props) => {
 
   // Handle click on a conversation box
   const onConvBoxClick = (roomId: number, settingBool: boolean) => {
-    console.log('Clicked on room:', roomId);
 
     setSelectedRoomId(roomId);
     setSelectedRoomIdSettings(settingBool);

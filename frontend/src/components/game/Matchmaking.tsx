@@ -1,28 +1,61 @@
 import React, { useState, useEffect } from "react";
-import SocketContext from '../../context/Socket';
+import SocketContext, { ISocketContextState } from '../../context/Socket';
 import GamePong, {GamePongProps, ScoreProps} from "./Pong";
 import FormJoinRoom from "./FormJoinRoom";
+import { noti_payload, notifications } from "../../App";
 
 type matchdata = {
 	roomID: string,
 	score: ScoreProps,
 	player: number,
 }
+type props = {
+  statusocket: ISocketContextState,
+}
+type invitation = {
+  origin: string,
+  room: string,
+}
 
-function Matchmaking() {
+function Matchmaking(props: props) {
+  const { statusocket } = props;
   const { SocketState, SocketDispatch } = React.useContext(SocketContext);
   const [match, setMatch] = useState<GamePongProps | null>(null);
   const [waiting, setwaiting] = useState<number>(0);
   const [bonus, setbonus] = useState<boolean>(true);
+  const [invitations, setinvitations] = useState<invitation>();
+  // const [noti, setnoti] = useState<notifications | null>(null);
+  let noti : notifications;
 
   useEffect(() => {
+    const invite_handler = (notif: notifications) => {
+      noti = (notif);
+      console.log(JSON.stringify(notif));
+      for (let i = 0; i < notif?.notifs?.length; i++){
+        if (notif.notifs[i].origin === notif.name){
+          handleCreateRoom();
+          statusocket.socket?.off('notification');
+          return ;
+        }
+        else if (notif.notifs[i].origin !== notif.name){
+          // const invite: invitation[] = invitations;
+          const inv: invitation = {
+            origin: notif.notifs[i].origin,
+            room: notif.notifs[i].data,
+          }
+          // invite.push(inv);
+          setinvitations(inv);
+        }
+      }
+      statusocket?.socket?.emit('game-visited');
+    };
+    statusocket.socket?.on('notification', invite_handler);
     // Subscribe to the "matchmaking" channel when the component mounts
     // SocketState.socket?.emit('subscribe', 'matchmaking');
 
     // Listen for "match_found" events and update the state accordingly
     const onMatchFound = (data: matchdata) => {
       if (SocketState.socket != undefined){
-        console.log("uid : " + SocketState.uid);
 		    const pongprops:GamePongProps = {
 		    	roomID: data.roomID,
 		    	score: data.score,
@@ -37,7 +70,6 @@ function Matchmaking() {
     SocketState.socket?.on('match_found', onMatchFound);
 
     const onRoom_created = (data: matchdata) => {
-      console.log('data received');
       if (SocketState.socket != undefined){
 		    const pongprops:GamePongProps = {
 		    	roomID: data.roomID,
@@ -48,6 +80,20 @@ function Matchmaking() {
 		    }
 		    setMatch(pongprops);
         setwaiting(2);
+        if (noti){
+          for (let i = 0; i < noti.notifs.length; i++){
+            if (noti.notifs[i].target === noti.name){
+              const payload: noti_payload = {
+                type : 'game',
+                target: noti.notifs[i].data,
+                data: data.roomID,
+              }// remove old notif
+              statusocket.socket?.emit('send-notif', payload);
+              // statusocket.socket?.emit('self-visited');
+              statusocket.socket?.off('notification', invite_handler);
+            }
+          }
+        }
       }
     };
     SocketState.socket?.on('room_created', onRoom_created);
@@ -60,6 +106,7 @@ function Matchmaking() {
       SocketState.socket?.off('quit', onquithandler);
       SocketState.socket?.off('room_created', onRoom_created);
       SocketState.socket?.off('match_found', onMatchFound);
+      statusocket.socket?.off('notification', invite_handler);
     };
   }, [SocketState.socket, SocketState.uid]);
 
@@ -71,13 +118,11 @@ function Matchmaking() {
 
   const handleCreateRoom = () => {
     setwaiting(2);
-    console.log('create room');
     // Emit a "create_room" event with the user's UID
     SocketState.socket?.emit('create_room', bonus);
   };
 
   const handleJoinRoom = (room :string) => {
-    console.log('join room triggered with ' + room);
     // Emit a "join_room" event with the user's UID
     SocketState.socket?.emit('join_room', room);
   };
@@ -89,10 +134,22 @@ function Matchmaking() {
     setwaiting(3);
   }
 
+  // let invitationButtons = [];
+
+  // for (let i = 0; i < invitations.length; i++) {
+  //   const inv = invitations[i];
+  //   invitationButtons.push(
+  //     <button key={inv.room} onClick={() => handleJoinRoom(inv.room)}>
+  //       Accept Invitation from {inv.origin}
+  //     </button>
+  //   );
+  // }
+
   return (
 	<div>
     <h1>Welcome to the Game</h1>
 	{!match && !waiting && (
+    <div>
 	  <>
 		<button onClick={handleFindMatch}>Find Match</button>
 		<button onClick={handleCreateRoom}>Create Room</button>
@@ -101,7 +158,13 @@ function Matchmaking() {
         {bonus ? 'bonus activated' : 'bonus desactivated'}
       </button>
 	  </>
-    
+    <>
+    invitations
+    {invitations && <button key={invitations.room} onClick={() => handleJoinRoom(invitations.room)}>
+        Accept Invitation from {invitations.origin}
+      </button>}
+    </>
+    </div>
 	)}
 	{match && !waiting && <GamePong {...match} />}
   {!match && waiting === 1 && 'waiting...'}
