@@ -4,13 +4,8 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToOne,
-  JoinColumn,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
+  JoinColumn
 } from 'typeorm';
-import { ChatRoom } from './chatroom.entity';
-import { Message } from './message.entity';
 
 @Entity({ name: 'users' })
 export class User {

@@ -10,10 +10,11 @@ type Props = {
     firstname: string;
     lastname: string;
     age: number;
-    avatar: {type: string, data: []}
+    avatar: {type: string, data: []},
+    statusid: number;
   },
   item: {
-    accessToken: string;
+    accessToken: string | undefined;
   };
   onChange: () => void;
 }
@@ -96,6 +97,9 @@ const SocialDataFriends = (props: Props) => {
           >
           Remove friends
           </button>
+        <div>
+          {props.profile.statusid === 1 ? <p>Online</p> : <p>Offline</p> }
+        </div>
       </div>
       <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-violet-900'/>
     </div>

@@ -18,12 +18,6 @@ export class ChatRoomController {
     return await this.chatRoomService.createChatRoomFromUsers(req.user.id, targetId);
   }
 
-  // Use because Auth Guard is not working
-  // @Post('create/:targetId/:userId')
-  // async createChatRoomFromUsersWithoutAuth(@Param('targetId') targetId: number, @Param('userId') userId: number) {
-  //   return await this.chatRoomService.createChatRoomFromUsers(userId, targetId);
-  // }
-
   @Post('create')
   @UseGuards(JwtAuthGuard)
   async createChatRoom(@Request() req: any, @Body() { name, mode, password }: { name: string, mode: string, password: string }) {

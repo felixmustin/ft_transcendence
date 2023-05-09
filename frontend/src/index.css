@@ -18,21 +18,3 @@ body,
   font-family: /* "DM Mono", sans-serif; */'Space Mono';
   @apply text-white;
 }
-
-button {
-  display: inline-block;
-  border: 2px solid purple;
-  background-color: purple;
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: white;
-  color: purple;
-}

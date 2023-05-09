@@ -5,7 +5,7 @@ import Loading from '../utils/Loading';
 import { tokenForm } from '../../interfaceUtils';
 
 type Props = {
-  item: tokenForm
+  item: tokenForm | undefined;
 }
 
 const Disconnect = (props: Props) => {
@@ -15,7 +15,7 @@ const Disconnect = (props: Props) => {
 
   const disconnect = () => {
     let url = 'http://localhost:3001/user/disconnect/'
-    let auth = 'Bearer ' + props.item.accessToken;
+    let auth = 'Bearer ' + props.item?.accessToken;
     fetch(url, {
       method: 'PUT',
       headers: {'Authorization': auth}
@@ -31,7 +31,7 @@ const Disconnect = (props: Props) => {
 
   const deleteAcc = () => {
     let url = 'http://localhost:3001/user/delete/'
-    let auth = 'Bearer ' + props.item.accessToken;
+    let auth = 'Bearer ' + props.item?.accessToken;
     fetch(url, {
       method: 'DELETE',
       headers: {'Authorization': auth}
@@ -54,10 +54,10 @@ const Disconnect = (props: Props) => {
   }
 
     return (
-      <div className="flex flex-col absolute right-0 mt-2 py-2">
-        <button className='link' onClick={disconnect}>Disconnect</button>
-        <button className='link' onClick={deleteAcc}>Delete Account</button>
-    </div>
+      <div className="flex flex-col absolute right-0 mt-2 py-2 z-50">
+        <button className='link w-[150px] py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={disconnect}>Disconnect</button>
+        <button className='link w-[150px] py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={deleteAcc}>Delete Account</button>
+      </div>
     )
   }
 

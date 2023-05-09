@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Message from './Message';
 import { ChatRoomInterface, MessageInterface } from './types';
-import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 
 type Props = {
@@ -11,13 +10,15 @@ type Props = {
 };
 
 const ChatBox = ({ roomId, id, socket }: Props) => {
-
   const [messages, setMessages] = useState<MessageInterface[]>([]);
-  // const [blocklist, setBlocklist] = useState<UserInterface[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     if (!socket) return;
-    // Fetch the entire conversation of the room
     const fetchConversation = async () => {
       try {
         const response = await fetch(`http://localhost:3001/messages/${roomId}/messages`);
@@ -47,11 +48,16 @@ const ChatBox = ({ roomId, id, socket }: Props) => {
     };
   }, [socket, roomId]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <div className="overflow-y-auto h-[25rem] max-h-[25rem]">
       {messages.map((message) => (
         <Message key={message.id} message={message} currentUserId={id} />
       ))}
+      <div ref={messagesEndRef}></div>
     </div>
   );
 };

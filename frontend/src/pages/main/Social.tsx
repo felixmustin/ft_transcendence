@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/design/Navbar'
 import Chat from '../../components/messages/Chat'
 import FriendList from '../../components/user/FriendList'
+import BlockedUsers from '../../components/user/BlockedUsers'
 import { tokenForm } from '../../interfaceUtils'
 import { useNavigate } from 'react-router-dom'
 import { getSessionsToken, isSessionTokenSet } from '../../sessionsUtils'
@@ -13,6 +14,7 @@ const Social = (props: Props) => {
 
   const [token, setToken] = useState<tokenForm>();
   const [isTokenSet, setIsTokenSet] = useState(false);
+  const [currentTab, setCurrentTab] = useState('Friends'); // Add a state for the current tab
 
   // Navigation
   const navigate = useNavigate();
@@ -40,20 +42,26 @@ const Social = (props: Props) => {
               </div>
           </div>
 
-      <div className="flex justify-evenly">
-        <div className='bg-violet-900 w-[800px] rounded-lg m-5'>
-          <div className='flex content-center text-center text-violet-300 text-3xl p-5' >
-            Friends List
-          </div>
-          <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>
-          <div>
-            <FriendList item={{ accessToken: token?.accessToken }} />
+        <div className="flex justify-evenly">
+          <div className='bg-violet-900 w-[800px] rounded-lg m-5'>
+            <div className='flex justify-between text-center text-violet-300 text-3xl p-5' >
+              {/* Add tabs for Friends and Blocked */}
+              <div className='mx-5' onClick={() => setCurrentTab('Friends')} style={{cursor: 'pointer'}}>Friends</div>
+              <span>|</span>
+              <div className='mx-5' onClick={() => setCurrentTab('Blocked')} style={{cursor: 'pointer'}}>Blocked</div>
+            </div>
+            <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>
+            <div>
+              {/* Conditionally render different components based on the current tab */}
+              {currentTab === 'Friends' && <FriendList accessToken={ token?.accessToken } />}
+              {currentTab === 'Blocked' && <BlockedUsers accessToken={ token?.accessToken } />} 
+              {/* Replace BlockedUsers with the name of your Blocked users component */}
+            </div>
           </div>
         </div>
       </div>
-    </div>
     )
   }
 }
 
-export default Social
+export default Social 

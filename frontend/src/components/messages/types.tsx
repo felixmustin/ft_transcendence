@@ -22,7 +22,7 @@ export interface ProfileInterface {
   age: number;
   avatar: Buffer;
   games: GameInterface[];
-  // statusid: number;
+  statusid: number;
   // profile: ProfileInterface;
   // blocklist: UserInterface[];
 }
@@ -45,7 +45,7 @@ export interface ChatRoomInterface {
     created_at: Date;
     updated_at: Date;
     messages: MessageInterface[];
-    admin: UserInterface[];
+    admin: ProfileInterface[];
   }
   
   export interface MessageInterface {

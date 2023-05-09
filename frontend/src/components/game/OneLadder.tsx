@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   item: { username: string; won: number };
@@ -6,6 +7,8 @@ type Props = {
 }
 
 const OneLadder = ({ item, index }: Props) => {
+  const navigate = useNavigate();
+
   const getBackgroundClassName = () => {
     switch (index) {
       case 0:
@@ -19,10 +22,14 @@ const OneLadder = ({ item, index }: Props) => {
     }
   };
 
+  const goToProfile = () => {
+    navigate(`/profile/${item.username}`);
+  };
+
   return (
     <div className={`${getBackgroundClassName()} flex m-2 p-2 rounded-lg items-center text-black border border-black font-bold`}>
       <p className=' w-1/5 text-xl mx-3'>{index + 1}</p>
-      <p className='w-3/5 text-xl text-center'>{item.username}</p>
+      <p className='w-3/5 text-xl text-center' onClick={goToProfile}>{item.username}</p>
       <p className='w-1/5 text-xl text-right mx-3'>{item.won}</p>
     </div>
   )

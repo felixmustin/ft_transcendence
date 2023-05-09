@@ -195,25 +195,25 @@ const Profile = ({ username }: Props) => {
                 {username && (
                   <div className="flex justify-center space-x-4 my-4">
                     <button
-                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                     onClick={handleLaunchGame}
                     >
                     Game
                     </button>
                     <button
-                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                     onClick={handleAddFriend}
                     >
                     Add
                     </button>
                     <button
-                      className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                      className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                       onClick={handleSendMessage}
                     >
                       Message
                     </button>
                     <button
-                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                     onClick={handleBlockUser}
                     >
                     Block

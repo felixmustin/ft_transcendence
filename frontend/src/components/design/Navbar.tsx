@@ -6,7 +6,7 @@ import { tokenForm } from '../../interfaceUtils';
 
 
 type Props = {
-  item: tokenForm;
+  item: tokenForm | undefined;
 }
 
 const Navbar = (props: Props) => {
@@ -33,7 +33,7 @@ const Navbar = (props: Props) => {
     <a href='/profile'><img src={ Logo } className='w-[100px] h-[100px]' /> </a>
     <input
       className="rounded-lg bg-gray-700 m-2 ml-10 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
-      placeholder="  Search for Targets"
+      placeholder="Search for Targets"
       value={search}
       onChange={(e) => setSearch(e.target.value)}
       onKeyDown={handleSearch}

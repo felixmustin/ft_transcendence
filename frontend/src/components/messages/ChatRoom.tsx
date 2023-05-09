@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import ChatBox from './ChatBox';
 import SendMessage from './SendMessage';
 import { Socket } from 'socket.io-client';
-import { ChatRoomInterface, MessageInterface } from './types';
+import { ChatRoomInterface } from './types';
 import Participants from './Participants';
 
 type Props = {
-  room:ChatRoomInterface;
+  room:ChatRoomInterface | undefined;
   roomId: number;
   id: number;
   socket: Socket | undefined;
