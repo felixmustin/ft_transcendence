@@ -24,7 +24,7 @@ export class Inv_button extends Component<{inv: invitation} & {handleJoinRoom: F
 	render(): ReactNode {
 		const {inv, handleJoinRoom } = this.props;
 		return (
-			<button onClick={() => handleJoinRoom(inv.room)}>
+			<button className='w-[200px] m-2 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={() => handleJoinRoom(inv.room)}>
         		Accept Invitation from {inv.origin}
      		</button>
 		)
