@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Logo from '../../assets/Logo.png'
 import Disconnect from '../authentication/Disconnect';
 import { useNavigate } from 'react-router-dom'
@@ -22,20 +22,34 @@ const Navbar = (props: Props) => {
   const [game_notif, setgame_notif] = useState(false);
   const [friend_notif, setfriend_notif] = useState(false);
 	const { SocketState, SocketDispatch } = React.useContext(SocketContext);
+  useEffect(() => {
 	const notif_handler = (notif: notifications) => {
+    console.log('receive notif ' + JSON.stringify(notif));
+    let game: boolean = false;
+    let message: boolean = false;
+    let friend: boolean = false;
     for (let i = 0; i < notif?.notifs?.length; i++){
       if (notif.notifs[i].type === 'game'){
-        setgame_notif(true);
+        game = true;
       }
       else if (notif.notifs[i].type === 'message'){
-        setmessage_notif(true);
+        message = true;
       }
       else if (notif.notifs[i].type === 'friend'){
-        setfriend_notif(true);
+        friend = true;;
       }
+    }
+    if (game !== game_notif || message !== message_notif || friend !== friend_notif){
+      setgame_notif(game);
+      setfriend_notif(friend);
+      setmessage_notif(message);
     }
 	}
 	SocketState.socket?.on('notification', notif_handler);
+  return () => {
+    SocketState.socket?.off('notification', notif_handler);
+  }
+})
 
   const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && search.trim()) {

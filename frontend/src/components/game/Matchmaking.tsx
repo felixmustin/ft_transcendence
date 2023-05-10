@@ -3,6 +3,7 @@ import SocketContext, { ISocketContextState } from '../../context/Socket';
 import GamePong, {GamePongProps, ScoreProps} from "./Pong";
 import FormJoinRoom from "./FormJoinRoom";
 import { noti_payload, notifications } from "../../App";
+import { Invitebuttons } from "./InvitationButtons";
 
 type matchdata = {
 	roomID: string,
@@ -12,7 +13,7 @@ type matchdata = {
 type props = {
   statusocket: ISocketContextState,
 }
-type invitation = {
+export type invitation = {
   origin: string,
   room: string,
 }
@@ -23,7 +24,7 @@ function Matchmaking(props: props) {
   const [match, setMatch] = useState<GamePongProps | null>(null);
   const [waiting, setwaiting] = useState<number>(0);
   const [bonus, setbonus] = useState<boolean>(true);
-  const [invitations, setinvitations] = useState<invitation>();
+  const [invitations, setinvitations] = useState<invitation[]>([]);
   // const [noti, setnoti] = useState<notifications | null>(null);
   let noti : notifications;
 
@@ -38,16 +39,19 @@ function Matchmaking(props: props) {
           return ;
         }
         else if (notif.notifs[i].origin !== notif.name){
-          // const invite: invitation[] = invitations;
+          const invite: invitation[] = invitations;
           const inv: invitation = {
             origin: notif.notifs[i].origin,
             room: notif.notifs[i].data,
           }
-          // invite.push(inv);
-          setinvitations(inv);
+          // if (!invite.includes(inv)){
+            invite.push(inv);
+            setinvitations([...invite]);
+            console.log('invites ' + invitations);
+            statusocket?.socket?.emit('game-visited');
+          // }
         }
       }
-      statusocket?.socket?.emit('game-visited');
     };
     statusocket.socket?.on('notification', invite_handler);
     // Subscribe to the "matchmaking" channel when the component mounts
@@ -65,6 +69,7 @@ function Matchmaking(props: props) {
 		    }
 		    setMatch(pongprops);
         setwaiting(0);
+        statusocket.socket?.emit('update_status', 2);
       }
     };
     SocketState.socket?.on('match_found', onMatchFound);
@@ -90,7 +95,7 @@ function Matchmaking(props: props) {
               }// remove old notif
               statusocket.socket?.emit('send-notif', payload);
               // statusocket.socket?.emit('self-visited');
-              statusocket.socket?.off('notification', invite_handler);
+              statusocket.socket?.on('notification', invite_handler);
             }
           }
         }
@@ -100,6 +105,7 @@ function Matchmaking(props: props) {
     const onquithandler = () => {
       setMatch(null);
       setwaiting(0);
+      statusocket.socket?.emit('update_status', 1);
     }
     SocketState.socket?.on('quit', onquithandler);
     return () => {
@@ -107,9 +113,13 @@ function Matchmaking(props: props) {
       SocketState.socket?.off('room_created', onRoom_created);
       SocketState.socket?.off('match_found', onMatchFound);
       statusocket.socket?.off('notification', invite_handler);
+      statusocket.socket?.emit('update_status', 1);
     };
   }, [SocketState.socket, SocketState.uid]);
 
+  // useEffect (() => {
+  //   statusocket.socket?.emit('game-visited');
+  // },[invitations])
   const handleFindMatch = () => {
     setwaiting(1);
     // Emit a "find_match" event with the user's UID
@@ -119,6 +129,7 @@ function Matchmaking(props: props) {
   const handleCreateRoom = () => {
     setwaiting(2);
     // Emit a "create_room" event with the user's UID
+    console.log('emiting create room');
     SocketState.socket?.emit('create_room', bonus);
   };
 
@@ -134,17 +145,6 @@ function Matchmaking(props: props) {
     setwaiting(3);
   }
 
-  // let invitationButtons = [];
-
-  // for (let i = 0; i < invitations.length; i++) {
-  //   const inv = invitations[i];
-  //   invitationButtons.push(
-  //     <button key={inv.room} onClick={() => handleJoinRoom(inv.room)}>
-  //       Accept Invitation from {inv.origin}
-  //     </button>
-  //   );
-  // }
-
   return (
 	<div>
     <h1>Welcome to the Game</h1>
@@ -159,10 +159,7 @@ function Matchmaking(props: props) {
       </button>
 	  </>
     <>
-    invitations
-    {invitations && <button key={invitations.room} onClick={() => handleJoinRoom(invitations.room)}>
-        Accept Invitation from {invitations.origin}
-      </button>}
+      <Invitebuttons invite={invitations} handleJoinRoom={handleJoinRoom}/>
     </>
     </div>
 	)}

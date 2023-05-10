@@ -21,6 +21,10 @@ export type notification = {
 	target: string,
 	data: string,
 }
+export type status = {
+	username: string,
+	status: number,
+}
 export type notifications = {
   name: string,
   notifs: notification[],

@@ -42,4 +42,8 @@ export class statusGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	async self_visit( client: any){
 		this.statusService.delete_self_notif(client);
 	}
+	@SubscribeMessage('update_status')
+	async update_status(client: any, data: number){
+		this.statusService.update_status(client, data);
+	}
 }

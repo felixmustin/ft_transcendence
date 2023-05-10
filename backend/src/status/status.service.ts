@@ -27,6 +27,11 @@ export type noti_payload = {
 	data: string | undefined,
 }
 
+export type status = {
+	username: string,
+	status: number,
+}
+
 @Injectable()
 export class StatusService {
 	private id_to_profile: Map < string, Profile > = new Map();
@@ -41,16 +46,16 @@ export class StatusService {
     	private userRepository: Repository<Profile>,
 		) {}
 	async login(client: any){
-		try {
+		// try {
 			const id = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
 			const user: Profile = await this.userservice.findUserProfileById(id.id);
 			user.statusid = 1;
 			await this.userRepository.save(user);
 			// this.identitymap.set(client.id, user);
 			this.register_user(client.id, user);
-		} catch (error) {
-			throw new WsException('Unauthorized');
-		}
+		// } catch (error) {
+		// 	throw new WsException('Unauthorized');
+		// }
 	}
 
 	async logout(client: any){
@@ -60,7 +65,8 @@ export class StatusService {
 		// this.identitymap.delete(client.id);
 		this.delete_id(client.id);
 	}
-	delete_self_notif(user: Profile){
+	delete_self_notif(client: any){
+		const user = this.id_to_profile.get(client.id);
 		const notif = this.notification.get(user.username)
 		if (notif){
 			for (let i = 0; i < notif.length; i++){
@@ -70,6 +76,8 @@ export class StatusService {
 			}
 		}
 		this.notification.set(user.username, notif);
+		console.log('delete self ' + JSON.stringify(notif));
+		client.emit('notification', this.build_noti(user.username));
 	}
 	delete_game_notif(client: any){
 		const user = this.id_to_profile.get(client.id);
@@ -82,6 +90,8 @@ export class StatusService {
 			}
 		}
 		this.notification.set(user.username, notif);
+		console.log('deleting game notif ' + notif);
+		client.emit('notification', this.build_noti(user.username));
 	}
 	delete_message_notif(client:any){
 		const user = this.id_to_profile.get(client.id);
@@ -94,10 +104,11 @@ export class StatusService {
 			}
 		}
 		this.notification.set(user.username, notif);
+		client.emit('notification', this.build_noti(user.username));
 	}
 	delete_friend_notif(client: any){
 		const user = this.id_to_profile.get(client.id);
-		const notif = this.notification.get(user.username)
+		const notif = this.notification.get(user.username);
 		if (notif){
 			for (let i = 0; i < notif.length; i++){
 				if (notif[i].type === 'friend'){
@@ -106,11 +117,12 @@ export class StatusService {
 			}
 		}
 		this.notification.set(user.username, notif);
+		client.emit('notification', this.build_noti(user.username));
 	}
 	set_notification(client:any, notif: noti_payload){
 		const user = this.id_to_profile.get(client.id);
 		if (notif.target !== user.username && notif.type === 'game'){
-			this.delete_self_notif(user);
+			this.delete_self_notif(client);
 		}
 		const not: notification = {
 			origin: user.username,
@@ -140,7 +152,8 @@ export class StatusService {
 		const user = this.id_to_profile.get(id);
 		this.id_to_profile.delete(id);
 		this.profile_to_id.delete(user.username);
-		this.notification.delete(user.username);
+		console.log('deleting notif because of disconect');
+		// this.notification.delete(user.username);
 	}
 	delete_user(user: Profile){
 		const id = this.profile_to_id.get(user.username);
@@ -164,8 +177,14 @@ export class StatusService {
 				const id = this.profile_to_id.get(key);
 				const noti = this.build_noti(key);
 				server.to(id).emit('notification', noti);
-				console.log('emiting notif to ' + key);
+				// console.log('emiting notif to ' + key);
 			}
 		}
+	}
+	async update_status(client: any, data: number){
+		const user = this.id_to_profile.get(client.id);
+		const profile = await this.userservice.findUserProfileById(user.id);
+		profile.statusid = data;
+		await this.userRepository.save(profile);
 	}
 }

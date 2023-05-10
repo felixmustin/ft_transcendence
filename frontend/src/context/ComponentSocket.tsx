@@ -76,14 +76,15 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 			console.info('reconnection failure');
 			alert('sorry we are unable to reconnect you');
 		});
-	};
-	const sendhandshake = () => {
-		socket.emit('handshake');
+
 		socket.on('handshake-response', (data: handshake) =>{
 			SocketDispatch({type : 'update_uid', payload : data.uid});
 			SocketDispatch({type: 'update_users', payload: data.users});
 			SocketDispatch({type: 'update_data', payload: data.data});
 		});
+	};
+	const sendhandshake = () => {
+		socket.emit('handshake');
 	};
 	useEffect(() => {
 		setloading(false);
