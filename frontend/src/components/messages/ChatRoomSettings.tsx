@@ -5,21 +5,41 @@ import SettingRoomField from './SettingRoomField';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
-  room:ChatRoomInterface | undefined;
-  id: number;
-  socket: Socket | undefined;
+  room:ChatRoomInterface;
   token: string | undefined;
 };
 
-const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
+const ChatRoomSettings= ({ room, token }: Props) => {
 
   const [addMemberUsername, setAddMemberUsername] = useState({username:''});
-  const [addAdminUsername, setAddAdminUsername] = useState({username:''});
+  // const [addAdminUsername, setAddAdminUsername] = useState({username:''});
 
-  const [adminList, setAdminList] = useState<ProfileInterface[]>([]);
+  const [adminList, setAdminList] = useState([]);
 
   const navigate = useNavigate();
+  const [showActionBoxId, setShowActionBoxId] = useState(0);
+  const [selectedUser, setSelectedUser] = useState<ProfileInterface>();
+  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedDuration, setSelectedDuration] = useState('');
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const [selectedAdminOptions, setSelectedAdminOptions] = useState('');
 
+
+  const isMuteSelected = () => {
+    if(selectedOption == 'mute')
+      return true;
+    return false
+  }
+  const isBanSelected = () => {
+    if(selectedOption == 'ban')
+      return true;
+    return false
+  }
+  const isAdminSelected = () => {
+    if(selectedOption == 'admin')
+      return true;
+    return false
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,14 +74,9 @@ const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
      }
    };
 
-  const isAdmin = (member: ProfileInterface) => {
-    if (!room || !room.admin) return false;
-    for (const admin of room.admin) {
-      if (admin.id === member.id) {
-        return true;
-      }
-    }
-    return false;
+  const isAdminFct = (member: ProfileInterface) => {
+    const isAdmin = adminList.includes(member.username);
+    return isAdmin
   };
 
   const handleInputAddMember = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -69,10 +84,45 @@ const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
     setAddMemberUsername(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const handleInputAddAdmin = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = event.target;
-    setAddAdminUsername(prevState => ({ ...prevState, [name]: value }));
+
+  const removeUserFromChatRoom = async (username: string) => {
+    const auth = 'Bearer ' + token;
+
+    await fetch('http://localhost:3001/chatroom/removeMember', {
+    method: 'POST',
+    headers: {
+    'Authorization': auth,
+    'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({roomId: room?.id, username: username})
+    }).then(response => {
+      if (response.ok) {
+        alert("Member removed");
+      } else {
+        alert(response.statusText);
+      }
+    });
+  }
+
+  const handleUserClick = (e: any, user: ProfileInterface) => {
+    e.preventDefault();
+    if (showActionBoxId == user.id) {
+      setShowActionBoxId(0);
+      setSelectedOption('')
+      setSelectedDuration('')
+    }
+    else {
+      setSelectedUser(user);
+      setShowActionBoxId(user.id);
+      setPopupPosition({
+        top: e.currentTarget.offsetTop + 100,
+        left: e.currentTarget.offsetLeft
+      });
+    }
   };
+
+  const handleDurationChange = (e: any) => setSelectedDuration(e.target.value);
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -89,59 +139,107 @@ const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
         if (response.ok) {
           alert("Member added");
         } else {
-          alert("Problem adding member");
+          alert(response.statusText);
         }
       });
-  
     }
 
-    const handleSubmitAdmin = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitForm = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const auth = 'Bearer ' + token;
+      let url = ''
+      let body = ''
 
-      if (!room) return;
-      for (const participant of room.participants) {
-        if (addAdminUsername.username == participant.username) {
-          await fetch('http://localhost:3001/chatroom/addAdmin', {
-          method: 'POST',
-          headers: {
-          'Authorization': auth,
-          'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({roomId: room.id, username: addAdminUsername.username})
-          }).then(response => {
-            if (response.ok) {
-              alert("Member added as admin");
+      if (selectedUser) {
+        if (selectedOption == 'mute') {
+          url = 'http://localhost:3001/chatroom/mute'
+          body = JSON.stringify({roomId: room.id, username: selectedUser.username, duration: selectedDuration})
+        }
+        else if (selectedOption == 'ban') {
+          url = 'http://localhost:3001/chatroom/ban'
+          body = JSON.stringify({roomId: room.id, username: selectedUser.username, duration: selectedDuration})
+        }
+        else if (selectedOption == 'admin') {
+          body = JSON.stringify({roomId: room.id, username: selectedUser.username})
+          if (selectedAdminOptions == "add")
+            url = 'http://localhost:3001/chatroom/addAdmin'
+          else if (selectedAdminOptions == "remove")
+            url = 'http://localhost:3001/chatroom/removeAdmin'
+        }
+      
+        await fetch(url, {
+            method: 'POST',
+            headers: {
+            'Authorization': auth,
+            'Content-Type': 'application/json',
+            },
+            body: body
+            }).then(response => {
+              if (response.ok) {
+                alert(response.statusText);
             } else {
-              alert("Problem adding member as admin");
+              alert(response.statusText);
             }
           });
         }
-      }
+      else
+        return ;
     }
 
     return (
       <div className="flex text-center bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 relative w-2/3 p-3 rounded-lg">
         <div className="bg-violet-900 w-[1000px] rounded-lg m-5">
           <p className="text-white text-3xl font-bold m-5">{room?.name} Settings</p>
-          <div className="grid grid-cols-2 items-center p-5">
-            <div className="grid grid-rows-3">
+          <div className="grid grid-cols-2 items-center gap-4 p-5">
+            <div className="grid grid-rows-auto gap-6">
               <div className="m-3">
                 <label>Members</label>
                 <div className="flex flex-row overflow-x-auto text-center whitespace-nowrap mt-2 space-x-4">
-                  {room?.participants.map((member) => (
-                    <span
-                      key={member.id}
-                      className={`${
-                        isAdmin(member) ? "text-yellow-400" : "text-white"
-                      }`}
-                    >
-                      {member.username}
-                    </span>
-                  ))}
+                  
+                {room?.participants.map((member, index) => {
+                return (
+                  <span key={member.id} className={`${isAdminFct(member) ? "text-yellow-400" : "text-white"}`}>
+                    <span onClick={(event) => handleUserClick(event, member)}>{member.username}</span>
+                    {(showActionBoxId === member.id) && (
+                      <div className="absolute" style={{ top: popupPosition.top -75, left: popupPosition.left -10 }}>
+                        <select onChange={(e) => setSelectedOption(e.target.value)} className="text-white bg-black">
+                          <option value="">Select an action</option>
+                          <option value="mute">Mute</option>
+                          <option value="ban">Ban</option>
+                          <option value="admin">Admins</option>
+                          <option value="remove">Remove</option>
+                        </select>
+                        {selectedOption === 'mute' || selectedOption === 'ban' ? (
+                          <form onSubmit={handleSubmitForm} className="bg-black text-white">
+                            <select onChange={handleDurationChange}>
+                              <option value="">Select duration</option>
+                              <option value="60">1min</option>
+                              <option value="600">10min</option>
+                              <option value="3600">1h</option>
+                            </select>
+                            <button type="submit">Confirm</button>
+                          </form>
+                        ) : null}
+                        {selectedOption === 'admin' ? (
+                          <form onSubmit={handleSubmitForm} className="text-white">
+                            <button onClick={() => setSelectedAdminOptions('add')}>Add</button>
+                            <button onClick={() => setSelectedAdminOptions('remove')}>Remove</button>
+                          </form>
+                        ) : null}
+                        {selectedOption === 'remove' ? (
+                          <form onSubmit={handleSubmitForm} className="text-white">
+                            <button onClick={() => removeUserFromChatRoom(member.username)} >Confirm</button>
+                          </form>
+                        ) : null}
+                      </div>
+                    )}
+                    {(index + 1) % 2 === 0 ? <br /> : null}
+                  </span>
+                );
+              })}
                 </div>
               </div>
-              <div className="m-3">
+              <div className="m-3 self-end">
                 <form onSubmit={handleSubmit}>
                   <label className="font-bold">Add member : </label>
                   <input
@@ -153,20 +251,8 @@ const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
                   />
                 </form>
               </div>
-              <div className="m-3">
-                <form onSubmit={handleSubmitAdmin}>
-                  <label className="font-bold">Add an admin : </label>
-                  <input
-                    className="bg-white rounded-lg text-black"
-                    type="text"
-                    name="username"
-                    value={addAdminUsername.username}
-                    onChange={handleInputAddAdmin}
-                  />
-                </form>
-              </div>
             </div>
-            <div>
+            <div className="self-end" >
               <SettingRoomField room={room} token={token} />
             </div>
           </div>
@@ -179,55 +265,7 @@ const ChatRoomSettings= ({ room, id, socket,token }: Props) => {
         </div>
       </div>
     );
-    
-    //<div className="bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 relative w-2/3 p-3 rounded-lg">
-    //  <div className="flex justify-evenly">
-    //    <div className='bg-violet-900 w-[1000px] rounded-lg m-5'>
-    //      <div className='text-center text-white text-2xl p-3 m-2'>
-    //        <h2>{room?.name} Settings</h2>
-    //      </div>
-    //      <div className='grid grid-cols-2 items-center p-5'>
-    //        <div>
-    //            <div className='underline'>Members</div>
-    //            {/* <Participants roomId={room.id} id={id} isSettings={true}/> */}
-    //            <div style={{ fontSize: '0.9rem' }}>
-    //              {room?.participants.map((user, index) => {
-    //                const isAdmin = adminList.includes(user.username);
-    //                return (
-    //                <span key={user.id} style={{marginRight: "10px", color: isAdmin ? 'red' : 'black' }}>
-    //                  <a href={`http://localhost:3000/profile/${user.username}`}>{user.username}</a>
-    //                  {(index + 1) % 3 === 0 ? <br /> : null}
-    //                </span>);
-    //              })}
-    //            </div>
-    //            <form className='' onSubmit={handleSubmitAdmin}>
-    //                <h2 className='underline'>Add an admin :</h2>
-    //                <input className='' type='text' name='username' value={addAdminUsername.username} onChange={handleInputAddAdmin}/>
-    //            </form>
-    //            <form className='' onSubmit={handleSubmit}>
-    //                <h2 className='underline'>Add a member :</h2>
-    //                <input className='' type='text' name='username' value={addMemberUsername.username} onChange={handleInputAddMember}/>
-    //            </form>
-    //        </div>
-    //        <div>
-    //            <SettingRoomField room={room} token={token}/>
-    //        </div>
-    //      </div>
-          {/* <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/> */}
-          {/* <div className='bg-violet-700 rounded-lg m-5'>
-            <div className='grid grid-cols-2 items-center p-5'>
-              <div className='text-center mx-auto'>
-                <SettingProfile item={{ accessToken: token?.accessToken }}/>
-              </div>
-              <div className='text-center mx-auto'>
-                <Setting2FA item={{ accessToken: token?.accessToken }} />
-              </div>
-            </div>
-          </div> */}
-    //    </div>
-    //  </div>
-    //</div>
-
+   
 };
 
 export default ChatRoomSettings;

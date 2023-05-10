@@ -4,7 +4,7 @@ import { ISocketContextState, SocketContextProvider, SocketReducer, defaultSocke
 import { getSessionsToken } from '../sessionsUtils';
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
-	token: string | undefined;
+	token: string;
 	adress: string;
 }
 export type handshake = {

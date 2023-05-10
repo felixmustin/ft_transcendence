@@ -4,27 +4,81 @@ import SendMessage from './SendMessage';
 import { Socket } from 'socket.io-client';
 import { ChatRoomInterface } from './types';
 import Participants from './Participants';
+import Loading from '../utils/Loading';
 
 type Props = {
   room:ChatRoomInterface | undefined;
   roomId: number;
-  id: number;
   socket: Socket | undefined;
   token: string | undefined;
 };
 
-const ChatRoom = ({ roomId, id, socket, token }: Props) => {
+const ChatRoom = ({ room, roomId, socket, token }: Props) => {
 
+  const [profileId, setProfileId] = useState(0);
+  const [isBanned, setIsBanned] = useState(false);
+
+
+  const fetchProfileId = async () => {
+    const auth = 'Bearer ' + token;
+    const url = 'http://localhost:3001/user/profile';
+       await fetch(url, { method: 'GET', headers: { Authorization: auth } }
+       ).then(res => res.json()
+       ).then(response => {
+           if (response.statusCode >= 400) {
+            console.log("error")
+          }
+          else
+            setProfileId(response.id);  
+        })
+  };
+
+  const fetchIsBan = async () => {
+    const auth = 'Bearer ' + token;
+    const url = `http://localhost:3001/chatroom/is_banned/${roomId}`;
+       await fetch(url, { method: 'GET', headers: { Authorization: auth } }
+       ).then(res => res.json()
+       ).then(response => {
+           if (response.statusCode >= 400) {
+            console.log("error")
+          }
+          else
+            console.log(response)
+            if (response)
+              setIsBanned(true)
+            else
+              setIsBanned(false)
+        })
+  };
+
+
+  useEffect(() => {
+    fetchProfileId();
+    fetchIsBan();
+  }, []);
+
+
+  console.log(isBanned)
+  if (profileId == 0) {
+    return (<Loading />)
+    }
+  else if (isBanned) {
+    return (
+      <div>You are banned from this conversation</div>
+        )
+  }
+  else {
   return (
     <div className="bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 relative w-2/3 p-3 rounded-lg flex flex-col h-full">
-      <Participants roomId={roomId} id={id}/>
+      <Participants roomId={roomId} profileId={profileId}/>
       <hr className="w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900" />
       <div className="flex-grow overflow-y-auto">
-        <ChatBox roomId={roomId} id={id} socket={socket} token={token}/>
+        <ChatBox roomId={roomId} socket={socket} token={token} profileId={profileId}/>
       </div>
-      <SendMessage roomId={roomId} id={id} socket={socket} />
+      <SendMessage roomId={roomId} socket={socket} profileId={profileId}/>
     </div>
   );
+  }
 };
 
 export default ChatRoom;

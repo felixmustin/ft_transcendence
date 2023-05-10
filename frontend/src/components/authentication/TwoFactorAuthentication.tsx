@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 
   type Props = {
   item: string;
+  setToken: (token: tokenForm) => void
 }
   
 const TwoFactorAuthentication = (props: Props) => {
@@ -41,6 +42,7 @@ const TwoFactorAuthentication = (props: Props) => {
         }
       else {
         setSessionToken(response.token)
+        props.setToken(response.token);
         navigate('/play');
       } 
       });

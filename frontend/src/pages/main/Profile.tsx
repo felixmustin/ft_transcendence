@@ -1,14 +1,11 @@
 import React from 'react'
 import Navbar from '../../components/design/Navbar'
-import loginImg from '../../assets/login.jpg'
 import ProfileData from '../../components/user/ProfileData'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Loading from '../../components/utils/Loading'
 import Error from '../../components/utils/Error'
 import DisplayAvatar from '../../components/utils/DisplayAvatar'
-import { getSessionsToken } from '../../sessionsUtils'
-import { tokenForm } from '../../interfaceUtils'
 import { ProfileInterface } from '../../components/messages/types'
 import MatchHistory from '../../components/user/MatchHistory'
 
@@ -21,33 +18,23 @@ interface FlexData {
 
 type Props = {
   username?: string;
+  token: string;
 }
 
-const Profile = ({ username }: Props) => {
+const Profile = ({ username, token }: Props) => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  // User data retrieved from the API
   const [profile, setProfile] = useState<ProfileInterface>();
-  const [token, setToken] = useState<tokenForm>();
-  const [isTokenSet, setIsTokenSet] = useState(false);
   const [flexData, setFlexData] = useState<FlexData>();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const getToken = async () => {
-      const sessionToken = await getSessionsToken();
-      if (!sessionToken) navigate('/');
-      setToken(sessionToken);
-      setIsTokenSet(true);
-    };
-    getToken();
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!token) {
         navigate('/');
       } else {
-        const auth = 'Bearer ' + token.accessToken;
+        const auth = 'Bearer ' + token;
         const url = username
           ? `http://localhost:3001/user/profile/${username}`
           : 'http://localhost:3001/user/profile';
@@ -59,22 +46,22 @@ const Profile = ({ username }: Props) => {
             setIsLoaded(true);
             setProfile(result);
           }
-        } catch (error) {
+        } catch (error: any) {
           setIsLoaded(true);
           setError(error);
         }
       }
     };
 
-    if (isTokenSet) {
+    if (token) {
       fetchData();
     }
-  }, [isTokenSet, username]);
+  }, [token, username]);
 
   useEffect(() => {
     const fetchFlexData = async () => {
       if (!token) return;
-      const auth = 'Bearer ' + token.accessToken;
+      const auth = 'Bearer ' + token;
       const url = username
         ? `http://localhost:3001/user/profile/flex/${username}`
         : 'http://localhost:3001/user/profile/flex';
@@ -98,7 +85,7 @@ const Profile = ({ username }: Props) => {
 
   const handleBlockUser = async () => {
     try {
-      const auth = 'Bearer ' + token?.accessToken;
+      const auth = 'Bearer ' + token;
       const res = await fetch(`http://localhost:3001/user/block/${profile?.id}`, {
         method: 'POST',
         headers: {
@@ -121,7 +108,7 @@ const Profile = ({ username }: Props) => {
   // Handle the adding of a friend
   const handleAddFriend = async () => {
     try {
-      const auth = 'Bearer ' + token?.accessToken;
+      const auth = 'Bearer ' + token;
      // Call the API to add the user as a friend
      const res = await fetch(`http://localhost:3001/friends/send/request`, { method: 'POST', headers: {
       'Authorization': auth,
@@ -141,8 +128,8 @@ const Profile = ({ username }: Props) => {
   // Handle the sending of a message to the user
   const handleSendMessage = async () => {
     try {
-      const auth = 'Bearer ' + token?.accessToken;
-      const res = await fetch(`http://localhost:3001/chatroom/create/${profile?.id}`, {
+      const auth = 'Bearer ' + token;
+      const res = await fetch(`http://localhost:3001/chatroom/create/${profile.id}`, {
         method: 'POST',
         headers: {
           'Authorization': auth,
@@ -169,7 +156,7 @@ const Profile = ({ username }: Props) => {
       <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
         <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
           <div className="xl:max-w-[1280px] w-full">
-            <Navbar item={token}/>
+            <Navbar accessToken={token}/>
           </div>
         </div>
 

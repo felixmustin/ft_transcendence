@@ -35,7 +35,7 @@ const BlockedUsers = (props: Props) => {
       </div>
       <div className='bg-violet-700 rounded-lg p-2 m-2'>
           {Object.entries(blocked).map(([key, profile]) => (
-              <SingleBlocked key={key} profile={profile} token={props.accessToken}/>
+              <SingleBlocked key={key} profile={profile} token={props.accessToken} />
           ))}
       </div>
     </div>

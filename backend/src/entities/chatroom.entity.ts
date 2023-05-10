@@ -13,6 +13,7 @@ import {
 import { Message } from './message.entity';
 import { Profile } from './profile.entity';
 import { Mute } from './mute.entity';
+import { Ban } from './ban.entity';
 
 export enum ChatRoomMode {
   PUBLIC = 'public',
@@ -68,9 +69,21 @@ export class ChatRoom {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Message, (message) => message.chatroom, {onDelete: 'CASCADE'})
-  messages: Message[];
+    @OneToMany(() => Message, (message) => message.chatroom, {onDelete: 'CASCADE'})
+    messages: Message[];
 
-  @OneToMany(() => Mute, (mute) => mute.chatroom, { onDelete: 'CASCADE' })
-  muted: Mute[];
-}
+    @OneToMany(() => Mute, (mute) => mute.chatroom, { onDelete: 'CASCADE' })
+    muted: Mute[];
+
+    @OneToMany(() => Ban, (ban) => ban.chatroom, { onDelete: 'CASCADE' })
+    banned: Ban[];
+
+
+    // @ManyToMany(() => User)
+    // @JoinTable({
+    //   name: 'chatroom_blocked_users',
+    //   joinColumn: { name: 'chatroom_id', referencedColumnName: 'id' },
+    //   inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    // })
+    // blocked: User[];
+  }

@@ -8,6 +8,8 @@ import { Profile } from 'src/entities/profile.entity';
 import { MessageService } from '../message/message.service';
 import { UserService } from 'src/user/user.service';
 import { readFileSync } from 'fs';
+import { Mute } from 'src/entities/mute.entity';
+import { Ban } from 'src/entities/ban.entity';
 
 @Injectable()
 export class ChatRoomService {
@@ -16,10 +18,10 @@ export class ChatRoomService {
     private chatRoomRepository: Repository<ChatRoom>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(Message)
-    private messageRepository: Repository<Message>,
-    @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>,
+    @InjectRepository(Mute)
+    private muteRepository: Repository<Mute>,
+    @InjectRepository(Ban)
+    private banRepository: Repository<Ban>,
 	private messageService: MessageService,
   private userService: UserService,
   ) {}
@@ -41,7 +43,7 @@ export class ChatRoomService {
       const chatRoom = this.chatRoomRepository.create({
         image: img,
         participants: [user1.profile, user2.profile],
-        admins: [user1.id, user2.id]
+        admins: [user1.id, user2.id],
       });
       await this.chatRoomRepository.save(chatRoom);
     }
@@ -68,10 +70,30 @@ export class ChatRoomService {
       mode: mode as ChatRoomMode,
       password_hash: (mode === ChatRoomMode.PROTECTED) ? password : null,
       participants: [user.profile],
-      admins: [user.id]
+      admins: [user.id],
     });
     await this.chatRoomRepository.save(chatRoom);
     return chatRoom;
+  }
+
+  async joinChatRoom(roomId: number, password: string, userId: number) {
+    const chatRoom = await this.getChatRoomById(roomId)
+    const userToAdd = await this.userService.findUserProfileById(userId)
+
+    if (chatRoom.mode == 'public') {
+        chatRoom.participants.push(userToAdd);
+        await this.updateChatRoom(chatRoom);
+      }   
+    
+    else if (chatRoom.mode == 'protected') {
+      if (password == chatRoom.password_hash) {
+        chatRoom.participants.push(userToAdd);
+        await this.updateChatRoom(chatRoom);
+      }
+      else
+        throw new UnauthorizedException('Wrong password');
+    }
+
   }
 
   async addMemberToChatRoom(roomId: number, username: string, userId: number) {
@@ -87,6 +109,27 @@ export class ChatRoomService {
     }
       if (!chatRoom.participants.find(participant => participant.id === userToAdd.id)) {
         chatRoom.participants.push(userToAdd);
+        await this.updateChatRoom(chatRoom);
+      }    
+    }
+  }
+
+  async removeMemberFromChatRoom(roomId: number, username: string, userId: number) {
+    const chatRoom = await this.getChatRoomById(roomId)
+    const isAdmin = chatRoom.admins.find(id => id === userId) !== undefined;   
+
+    if (!isAdmin)
+      throw new UnauthorizedException('You are not an admin of this group chat');
+    else {
+      const userToRemove = await this.userService.findUserProfileByUsername(username)
+      const you = await this.userService.findUserProfileById(userId)
+      if (username == you.username)
+        throw new UnauthorizedException('Cannot remove yousrelf of this group chat');
+    if (!userToRemove) {
+      throw new Error(`User with username ${username} does not exist`);
+    }
+      if (chatRoom.participants.find(participant => participant.id === userToRemove.id)) {
+        chatRoom.participants = chatRoom.participants.filter((participant) => participant.id !== userToRemove.id);
         await this.updateChatRoom(chatRoom);
       }    
     }
@@ -112,6 +155,93 @@ export class ChatRoomService {
       }
     }
   }
+
+  async removeAdminFromChatRoom(roomId: number, username: string, userId: number) {
+    const chatRoom = await this.getChatRoomById(roomId)
+    const isAdmin = chatRoom.admins.find(id => id === userId) !== undefined;   
+
+    if (!isAdmin)
+      throw new UnauthorizedException('You are not an admin of this group chat');
+    else {
+      const userToRemove = await this.userService.findUserByUsername(username)
+    if (!userToRemove) {
+      throw new Error(`User with username ${username} does not exist`);
+    }
+    if (!chatRoom.admins.includes(userToRemove.id)) {
+      throw new Error(`User with username ${username} is not an admin in this chat room`);
+    }
+    chatRoom.admins = chatRoom.admins.filter((id) => id !== userToRemove.id);
+    await this.updateChatRoom(chatRoom);
+    }
+  }
+
+  async banOrMuteUserFromChatRoom(roomId: number, username: string, userId: number, duration: string, banOrMute: boolean) {
+    const chatRoom = await this.getChatRoomById(roomId)
+    const isAdmin = chatRoom.admins.find(id => id === userId) !== undefined;   
+
+    if (!isAdmin)
+      throw new UnauthorizedException('You are not an admin of this group chat');
+    else {
+      const userProfileTo = await this.userService.findUserProfileByUsername(username)
+      if (!userProfileTo)
+        throw new Error(`User with username ${username} does not exist`);
+
+      const isToAdmin = chatRoom.admins.find(id => id === userProfileTo.id) !== undefined;   
+      if (isToAdmin)
+        throw new UnauthorizedException('Cannot mute or ban an admin');
+
+      if (chatRoom.participants.find(participant => participant.id === userProfileTo.id)) {
+        if (banOrMute) {
+
+          const mute = new Mute();
+          mute.chatroom_id = roomId;
+          mute.chatroom = chatRoom;
+          mute.user_id = userProfileTo.id;
+          mute.time_muted = new Date(Date.now() +  (Number(duration)*1000) );
+          chatRoom.muted.push(mute);
+          await this.muteRepository.save(mute);
+        }
+        else {
+          const ban = new Ban();
+          ban.chatroom_id = roomId;
+          ban.chatroom = chatRoom;
+          ban.user_id = userProfileTo.id;
+          ban.time_banned = new Date(Date.now() +  (Number(duration)*1000) );
+          chatRoom.banned.push(ban);
+          await this.banRepository.save(ban);
+        }
+        await this.updateChatRoom(chatRoom);
+      }
+    }
+  }
+
+  async isUserMutedFromChatRoom(userId: number, roomId: number) {
+    const chatRoom = await this.getChatRoomById(roomId)
+    const userProfile = await this.userService.findUserProfileById(userId)
+
+   for (let i=0; i < chatRoom.muted.length; i++) {
+    if (chatRoom.muted[i].user_id == userProfile.id) {
+
+      if (chatRoom.muted[i].time_muted > (new Date(Date.now())))
+        return true;
+    }
+   }
+   return false
+  }
+
+  async isUserBannedFromChatRoom(userId: number, roomId: number) {
+    const chatRoom = await this.getChatRoomById(roomId)
+    const userProfile = await this.userService.findUserProfileByProfileId(userId)
+
+   for (let i=0; i < chatRoom.banned.length; i++) {
+    if (chatRoom.banned[i].user_id == userProfile.id) {
+      if (chatRoom.banned[i].time_banned > (new Date(Date.now())))
+        return true;
+    }
+   }
+   return false
+  }
+
 
   async updateImageChatRoom(userId: number, file: Buffer, roomId: number) {
     const chatRoom = await this.getChatRoomById(roomId)
@@ -183,7 +313,7 @@ export class ChatRoomService {
       participants: [user.profile],
       name: name,
       image: img,
-      admins: [user.id]
+      admins: [user.id],
     });
     await this.chatRoomRepository.save(chatRoom);
     return chatRoom;
@@ -195,7 +325,7 @@ export class ChatRoomService {
   }
 
   async getChatRoomById(roomId: number): Promise<ChatRoom> {
-    const chatRoom = await this.chatRoomRepository.findOne({ where: { id: roomId }, relations: ['messages', 'participants'] });
+    const chatRoom = await this.chatRoomRepository.findOne({ where: { id: roomId }, relations: ['messages', 'participants', 'muted', 'banned'] });
     return chatRoom;
   }
 
@@ -228,10 +358,23 @@ export class ChatRoomService {
 	return messages;
   }
 
-  async deleteChatRoomById(roomId: number): Promise<void> {
-    const chatRoom = await this.chatRoomRepository.findOne({ where: { id: roomId } });
-    if (!chatRoom) {
+  async deleteChatRoomById(roomId: number, userId:number): Promise<void> {
+
+    let chatRoom = await this.getChatRoomById(roomId);
+    if (!chatRoom) 
       throw new NotFoundException('Chatroom not found');
+    const isAdmin = chatRoom.admins.find(id => id === userId) !== undefined;   
+    if (!isAdmin)
+      throw new UnauthorizedException('You are not an admin of this group chat');
+    chatRoom.last_message = null;
+    chatRoom.last_profile = null;
+    chatRoom.last_message_id = null;
+    chatRoom.last_profile_id = null;
+    await this.updateChatRoom(chatRoom);
+    let messages = await this.getMessagesByChatRoomId(roomId);
+    for (let i = 0; i < messages.length; i++) {
+      messages[i].chatroom = null;
+      await this.messageService.deleteMessageById(messages[i].id);
     }
     chatRoom.messages = [];
     await this.chatRoomRepository.remove(chatRoom);
@@ -260,6 +403,8 @@ export class ChatRoomService {
     }
     return chatRoom.participants.map((profile) => profile);
   }
+
+ 
 
   async updateChatRoom(chatRoom: ChatRoom): Promise<ChatRoom> {
     return await this.chatRoomRepository.save(chatRoom);

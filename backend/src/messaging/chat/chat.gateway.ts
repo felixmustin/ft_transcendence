@@ -50,6 +50,14 @@ export class ChatGateway
         console.error('sendMessage error: chatroomId is undefined');
         return;
       }
+      if (await this.chatRoomService.isUserMutedFromChatRoom(senderId, chatroomId)) {
+        console.error('sendMessage error: user is muted');
+        this.server.to(chatroomId.toString()).emit('is_muted', true)
+        return;
+      }
+      else
+        this.server.to(chatroomId.toString()).emit('is_muted', false)
+
       const newMessage = await this.messageService.sendToChatRoom(chatroomId, senderId, content);
       const updatedMessages = await this.chatRoomService.getMessagesByChatRoomId(chatroomId);
       if (updatedMessages.length === 1)
@@ -60,6 +68,7 @@ export class ChatGateway
       console.error('sendMessage error:', error);
     }
   }
+
   @SubscribeMessage('handshake')
   async handshake(client: Socket, payload: string){
     const response : handshake = {

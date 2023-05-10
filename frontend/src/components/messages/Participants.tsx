@@ -4,10 +4,10 @@ import { ChatRoomInterface, ProfileInterface } from './types';
 
 type Props = {
   roomId: number;
-  id: number;
+  profileId: number
 };
 
-const Participants = ({ roomId, id }: Props) => {
+const Participants = ({ roomId, profileId }: Props) => {
   const [users, setUsers] = useState<ProfileInterface[]>([]);
   const [room, setRoom] = useState<ChatRoomInterface>();
 
@@ -41,7 +41,7 @@ const Participants = ({ roomId, id }: Props) => {
   return (
     <div className="overflow-x-scroll whitespace-nowrap my-2">
       {room && users.map((user) => (
-        <SingleParticipant key={user.id} user={user} currentUserId={id} room={room} />
+        <SingleParticipant key={user.id} user={user} room={room} profileId={profileId} />
       ))}
     </div>
   );

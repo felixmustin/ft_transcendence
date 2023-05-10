@@ -34,7 +34,7 @@ export class User {
   @JoinColumn({ name: 'profileid' })
   profile: Profile;
 
-  @Column({ type: 'integer', array: true, default: '{}' })
-  blocked: number[];
+  // @Column({ type: 'integer', array: true, default: '{}' })
+  // blocked: number[];
 }
 

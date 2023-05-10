@@ -11,14 +11,16 @@ CREATE TABLE public.user_profiles
     avatar BYTEA,
     gameswon INT,
     statusid INT,
+    blocked INTEGER[] DEFAULT ARRAY[]::INTEGER[]
+
 );
 
-CREATE TABLE public.game
-(
-    id SERIAL PRIMARY KEY,
-    score1 INT,
-    score2 INT
-);
+-- CREATE TABLE public.game
+-- (
+--     id SERIAL PRIMARY KEY,
+--     score1 INT,
+--     score2 INT
+-- );
 
 CREATE TABLE public.profile_games
 (
@@ -43,10 +45,10 @@ CREATE TABLE public.Users
     user42id INT,
     refreshtoken VARCHAR(255),
     profileId INT,
-    blocked INT[],
+    -- blocked INT[],
     CONSTRAINT fk_profile
     FOREIGN KEY (profileId)
-    REFERENCES user_profiles(id)
+    REFERENCES public.user_profiles(id)
     ON DELETE SET NULL
 );
 
@@ -107,7 +109,7 @@ CREATE TABLE public.message
     ON DELETE CASCADE,
     CONSTRAINT fk_profile
     FOREIGN KEY (profile_id)
-    REFERENCES user_profiles(id)
+    REFERENCES public.user_profiles(id)
     ON DELETE CASCADE
 );
 
@@ -117,7 +119,6 @@ CREATE TABLE public.chatroom
     name VARCHAR(255) NULL,
     image BYTEA,
     admins INTEGER[] DEFAULT ARRAY[]::INTEGER[],
-    -- participants JSONB DEFAULT '[]'::jsonb,
     mode chatroommode NOT NULL DEFAULT 'private',
     password_hash VARCHAR(255) NULL,
     last_message_id INT NULL,
@@ -130,7 +131,7 @@ CREATE TABLE public.chatroom
         ON DELETE SET NULL,
     CONSTRAINT fk_last_profile
         FOREIGN KEY (last_profile_id)
-        REFERENCES user_profiles(id)
+        REFERENCES public.user_profiles(id)
         ON DELETE SET NULL
 );
 
@@ -156,7 +157,7 @@ CREATE TABLE public.chatroom_admins
         REFERENCES public.chatroom(id)
         ON DELETE CASCADE,
     FOREIGN KEY (user_id)
-        REFERENCES public.Users(id)
+        REFERENCES public.user_profiles(id)
         ON DELETE CASCADE
 );
 
@@ -175,16 +176,30 @@ CREATE TABLE public.chatroom_blocked_users
 
 CREATE TABLE public.mute
 (
-    chatroom_id INT NOT NULL,
-    user_id INT NOT NULL,
-    time_muted TIMESTAMPTZ,
+    chatroom_id INT,
+    user_id INT,
+    time_muted TIMESTAMPTZ
     PRIMARY KEY(chatroom_id, user_id),
     FOREIGN KEY (chatroom_id)
         REFERENCES public.chatroom(id)
         ON DELETE CASCADE,
-    FOREIGN KEY (user_id)
-        REFERENCES public.Users(id)
-        ON DELETE CASCADE
+    -- FOREIGN KEY (user_id)
+    --     REFERENCES public.user_profiles(id)
+    --     ON DELETE CASCADE
+);
+
+CREATE TABLE public.ban
+(
+    chatroom_id INT,
+    user_id INT,
+    time_banned TIMESTAMPTZ,
+    PRIMARY KEY(chatroom_id, user_id),
+    FOREIGN KEY (chatroom_id)
+        REFERENCES public.chatroom(id)
+        ON DELETE CASCADE,
+    -- FOREIGN KEY (user_id)
+    --     REFERENCES public.user_profiles(id)
+    --     ON DELETE CASCADE
 );
 
 ALTER TABLE public.Users OWNER TO myUsername;
@@ -198,5 +213,6 @@ ALTER TABLE public.chatroom_participants OWNER TO myUsername;
 ALTER TABLE public.chatroom_admins OWNER TO myUsername;
 ALTER TABLE public.chatroom_blocked_users OWNER TO myUsername;
 ALTER TABLE public.mute OWNER TO myUsername;
+ALTER TABLE public.ban OWNER TO myUsername;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO myUsername;

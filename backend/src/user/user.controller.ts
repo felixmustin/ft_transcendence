@@ -27,7 +27,7 @@ export class UserController {
     let profiles = [];
     const userIds = body.users;
     for (let i = 0; i < userIds.length; i++) {
-      let profile = (await this.userService.findUserProfileById(userIds[i])).username;
+      let profile = (await this.userService.findUserProfileByProfileId(userIds[i])).username;
       profiles.push(profile);
     }
     return profiles;
@@ -154,7 +154,8 @@ export class UserController {
   @Put('update/lastname')
   @UseGuards(JwtAuthGuard)
   public async updateLastname(@Req() req, @Body() body) {
-    return await this.userService.updateLastname(req.user.id, body.lastname);
+    const profile =  await this.userService.updateLastname(req.user.id, body.lastname);
+    return profile;
   }
 
   // @Patch('users/:id/profile')
@@ -167,4 +168,24 @@ export class UserController {
     return user;
   }
 
+  // @Get('profile/blocked/list')
+  // @UseGuards(JwtAuthGuard)
+  // public async getBlockedList(@Req() req) {
+  //   const blockedList = await this.userService.getBlockedList(req.user.id);
+  //   return blockedList;
+  // }
+
+  // @Post('profile/blocked/add')
+  // @UseGuards(JwtAuthGuard)
+  // public async addUserToBlockedList(@Req() req, @Body() { username }: { username: string}) {
+  //   const user = await this.userService.addUserToBlockedList(req.user.id, username);
+  //   return user;
+  // }
+
+  // @Post('profile/blocked/remove')
+  // @UseGuards(JwtAuthGuard)
+  // public async removeUserFromBlockedList(@Req() req, @Body() { username }: { username: string}) {
+  //   const user = await this.userService.removeUserFromBlockedList(req.user.id, username);
+  //   return user;
+  // }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { Dispatch, SetStateAction, useEffect } from 'react'
 import loginImg from '../../assets/login.jpg'
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
@@ -8,7 +8,7 @@ import { getSessionsToken, setSessionToken } from '../../sessionsUtils';
 import { LoginForm, tokenForm } from '../../interfaceUtils';
 
 
-const Login = ({setoken}) => {
+const Login = (props: {setToken: (token: tokenForm) => void}) => {
 
   // Initializing the values and preparing the functions to handle the form
   const [LoginForm, setLoginForm] = useState<LoginForm>({
@@ -24,27 +24,6 @@ const Login = ({setoken}) => {
   const navigate = useNavigate();
   // Function responsible for redirecting the user to the signup page
   const gotoSignUpPage = () => navigate("/signup");
-
-  const check_auth = async () => {
-    const sessionToken = await getSessionsToken();
-     await fetch('http://localhost:3001/user/id', {
-      method: 'Get',
-      headers: {
-      'Authorization': 'Bearer ' + sessionToken?.accessToken,
-      },
-    }).then(res => res.json()
-    ).then(response => {
-      if (response.statusCode >= 400) {}
-      else{
-        setoken(sessionToken);
-        navigate("/play")
-      }
-  })
-}
-
-  useEffect(() => {
-    check_auth()
-  }, []);
 
   /*
     Function responsible for updating the values of the form.
@@ -79,8 +58,8 @@ const Login = ({setoken}) => {
           setTwoAuthToken(response.token.access2FAToken)
         }
         else {
+          props.setToken(response.token);
           setSessionToken(response.token);
-          setoken(response.token);
           navigate("/play");
         }
       } 
@@ -95,7 +74,7 @@ const Login = ({setoken}) => {
     </div>
     {isTwoAuthentication ?
     <div className="relative w-[200px] py-2">
-      <TwoFactorAuthentication item={twoAuthToken}/>
+      <TwoFactorAuthentication item={twoAuthToken} setToken={props.setToken}/>
     </div>
     : null}
     <div className='bg-gradient-to-tl from-violet-900 via-slate-900 to-slate-900 flex flex-col justify-center'>

@@ -4,7 +4,7 @@ import { ProfileInterface } from '../messages/types'
 import DisplayAvatar from '../utils/DisplayAvatar'
 
 type Props = {
-  profile: ProfileInterface;
+  profile: ProfileInterface
   token: string | undefined;
 }
 

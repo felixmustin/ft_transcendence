@@ -4,16 +4,20 @@ import {
   ManyToOne,
   JoinColumn,
   Column,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 import { ChatRoom } from './chatroom.entity';
+import { Profile } from './profile.entity';
 
 @Entity('mute')
 export class Mute {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+	id: number;
+  
+  @Column()
   chatroom_id: number;
 
-  @PrimaryColumn()
+  @Column()
   user_id: number;
 
   @Column('timestamptz')
@@ -23,7 +27,7 @@ export class Mute {
   @JoinColumn({ name: 'chatroom_id' })
   chatroom: ChatRoom;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  // @ManyToOne(() => Profile, { onDelete: 'CASCADE' })
+  // @JoinColumn({ name: 'user_id' })
+  // user: Profile;
 }

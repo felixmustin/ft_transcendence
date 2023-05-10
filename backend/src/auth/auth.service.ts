@@ -12,7 +12,6 @@ import * as bcrypt from 'bcrypt';
 
 export interface JwtPayload {
   id: number
-	// isTwoFaAuthenticated : boolean
 }
 
 @Injectable()

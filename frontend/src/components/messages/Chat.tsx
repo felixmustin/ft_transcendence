@@ -7,13 +7,14 @@ import { Socket, io } from 'socket.io-client';
 import CreateRoom from './CreateRoom';
 import ChatRoomSettings from './ChatRoomSettings';
 import SocketContext from '../../context/Socket';
+import ChatRoomList from './ChatRoomList';
 
 interface DecodedToken {
   id: number;
 }
 
 type Props = {
-  accessToken: string | undefined;
+  accessToken: string;
 };
 
 const Chat = (props: Props) => {
@@ -27,6 +28,8 @@ const Chat = (props: Props) => {
   // Selected room
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [selectedRoomIdSettings, setSelectedRoomIdSettings] = useState(false);
+
+  const [displayAllRooms, setDisplayAllRooms] = useState(false);
 
 
   // Get user id from token
@@ -68,7 +71,7 @@ const Chat = (props: Props) => {
 
   // Handle click on a conversation box
   const onConvBoxClick = (roomId: number, settingBool: boolean) => {
-
+    setDisplayAllRooms(false)
     setSelectedRoomId(roomId);
     setSelectedRoomIdSettings(settingBool);
   };
@@ -78,12 +81,20 @@ const Chat = (props: Props) => {
     setCreateRoom(true);
   }
 
+  const displayRoomList = () => {
+    if (displayAllRooms)
+      setDisplayAllRooms(false)
+    else
+      setDisplayAllRooms(true)
+
+  }
+
   return (
     <div className="flex bg-violet-700 rounded-lg p-2 m-2">
       <div className="bg-violet-800 w-1/3 rounded-lg mx-1">
         {!createRoom && <button className="bg-gradient-to-tl from-violet-900 via-black to-black text-white font-xl font-bold rounded m-2 p-2 hover:bg-black" onClick={createNewRoom}>Create Room</button>}
         {createRoom && <CreateRoom token={props.accessToken} id={userId} setCreateRoom={setCreateRoom} />}
-        
+        <button className="bg-gradient-to-tl from-violet-900 via-black to-black text-white font-xl font-bold rounded m-2 p-2 hover:bg-black" onClick={displayRoomList}>Find Room</button>
         <ConvList
           rooms={rooms}
           onRoomSelect={onConvBoxClick}
@@ -92,13 +103,18 @@ const Chat = (props: Props) => {
           id = {userId}
         />
       </div>
-      {selectedRoomId && 
+      {displayAllRooms ? 
+        <ChatRoomList 
+        key={selectedRoomId}
+        myRooms={rooms}
+        token={props.accessToken}
+        />
+      :
+      (selectedRoomId && 
         selectedRoomIdSettings ? (
           <ChatRoomSettings
           key={selectedRoomId}
           room={rooms.find((room) => room.id === selectedRoomId)}
-          id={userId}
-          socket={socket}
           token={props.accessToken}
         />
       ) 
@@ -107,12 +123,11 @@ const Chat = (props: Props) => {
           key={selectedRoomId}
           room={rooms.find((room) => room.id === selectedRoomId)}
           roomId={selectedRoomId}
-          id={userId}
           socket={socket}
           token={props.accessToken}
         />
       :
-      null}
+      null)}
     </div>
   );
 };

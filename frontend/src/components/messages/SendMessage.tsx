@@ -3,12 +3,13 @@ import { Socket } from 'socket.io-client';
 
 type Props = {
   roomId: number;
-  id: number;
   socket: Socket | undefined;
+  profileId: number;
 };
 
-const SendMessage = ({ roomId, id, socket }: Props) => {
+const SendMessage = ({ roomId, socket, profileId }: Props) => {
   const [content, setContent] = useState('');
+  const [isMuted, setIsMuted] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setContent(event.target.value);
@@ -16,17 +17,25 @@ const SendMessage = ({ roomId, id, socket }: Props) => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
     if (!content) return;
 
-    if (socket)
-      socket.emit('send_message', { chatroomId: roomId, senderId: id, content })
+    if (socket) {
+      socket.emit('send_message', { chatroomId: roomId, senderId: profileId, content })
+      socket.on("is_muted", setIsMuted);
+    }
   
     setContent('');
   };
   
 
   return (
+  <div>
+    <div>
+   {isMuted ? 
+    <div>You are muted from this conv</div>
+    : null
+    }
+    </div>
     <div className='h-10 mt-auto'>
       <form className='containerWrap flex' onSubmit={handleSubmit}>
         <input
@@ -44,6 +53,7 @@ const SendMessage = ({ roomId, id, socket }: Props) => {
         </button>
       </form>
     </div>
+  </div>
   );
 };
 

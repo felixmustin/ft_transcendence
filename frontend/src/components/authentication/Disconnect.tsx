@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { removeSessionsToken } from '../../sessionsUtils';
-import Loading from '../utils/Loading';
-import { tokenForm } from '../../interfaceUtils';
+
 
 type Props = {
-  item: tokenForm | undefined;
+  accessToken: string;
 }
 
 const Disconnect = (props: Props) => {
@@ -15,7 +14,7 @@ const Disconnect = (props: Props) => {
 
   const disconnect = () => {
     let url = 'http://localhost:3001/user/disconnect/'
-    let auth = 'Bearer ' + props.item?.accessToken;
+    let auth = 'Bearer ' + props.accessToken;
     fetch(url, {
       method: 'PUT',
       headers: {'Authorization': auth}
@@ -25,13 +24,14 @@ const Disconnect = (props: Props) => {
       else {
         removeSessionsToken()
         navigate('/');
+        window.location.reload();
       } 
     });
   };
 
   const deleteAcc = () => {
     let url = 'http://localhost:3001/user/delete/'
-    let auth = 'Bearer ' + props.item?.accessToken;
+    let auth = 'Bearer ' + props.accessToken;
     fetch(url, {
       method: 'DELETE',
       headers: {'Authorization': auth}

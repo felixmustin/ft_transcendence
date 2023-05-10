@@ -7,7 +7,7 @@ import { LoginForm, tokenForm } from '../../interfaceUtils';
 import { getSessionsToken } from '../../sessionsUtils';
 
 
-const Signup = ({setoken}) => {
+const Signup = (props: {setToken: (token: tokenForm) => void}) => {
 
   // Initializing the values and preparing the functions to handle the form
   const [LoginForm, setLoginForm] = useState<LoginForm>({
@@ -16,22 +16,12 @@ const Signup = ({setoken}) => {
   });
 
   const [isAuthenticated, setAuthentication] = useState(false);
-  const [token, setToken] = useState<tokenForm>();
+  const [tokenTmp, setTokenTmp] = useState<tokenForm>();
 
   // Used for navigation
   const navigate = useNavigate();
   // Function responsible for redirecting the user to the signup page
-  const gotoLoginPage = () => navigate("/");
-
-  useEffect(() => {
-    async function getToken() {
-      const sessionToken = await getSessionsToken();
-      if (sessionToken){
-        setoken(sessionToken);
-        navigate("/play");}
-    }
-    getToken();
-  }, []);
+  const gotoLoginPage = () => navigate("/login");
 
   /*
     Function responsible for updating the values of the form.
@@ -61,14 +51,14 @@ const Signup = ({setoken}) => {
           alert(response.message);
         } else {
           setAuthentication(true);
-          setToken(response.token);
+          setTokenTmp(response.token);
         }
       });
   };
 
 
   if (isAuthenticated)
-    return <UserInfo item={token!} setoken={setoken}/>
+    return <UserInfo item={tokenTmp!} setToken={props.setToken} />
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
     <div className='hidden sm:block'>

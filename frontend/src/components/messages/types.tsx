@@ -45,7 +45,9 @@ export interface ChatRoomInterface {
     created_at: Date;
     updated_at: Date;
     messages: MessageInterface[];
-    admin: ProfileInterface[];
+    admin: number[];
+    muted: any[];
+    banned: any[];
   }
   
   export interface MessageInterface {

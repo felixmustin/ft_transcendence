@@ -7,6 +7,7 @@ import { User } from '../entities/user.entity';
 import { ChatRoom } from 'src/entities/chatroom.entity';
 import { Game } from 'src/entities/game.entity';
 import { Mute } from 'src/entities/mute.entity';
+import { Ban } from 'src/entities/ban.entity';
 
 @Module({
   imports: [
@@ -17,10 +18,10 @@ import { Mute } from 'src/entities/mute.entity';
       username: 'myUsername',
       password: 'myPassword',
       database: 'myDatabase',
-      entities: [User, Profile, Friends, ChatRoom, Message, Game, Mute],
+      entities: [User, Profile, Friends, ChatRoom, Message, Game, Mute, Ban],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Profile, ChatRoom, Message, Game, Mute]),
+    TypeOrmModule.forFeature([User, Profile, ChatRoom, Message, Game, Mute, Ban]),
   ],
 })
 export class DatabaseModule {}

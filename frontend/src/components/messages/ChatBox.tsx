@@ -5,12 +5,13 @@ import { Socket } from 'socket.io-client';
 
 type Props = {
   roomId?: number;
-  id: number;
   socket: Socket | undefined;
+  profileId: number;
   token: string | undefined;
 };
 
-const ChatBox = ({ roomId, id, socket, token }: Props) => {
+const ChatBox = ({ roomId, socket, token, profileId }: Props) => {
+
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [blocked, setBlocked] = useState<number[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -50,16 +51,19 @@ const ChatBox = ({ roomId, id, socket, token }: Props) => {
     fetchConversation();
   }, [socket, roomId]);
 
+
   useEffect(() => {
+
     if (!socket || !roomId) return;
 
-    socket.emit("join_room", roomId);
+    socket.emit("join_room",{ chatroomId: roomId, senderId: profileId });
 
     const handleUpdateConversation = (updatedMessages: MessageInterface[]) => {
       setMessages(updatedMessages);
     };
 
     socket.on("update_conversation", handleUpdateConversation);
+
 
     return () => {
       socket.off("update_conversation", handleUpdateConversation);
@@ -74,7 +78,7 @@ const ChatBox = ({ roomId, id, socket, token }: Props) => {
   return (
     <div className="overflow-y-auto h-[25rem] max-h-[25rem]">
       {messages.map((message) => (
-        <Message key={message.id} message={message} currentUserId={id} blocked={blocked}/>
+        <Message key={message.id} message={message} profileId={profileId} blocked={blocked}/>
       ))}
       <div ref={messagesEndRef}></div>
     </div>

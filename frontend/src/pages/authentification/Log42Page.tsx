@@ -7,7 +7,7 @@ import { setSessionToken } from '../../sessionsUtils';
 import { UsernameInput, tokenForm } from '../../interfaceUtils';
 import TwoFactorAuthentication from '../../components/authentication/TwoFactorAuthentication';
 
-const Log42Page = ({setoken}) => {
+const Log42Page = (props: {setToken: (token: tokenForm) => void}) => {
 
   // Initialize form values
   const [UsernameInput, setUsernameInput] = useState<UsernameInput>({
@@ -25,7 +25,6 @@ const Log42Page = ({setoken}) => {
   // Because the user coming to this page has the cookies, it must be removed and set in session when valid username is set
   useEffect(() => {
 
-    
     const tok = Cookies.get("token");
 
     if (tok) {
@@ -40,13 +39,13 @@ const Log42Page = ({setoken}) => {
         ).then(response => {
             if (response.statusCode >= 400) {
               alert(response.message);
-              navigate("/");
+              navigate("/login");
             } else {
               const usernameTmp = "Default" + response.id;
               if (response.username != usernameTmp && response.username != null) {
                 setSessionToken(parseTok);
                 Cookies.remove("token");
-                setoken(parseTok);
+                props.setToken(parseTok);
                 navigate('/play')
               }
               else 
@@ -91,11 +90,11 @@ const Log42Page = ({setoken}) => {
     ).then(response => {
         if (response.statusCode >= 400) {
           alert(response.message);
-          navigate("/");
+          navigate("/login");
         } else {
           setSessionToken(token);
           Cookies.remove("token");
-          setoken(token);
+          props.setToken(token!);
           navigate("/play");
         }
       });
@@ -106,7 +105,7 @@ const Log42Page = ({setoken}) => {
         <div>
         {is2FA ? 
           <div> 
-            <TwoFactorAuthentication item={token2FA}/> 
+            <TwoFactorAuthentication item={token2FA} setToken={props.setToken}/> 
           </div> 
           : needUsername ?
           <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>

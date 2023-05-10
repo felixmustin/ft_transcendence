@@ -5,14 +5,12 @@ import { Profile } from 'src/entities/profile.entity';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Game } from '../entities/game.entity';
-// import { Friends } from '../entities/friends.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Profile) private userProfileRepository: Repository<Profile>,
-    // @InjectRepository(Friends) private friendsRepository: Repository<Friends>,
   ) {}
 
   async allUsers(): Promise<User[]> {
@@ -47,7 +45,6 @@ export class UserService {
     return user;
   }
 
-
   async findUserByUsername(username: string): Promise<User> {
     const userProfile = await this.findUserProfileByUsername(username)
     const user = await this.userRepository.createQueryBuilder('user')
@@ -66,6 +63,11 @@ export class UserService {
   
     const userProfile = user.profile;
     return userProfile;
+  }
+
+  async findUserProfileByProfileId(id: number): Promise<Profile> {
+    const profile = await this.userProfileRepository.findOne({ where: { id: id } });
+    return profile;
   }
 
   async getLadder(): Promise<{ username: string; won: number }[]> {
@@ -100,56 +102,59 @@ export class UserService {
     return sortedLadder;
   }
 
-  async blockUser(currentUserId: number, userToBlockId: number): Promise<void> {
-    if (currentUserId === userToBlockId) {
-      throw new BadRequestException('You cannot block yourself');
-    }
-    const currentUser = await this.findUserById(currentUserId);
-    if (!currentUser) {
+  async blockUser(currentUserId: number, toBlockProfileId: number): Promise<void> {
+    const currentUserProfile = await this.findUserProfileById(currentUserId);
+    if (!currentUserProfile) {
       throw new NotFoundException('Current user not found');
     }
-    if (currentUser.blocked.includes(userToBlockId)) {
+    if (currentUserProfile.id === toBlockProfileId) {
+      throw new BadRequestException('You cannot block yourself');
+    }
+
+    if (currentUserProfile.blocked.includes(toBlockProfileId)) {
       throw new BadRequestException('User already blocked');
     }
-    currentUser.blocked.push(userToBlockId);
-    await this.userRepository.save(currentUser);
+    currentUserProfile.blocked.push(toBlockProfileId);
+    await this.userProfileRepository.save(currentUserProfile)
+    await this.updateUserProfile(currentUserId, currentUserProfile);
   }
 
   
   async getBlockedUsers(currentUserId: number): Promise<Profile[]> {
-    const currentUser = await this.findUserById(currentUserId);
-    if (!currentUser) {
+    const currentUserProfile = await this.findUserProfileById(currentUserId);
+    if (!currentUserProfile) {
       throw new NotFoundException('Current user not found');
     }
-    console.log(currentUser);
-    if (!currentUser.blocked) {
+    console.log(currentUserProfile);
+    if (!currentUserProfile.blocked) {
       return [];
     }
     const blockedProfils = [] as Profile[];
-    for (const blockedUserId of currentUser.blocked) {
+    for (const blockedUserId of currentUserProfile.blocked) {
       blockedProfils.push(await this.findUserProfileById(blockedUserId));
     }
     return blockedProfils;
   }
 
   async getBlockedUsersList(currentUserId: number): Promise<number[]> {
-    const user = await this.findUserById(currentUserId);
-    return user.blocked;
+    const currentUserProfile = await this.findUserProfileById(currentUserId);
+    return currentUserProfile.blocked;
   }
 
 
-  async unblockUser(currentUserId: number, toUnblockId: number): Promise<void> {
-    const currentUser = await this.findUserById(currentUserId);
-    const toUnblockUser = await this.findUserById(toUnblockId);
-    if (!currentUser || !toUnblockUser) {
+  async unblockUser(currentUserId: number, toUnblockProfileId: number): Promise<void> {
+    const currentUserProfile = await this.findUserProfileById(currentUserId);
+    const toUnblockUserProfile = await this.findUserProfileByProfileId(toUnblockProfileId);
+    if (!currentUserProfile || !toUnblockUserProfile) {
       throw new NotFoundException('User not found');
     }
-    console.log('Blocked list: ', currentUser.blocked);
-    if (!currentUser.blocked.includes(toUnblockId)) {
+    console.log('Blocked list: ', currentUserProfile.blocked);
+    if (!currentUserProfile.blocked.includes(toUnblockProfileId)) {
       throw new BadRequestException('User not blocked');
     }
-    currentUser.blocked = currentUser.blocked.filter((id) => id !== toUnblockId);
-    await this.userRepository.save(currentUser);
+    currentUserProfile.blocked = currentUserProfile.blocked.filter((id) => id !== toUnblockProfileId);
+    await this.userProfileRepository.save(currentUserProfile)
+    await this.updateUserProfile(currentUserId, currentUserProfile);
   }
 
   async findUserByloginName(loginName: string): Promise<User> {
@@ -229,11 +234,6 @@ export class UserService {
 
 
 
-  // async findUserByUsername(username: string): Promise<User> {
-  //   const userProfile = await this.userProfileRepository.findOne({ where: { username: username} });
-  //   return user;
-  // }
-
   async findUserProfileByUsername(username: string): Promise<Profile> {
     const userProfile = await this.userProfileRepository.createQueryBuilder("profile")
       .leftJoinAndSelect("profile.games", "games")
@@ -310,23 +310,25 @@ export class UserService {
   async updateEmail(id: number, newEmail: string): Promise<Profile> {
     const userProfile = await this.findUserProfileById(id)
     userProfile.email = newEmail;
-    await this.updateUserProfile(id,userProfile)
-    return (userProfile)
+    const newProfile = await this.userProfileRepository.save(userProfile)
+    await this.updateUserProfile(id,newProfile)
+    return (newProfile)
   }
 
   async updateFirstname(id: number, newFirstname: string): Promise<Profile> {
     const userProfile = await this.findUserProfileById(id)
     userProfile.firstname = newFirstname;
-    await this.updateUserProfile(id,userProfile)
-    return (userProfile)
+    const newProfile =  await this.userProfileRepository.save(userProfile)
+    await this.updateUserProfile(id,newProfile)
+    return (newProfile)
   }
 
   async updateLastname(id: number, newLastname: string): Promise<Profile> {
     const userProfile = await this.findUserProfileById(id)
     userProfile.lastname = newLastname;
-    await this.updateUserProfile(id,userProfile)
-    return (userProfile)
+    const newProfile =  await this.userProfileRepository.save(userProfile)
+    await this.updateUserProfile(id,newProfile)
+    return (newProfile)
   }
-
 
 }

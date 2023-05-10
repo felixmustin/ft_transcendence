@@ -7,7 +7,7 @@ import { SignupForm, tokenForm } from '../../interfaceUtils';
 
 type Props = {
   item: tokenForm,
-  setoken: any, 
+  setToken: (token: tokenForm) => void
 }
 
 const UserInfo = (props: Props) => {
@@ -25,7 +25,7 @@ const UserInfo = (props: Props) => {
   useEffect(() => {
     if (!props.item)
       navigate('/');
-    }, [props.item])
+    }, [])
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = event.target;
@@ -45,7 +45,7 @@ const UserInfo = (props: Props) => {
       }).then(response => {
           if (response.ok) {
             setSessionToken(props.item);
-            props.setoken(props.item);
+            props.setToken(props.item);
             navigate('/play');
           }  else if (response.status === 401){
               alert('Please login first');}

@@ -1,6 +1,5 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { date } from 'joi';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { Friends } from '../entities/friends.entity';

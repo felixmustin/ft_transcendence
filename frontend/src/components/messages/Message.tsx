@@ -3,12 +3,12 @@ import { MessageInterface } from './types';
 
 type Props = {
   message: MessageInterface;
-  currentUserId: number;
+  profileId: number;
   blocked: number[];
 };
 
-const Message = ({ message, currentUserId, blocked }: Props) => {
-  const isCurrentUser = message.profile_id === currentUserId;
+const Message = ({ message, profileId, blocked }: Props) => {
+  const isCurrentUser = message.profile_id === profileId;
   const isBlocked = blocked.includes(message.profile_id);
 
   // If the sender is blocked, don't display the message

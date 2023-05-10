@@ -5,9 +5,6 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { CreateUserProfileDto } from '../user/dto/create-user-profile.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guards';
 import { FortytwoGuard } from './guards/fortytwo.guards';
-import { UserService } from 'src/user/user.service';
-import { TwoFactorAuthenticationService } from './twoFactorAuthentication.service';
-// import { MySession } from 'src/mySession'
 
 @Controller('auth')
 export class AuthController {

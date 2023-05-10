@@ -43,28 +43,21 @@ export class StatusService {
 		private readonly jwtStrategy: JwtStrategy, 
 		private readonly userservice: UserService,
 		@InjectRepository(Profile)
-    	private userRepository: Repository<Profile>,
-		) {}
+    	private userProfileRepository: Repository<Profile>,
+	) {}
 	async login(client: any){
-		// try {
-			const id = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
-			const user: Profile = await this.userservice.findUserProfileById(id.id);
-			user.statusid = 1;
-			await this.userRepository.save(user);
-			// this.identitymap.set(client.id, user);
-			this.register_user(client.id, user);
-		// } catch (error) {
-		// 	throw new WsException('Unauthorized');
-		// }
+		const payload = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
+		const profile = await this.userservice.findUserProfileById(payload.id);
+		profile.statusid = 1;
+		await this.userProfileRepository.save(profile)
+		this.register_user(client.id, profile);
 	}
 
 	async logout(client: any){
-		const user = this.id_to_profile.get(client.id)
-		user.statusid = 0;
-		await this.userRepository.save(user);
-		// this.identitymap.delete(client.id);
+		this.update_status(client, 0)
 		this.delete_id(client.id);
 	}
+	
 	delete_self_notif(client: any){
 		const user = this.id_to_profile.get(client.id);
 		const notif = this.notification.get(user.username)
@@ -185,6 +178,6 @@ export class StatusService {
 		const user = this.id_to_profile.get(client.id);
 		const profile = await this.userservice.findUserProfileById(user.id);
 		profile.statusid = data;
-		await this.userRepository.save(profile);
+		await this.userProfileRepository.save(profile);
 	}
 }

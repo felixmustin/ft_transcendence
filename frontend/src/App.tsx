@@ -1,11 +1,10 @@
 import './index.css'
-import { BrowserRouter, Routes, Route, Outlet, useParams, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Outlet, useParams, useNavigate, Navigate } from 'react-router-dom'
 import Login from './pages/authentification/Login'
 import Signup from './pages/authentification/Signup'
 import Profile from './pages/main/Profile'
 import Social from './pages/main/Social'
 import Log42Page from './pages/authentification/Log42Page'
-import UserInfo from './components/authentication/UserInfo'
 import Settings from './pages/main/Settings'
 import Play from './pages/main/Play'
 import ChatPage from './pages/main/ChatPage'
@@ -14,6 +13,11 @@ import { useEffect, useState } from 'react'
 import { tokenForm } from './interfaceUtils'
 import { getSessionsToken } from './sessionsUtils'
 import { type } from 'os'
+import Loading from './components/utils/Loading'
+
+type Props = {
+  token: tokenForm;
+}
 // import {SocketContext, socket} from './context/Socket';
 export type notification = {
 	type: string,
@@ -35,51 +39,61 @@ export type noti_payload = {
 	data: string | undefined,
 }
 
-function ProfileWrapper() {
+function ProfileWrapper({token}: Props) {
     const { username } = useParams<{ username?: string }>();
-    return <Profile username={username} />;
+    return <Profile username={username} token={token.accessToken}/>;
   }
 
 function App() {
   const [token, setToken] = useState<tokenForm>();
-  // const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getToken() {
       const sessionToken = await getSessionsToken();
-      // if (!sessionToken)
-      //   navigate('/')
-      setToken(sessionToken);
+      if (sessionToken) {
+        setToken(sessionToken);
+      }
+      setLoading(false)      
     }
     getToken();
   }, []);
-  const site = (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/profile/*" element={<ProfileWrapper />}>
-          <Route index element={<Profile />} />
-          <Route path=":username" element={<Outlet />} />
-        </Route>
-        <Route path='/social' element={<Social />} />
-        <Route path='/settings' element={<Settings />} />
-        <Route path='/play' element={<Play />} />
-        <Route path='/chatpage' element={<ChatPage />} />
-      </Routes>
-    </BrowserRouter>
-  );
-  if (token){
-  return (<SocketContextComponent token={token.accessToken} adress="ws://127.0.0.1:3001/" children={site}/>)}
-  else
-  return (
-          
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login setoken={setToken} />} />
-        <Route path='/signup' element={<Signup setoken={setToken} />} />
-        <Route path='/log42page' element={<Log42Page setoken={setToken} />} />
-        </Routes>
-    </BrowserRouter>
-          )
+
+
+  const routes = ( 
+  <BrowserRouter>
+    <Routes>
+      {(token && token.accessToken) ? (
+        <>
+          <Route path="/" element={<Navigate to="/play" />} />
+          <Route path="/profile/*" element={<ProfileWrapper token={token}/>}>
+            <Route index element={<Profile token={token.accessToken}/>} />
+            <Route path=":username" element={<Outlet />} />
+          </Route>
+          <Route path='/social' element={<Social token={token.accessToken}/>} />
+          <Route path='/settings' element={<Settings token={token.accessToken} />} />
+          <Route path='/play' element={<Play token={token.accessToken} />} />
+          <Route path='/chatpage' element={<ChatPage token={token.accessToken}/>} />
+        </>
+      ) : (
+        <>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path='/login' element={<Login setToken={setToken} />} />
+          <Route path='/signup' element={<Signup setToken={setToken} />} />
+          <Route path='/log42page' element={<Log42Page setToken={setToken} />} />
+        </>
+      )}
+    </Routes>
+  </BrowserRouter>  );
+
+  
+  if (loading) {
+    return <Loading />;
+  } else if (token && token.accessToken) {
+    return (<SocketContextComponent token={token.accessToken} adress="ws://127.0.0.1:3001/" children={routes} />);
+  } else {
+    return routes;
+  }
 }
 
 export default App
