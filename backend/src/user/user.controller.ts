@@ -1,4 +1,4 @@
-import { Body, Request, Controller, Get, Post, Param,Delete,Patch,HttpStatus, UseGuards, Put, Req, UploadedFile, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Body, Request, Controller, Get, Post, Param,Delete,Patch,HttpStatus, UseGuards, Put, Req, UploadedFile, UseInterceptors, UploadedFiles, ParseIntPipe } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -43,7 +43,8 @@ export class UserController {
   @Get('profile/flex/:username')
   @UseGuards(JwtAuthGuard)
   async getUserFlexProfileByUsername(@Request() req, @Param('username') username: string) {
-    const {played, won, stomp, rank} = await this.userService.findUserFlexProfileByUsername(req.user.id);
+    const user = await this.userService.findUserByUsername(username);
+    const {played, won, stomp, rank} = await this.userService.findUserFlexProfileById(user.id);
     return {played, won, stomp, rank};
   }
 
@@ -52,6 +53,38 @@ export class UserController {
   async getUserProfileByUsername(@Request() req, @Param('username') username: string) {
     const userProfile = await this.userService.findUserProfileByUsername(username);
     return userProfile;
+  }
+
+  @Post('block/:userId')
+  @UseGuards(JwtAuthGuard)
+  async blockUser(@Request() req: any, @Param('userId', ParseIntPipe) userId: number) {
+    await this.userService.blockUser(req.user.id, userId);
+    const user = await this.userService.findUserById(req.user.id);
+    console.log('Blocked user after the call to block:', user);
+    return { status: HttpStatus.OK, message: 'User has been blocked successfully' };
+  }
+
+  @Get('blocked')
+  @UseGuards(JwtAuthGuard)
+  async getBlockedUsers(@Request() req: any) {
+    const blockedUsers = await this.userService.getBlockedUsers(req.user.id);
+    console.log('Blocked users from the service :', blockedUsers);
+    return blockedUsers;
+  }
+
+  @Get('blocked/list')
+  @UseGuards(JwtAuthGuard)
+  async getBlockedUsersList(@Request() req: any) {
+    const blockedUsersList = await this.userService.getBlockedUsersList(req.user.id);
+    console.log('Blocked users from the service :', blockedUsersList);
+    return blockedUsersList;
+  }
+
+
+  @Delete('unblock/:userId')
+  @UseGuards(JwtAuthGuard)
+  async unblockUser(@Request() req: any, @Param('userId', ParseIntPipe) userId: number) {
+    return await this.userService.unblockUser(req.user.id, userId);
   }
 
   @Get('ladder')

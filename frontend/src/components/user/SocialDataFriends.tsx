@@ -14,10 +14,11 @@ type Props = {
     firstname: string;
     lastname: string;
     age: number;
-    avatar: {type: string, data: []}
+    avatar: {type: string, data: []},
+    statusid: number;
   },
   item: {
-    accessToken: string;
+    accessToken: string | undefined;
   };
   onChange: () => void;
 }
@@ -93,24 +94,28 @@ const SocialDataFriends = (props: Props) => {
         <h1>{ props.item.status }</h1> */}
         <div>
         <button
-          className="items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+          className="items-center p-2 m-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
           onClick={handleLaunchGame}
           >
           Game
           </button>
           <button
-          className="items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+          className="items-center p-2 m-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
           onClick={handleMessage}
           >
           Message
           </button>
         </div>
         <button
-          className="items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+          className="items-center p-2 m-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
           onClick={handleRemove}
           >
           Remove friends
           </button>
+          <div className='flex items-center'>
+          <div className={`h-3 w-3 rounded-full m-2 ${props.profile.statusid === 1 ? 'bg-green-500' : 'bg-red-500'}`}></div>
+          {props.profile.statusid === 1 ? <p className='ml-2'>Online</p> : <p className='ml-2'>Offline</p> }
+        </div>
       </div>
       <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-violet-900'/>
     </div>

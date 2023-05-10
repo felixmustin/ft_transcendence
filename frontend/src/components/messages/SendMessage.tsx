@@ -16,7 +16,9 @@ const SendMessage = ({ roomId, id, socket }: Props) => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-  
+
+    if (!content) return;
+
     if (socket)
       socket.emit('send_message', { chatroomId: roomId, senderId: id, content })
   

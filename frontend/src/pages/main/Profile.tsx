@@ -24,73 +24,56 @@ type Props = {
 }
 
 const Profile = ({ username }: Props) => {
-  // Error management
   const [error, setError] = useState(null);
-  // Loading management
   const [isLoaded, setIsLoaded] = useState(false);
-  // User data retrieved from the API
   const [profile, setProfile] = useState<ProfileInterface>();
   const [token, setToken] = useState<tokenForm>();
   const [isTokenSet, setIsTokenSet] = useState(false);
   const [flexData, setFlexData] = useState<FlexData>();
-
-
-  // Navigation
   const navigate = useNavigate();
-  // Session and auth
+
   useEffect(() => {
-    async function getToken() {
+    const getToken = async () => {
       const sessionToken = await getSessionsToken();
-      if (!sessionToken)
-        navigate('/')
+      if (!sessionToken) navigate('/');
       setToken(sessionToken);
-      setIsTokenSet(true)
-    }
+      setIsTokenSet(true);
+    };
     getToken();
   }, []);
 
-
-  // Fetch user data and handles loading and error.
-  // Depending on if the user asked for another user's profile or his own,
-  // the API will return different data.
   useEffect(() => {
     const fetchData = async () => {
-      const auth = 'Bearer ' + token?.accessToken;
-      const url = username
-        ? `http://localhost:3001/user/profile/${username}`
-        : 'http://localhost:3001/user/profile';
-
-      try {
-        const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
-        const result = await res.json();
-        if (result.statusCode === 401)
-              navigate('/');
-        else {
+      if (!token) {
+        navigate('/');
+      } else {
+        const auth = 'Bearer ' + token.accessToken;
+        const url = username
+          ? `http://localhost:3001/user/profile/${username}`
+          : 'http://localhost:3001/user/profile';
+        try {
+          const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
+          const result = await res.json();
+          if (result.statusCode === 401) navigate('/');
+          else {
+            setIsLoaded(true);
+            setProfile(result);
+          }
+        } catch (error) {
           setIsLoaded(true);
-          setProfile(result);
+          setError(error);
         }
-      } catch (error) {
-        setIsLoaded(true);
-        setError(error);
       }
     };
 
     if (isTokenSet) {
-      if (!token) {
-        navigate('/');
-      } else {
-        fetchData();
-      }
+      fetchData();
     }
   }, [isTokenSet, username]);
 
-
-  // Fetch user flex data
   useEffect(() => {
     const fetchFlexData = async () => {
-      if (!token) {
-        return;
-      }
+      if (!token) return;
       const auth = 'Bearer ' + token.accessToken;
       const url = username
         ? `http://localhost:3001/user/profile/flex/${username}`
@@ -114,19 +97,24 @@ const Profile = ({ username }: Props) => {
   };
 
   const handleBlockUser = async () => {
-    //try {
-    //  const auth = 'Bearer ' + token.accessToken;
-    // // Call the API to add the user as a friend
-    // const res = await fetch(`http://localhost:3001/user/${profile.id}/block`, { method: 'POST', headers: {
-    //  'Authorization': auth,
-    //  },});
-    //  if (res.ok)
-    //    alert("User blocked");
-    //  else if (res.status == 400)
-    //    alert("User already blocked")
-    //} catch (error) {
-    // console.error("Error blocking user:", error);
-    //}
+    try {
+      const auth = 'Bearer ' + token?.accessToken;
+      const res = await fetch(`http://localhost:3001/user/block/${profile?.id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': auth,
+        },
+      });
+  
+      if (res.ok) {
+        alert("User blocked");
+      } else {
+        console.error("Error blocking user:", res.statusText);
+      }
+    }
+    catch (error) {
+      console.error("Error blocking user:", error);
+    }
   };
 
   // This needs to be updated to use the API.
@@ -195,25 +183,25 @@ const Profile = ({ username }: Props) => {
                 {username && (
                   <div className="flex justify-center space-x-4 my-4">
                     <button
-                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                     onClick={handleLaunchGame}
                     >
                     Game
                     </button>
                     <button
-                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                     onClick={handleAddFriend}
                     >
                     Add
                     </button>
                     <button
-                      className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                      className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                       onClick={handleSendMessage}
                     >
                       Message
                     </button>
                     <button
-                    className="w-[75px] h-[40px] items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
+                    className="w-[75px] h-[40px] border-black items-center py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white rounded-lg"
                     onClick={handleBlockUser}
                     >
                     Block

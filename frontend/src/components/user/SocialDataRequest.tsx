@@ -7,7 +7,7 @@ type Props = {
     date: string;
     username: string;
   };
-  item: { accessToken: string; };
+  item: { accessToken: string | undefined; };
 
   onChange: () => void;
 }

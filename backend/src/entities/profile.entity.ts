@@ -45,11 +45,5 @@ export class Profile {
 
   @Column({ default: 0 })
   statusid: number;
-  // @ManyToMany(() => Game, (game) => game.players)
-  // @JoinTable({
-  //   name: 'profile_games',
-  //   joinColumn: { name: 'profile_id', referencedColumnName: 'id' },
-  //   inverseJoinColumn: { name: 'game_id', referencedColumnName: 'id' },
-  // })
-  // games: Game[];
+
 }

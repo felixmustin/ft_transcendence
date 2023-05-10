@@ -20,6 +20,9 @@ const MatchResume = ({ game, currentUserId }: Props) => {
       try {
         const response = await fetch(`http://localhost:3001/user/username/${id}`, { method: 'GET' });
         const userData = await response.text();
+        if (response.status !== 200) {
+          setter('Unknown');
+        }
         setter(userData);
       } catch (error) {
         console.error(`Error fetching user data for ID ${id}:`, error);

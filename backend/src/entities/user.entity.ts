@@ -4,13 +4,8 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToOne,
-  JoinColumn,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
+  JoinColumn
 } from 'typeorm';
-import { ChatRoom } from './chatroom.entity';
-import { Message } from './message.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -38,5 +33,8 @@ export class User {
   @OneToOne(() => Profile, { cascade: true })
   @JoinColumn({ name: 'profileid' })
   profile: Profile;
+
+  @Column({ type: 'integer', array: true, default: '{}' })
+  blocked: number[];
 }
 

@@ -21,15 +21,6 @@ const Chat = (props: Props) => {
   const { SocketState, SocketDispatch } = React.useContext(SocketContext);
   const socket = SocketState.socket;
 
-  // useEffect(() => {
-  //   const newSocket = io("http://localhost:3001/chat");
-  //   setSocket(newSocket);
-
-  //   return () => {
-  //     newSocket.close();
-  //   };
-  // }, []);
-
   // Rooms
   const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);
   const [createRoom, setCreateRoom] = useState<boolean>(false);
@@ -90,7 +81,7 @@ const Chat = (props: Props) => {
   return (
     <div className="flex bg-violet-700 rounded-lg p-2 m-2">
       <div className="bg-violet-800 w-1/3 rounded-lg mx-1">
-        {!createRoom && <button className='m-2' onClick={createNewRoom}>Create Room</button>}
+        {!createRoom && <button className="bg-gradient-to-tl from-violet-900 via-black to-black text-white font-xl font-bold rounded m-2 p-2 hover:bg-black" onClick={createNewRoom}>Create Room</button>}
         {createRoom && <CreateRoom token={props.accessToken} id={userId} setCreateRoom={setCreateRoom} />}
         
         <ConvList
@@ -118,6 +109,7 @@ const Chat = (props: Props) => {
           roomId={selectedRoomId}
           id={userId}
           socket={socket}
+          token={props.accessToken}
         />
       :
       null}

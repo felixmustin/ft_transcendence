@@ -12,9 +12,10 @@ type Props = {
 };
 
 const ConvList = ({ rooms, onRoomSelect, socket, token, id }: Props) => {
+
   return (
     <div
-      className="bg-violet-800 rounded-lg mx-1 overflow-y-auto max-h-[calc(6*6.5rem)]"
+      className="bg-violet-800 rounded-lg mx-1 overflow-y-auto max-h-[calc(6*5.5rem)]"
     >
       {rooms.map((room) => (
         <ConvBox

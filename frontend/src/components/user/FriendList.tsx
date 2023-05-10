@@ -2,21 +2,20 @@ import React, { useEffect, useState } from 'react'
 import SocialDataFriends from './SocialDataFriends';
 import SocialDataRequest from './SocialDataRequest';
 import Error from '../../components/utils/Error'
+import { ProfileInterface } from '../messages/types';
 
 type Props = {
-  item: {
     accessToken: string | undefined;
-  };
 }
 
-const FriendList = (props: Props) => {
+const FriendList = ({accessToken}: Props) => {
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<Error>();
     const [friends, setFriends] = useState([]);
     const [requestList, setRequestList] = useState([]);
     const [change, onChange] = useState(false);
 
-    const auth = 'Bearer ' + props.item.accessToken;
+    const auth = 'Bearer ' + accessToken;
 
     useEffect(() => {
             const fetchFriends = async () => {
@@ -27,7 +26,7 @@ const FriendList = (props: Props) => {
         
                 if (res.ok)
                   setFriends(result);
-              } catch (error) {
+              } catch (error : any) {
                 setError(error);
               }
             };
@@ -39,7 +38,7 @@ const FriendList = (props: Props) => {
                 
                 if (res.ok)
                   setRequestList(result);
-              } catch (error) {
+              } catch (error : any) {
                 setError(error);
               }
             };
@@ -72,7 +71,7 @@ const FriendList = (props: Props) => {
             </div>
             <div className='bg-violet-700 rounded-lg p-2 m-2'>
               {Object.entries(requestList).map(([key, request]) => (
-                    <SocialDataRequest key={key} request={request} item={{ accessToken: props.item.accessToken }} onChange={handleChange}/>
+                    <SocialDataRequest key={key} request={request} item={{ accessToken: accessToken }} onChange={handleChange}/>
                 ))}
             </div>
           </>
@@ -82,7 +81,7 @@ const FriendList = (props: Props) => {
         </div>
         <div className='bg-violet-700 rounded-lg p-2 m-2'>
             {Object.entries(friends).map(([key, profile]) => (
-                <SocialDataFriends key={key} profile={profile} item={{ accessToken: props.item.accessToken }} onChange={handleChange}/>
+                <SocialDataFriends key={key} profile={profile} item={{ accessToken: accessToken }} onChange={handleChange}/>
             ))}
         </div>
       </div>
