@@ -13,6 +13,7 @@ interface UpdateLastMessageData {
 }
 
 type Props = {
+  profileId: number;
   room: ChatRoomInterface;
   onBoxClick: (roomId: number, settingBool: boolean) => void;
   socket: Socket | undefined;
@@ -20,7 +21,7 @@ type Props = {
   id: number;
 };
 
-const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
+const ConvBox = ({profileId,  room, onBoxClick, socket, token, id }: Props) => {
   const [lastMessage, setLastMessage] = useState<MessageInterface | null>(null);
   const [users, setUsers] = useState<number[]>([]);
   const [usersnames, setUsernames] = useState<string[]>([]);
@@ -137,7 +138,8 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
     return message.slice(0, maxLength) + '...';
   };
 
-  const isAdmin = room.admins.some((adminId) => adminId === id);
+  const isAdmin = room.admins.some((adminId) => adminId === profileId);
+  const isOwner = (room.owner_id === profileId)
 
   const img = Buffer.from(room.image.data).toString('base64')
 
@@ -150,11 +152,11 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
         onClick={handleClickConv}
       />
       <div className="flex flex-col mx-4 w-full" onClick={handleClickConv}>
-        <p className="text-lg font-bold truncate">{groupName}</p>
+        <p className="text-lg font-bold truncate">{truncateMessage(groupName || '', 10)}</p>
         <p className="text-sm truncate">{truncateMessage(lastMessage?.content || '', 50)}</p>
       </div>
 
-      { <TbDoorExit
+      { !isOwner && <TbDoorExit
       className=" justify-end text-center cursor-pointer mr-2"
       size="1.5em"
       onClick={() => handleClickLeaveRoom()}

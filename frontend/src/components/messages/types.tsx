@@ -39,6 +39,7 @@ export interface ChatRoomInterface {
     participants: ProfileInterface[];
     mode: string; // Change this to the ChatRoomMode enum if you have it in your frontend code
     password_hash: string | null;
+    owner_id: number;
     last_message_id: number | null;
     last_message: MessageInterface | null;
     last_profile_id: number | null;

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import ChatRoom from './ChatRoom';
 import ConvList from './ConvList';
-import { ChatRoomInterface, MessageInterface } from './types';
+import { ChatRoomInterface } from './types';
 import jwtDecode from 'jwt-decode';
-import { Socket, io } from 'socket.io-client';
 import CreateRoom from './CreateRoom';
 import ChatRoomSettings from './ChatRoomSettings';
 import SocketContext, { ISocketContextState } from '../../context/Socket';
 import ChatRoomList from './ChatRoomList';
 import { notifications } from '../../App';
+import Loading from '../utils/Loading';
 
 interface DecodedToken {
   id: number;
@@ -25,6 +25,7 @@ const Chat = (props: Props) => {
   const { statusocket } = props;
   const socket = SocketState.socket;
 
+  const [profileId, setProfileId] = useState(0);
   // Rooms
   const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);
   const [createRoom, setCreateRoom] = useState<boolean>(false);
@@ -53,7 +54,22 @@ const Chat = (props: Props) => {
     }
   };
 
+  const fetchProfileId = async () => {
+    const auth = 'Bearer ' + props.accessToken;
+    const url = 'http://localhost:3001/user/profile';
+       await fetch(url, { method: 'GET', headers: { Authorization: auth } }
+       ).then(res => res.json()
+       ).then(response => {
+           if (response.statusCode >= 400) {
+            console.log("error")
+          }
+          else
+            setProfileId(response.id);  
+        })
+  };
+
   useEffect(() => {
+    fetchProfileId();
     fetchRooms();
   }, []);
 
@@ -104,13 +120,17 @@ const Chat = (props: Props) => {
 
   }
 
+  if (profileId == 0) {
+    return (<Loading />)
+    }
   return (
     <div className="flex bg-violet-700 rounded-lg p-2 m-2">
       <div className="bg-violet-800 w-1/3 rounded-lg mx-1">
         {!createRoom && <button className="bg-gradient-to-tl from-violet-900 via-black to-black text-white font-xl font-bold rounded m-2 p-2 hover:bg-black" onClick={createNewRoom}>Create Room</button>}
         {createRoom && <CreateRoom token={props.accessToken} id={userId} setCreateRoom={setCreateRoom} />}
-        <button className="bg-gradient-to-tl from-violet-900 via-black to-black text-white font-xl font-bold rounded m-2 p-2 hover:bg-black" onClick={displayRoomList}>Find Room</button>
+        <button className={`bg-gradient-to-tl from-violet-900 via-black to-black text-white font-xl font-bold rounded m-2 p-2 ${displayAllRooms ? 'bg-blue-500' : 'hover:bg-black'}`} onClick={displayRoomList}>Find Room</button>
         <ConvList
+          profileId={profileId}
           rooms={rooms}
           onRoomSelect={onConvBoxClick}
           socket={socket}
@@ -122,6 +142,7 @@ const Chat = (props: Props) => {
         <ChatRoomList 
         key={selectedRoomId}
         myRooms={rooms}
+        setRooms={setRooms}
         token={props.accessToken}
         />
       :
@@ -136,6 +157,7 @@ const Chat = (props: Props) => {
       : selectedRoomId ?
       <ChatRoom
           key={selectedRoomId}
+          profileId={profileId}
           room={rooms.find((room) => room.id === selectedRoomId)}
           roomId={selectedRoomId}
           socket={socket}
