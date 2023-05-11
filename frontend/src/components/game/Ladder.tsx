@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import OneLadder from './OneLadder';
 
-type Props = {};
+type Props = {
+  token: string;
+};
 
 const Ladder = (props: Props) => {
   const [ladder, setLadder] = useState<{ username: string; won: number }[]>([]);
 
   useEffect(() => {
     const fetchLadderData = async () => {
+      const auth = 'Bearer ' + props.token;
       try {
-        const response = await fetch('http://localhost:3001/user/ladder');
+        const response = await fetch('http://localhost:3001/user/ladder', { method: 'GET', headers: { Authorization: auth } });
         const data = await response.json();
         setLadder(data);
       } catch (error) {

@@ -4,9 +4,10 @@ import { GameInterface } from '../messages/types';
 type Props = {
   game: GameInterface | undefined;
   currentUserId: number | undefined;
+  token: string;
 };
 
-const MatchResume = ({ game, currentUserId }: Props) => {
+const MatchResume = ({ game, currentUserId, token }: Props) => {
   const [player1, setPlayer1] = useState<string | null>(null);
   const [player2, setPlayer2] = useState<string | null>(null);
   const [outcome, setOutcome] = useState<string | null>(null);
@@ -17,8 +18,10 @@ const MatchResume = ({ game, currentUserId }: Props) => {
         return;
       }
 
+      const auth = 'Bearer ' + token;
+
       try {
-        const response = await fetch(`http://localhost:3001/user/username/${id}`, { method: 'GET' });
+        const response = await fetch(`http://localhost:3001/user/username/${id}`, { method: 'GET', headers: { Authorization: auth } });
         const userData = await response.text();
         if (response.status !== 200) {
           setter('Unknown');

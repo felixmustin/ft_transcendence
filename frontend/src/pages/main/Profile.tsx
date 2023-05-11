@@ -217,7 +217,7 @@ const Profile = ({ username, token }: Props) => {
             </div>
             <hr className="w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900" />
             <div>
-              <MatchHistory games={profile?.games} currentId={profile?.id}/>
+              <MatchHistory games={profile?.games} currentId={profile?.id} token={token}/>
             </div>
           </div>
         </div>

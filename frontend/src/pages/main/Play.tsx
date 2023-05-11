@@ -33,7 +33,7 @@ const Play = ({token}: Props) => {
 					) : (
 						<p>Loading...</p>
 					)}
-          <Ladder />
+          <Ladder token={token}/>
 				</div>
 			</div>
 		</div>

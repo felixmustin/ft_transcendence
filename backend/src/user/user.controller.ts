@@ -23,6 +23,7 @@ export class UserController {
   }
 
   @Post('profiles')
+  @UseGuards(JwtAuthGuard)
   async getUsersUsernameByIds(@Body() body: { users: number[] }) {
     let profiles = [];
     const userIds = body.users;
@@ -88,6 +89,7 @@ export class UserController {
   }
 
   @Get('ladder')
+  @UseGuards(JwtAuthGuard)
   async getLadder() {
     const ladder = await this.userService.getLadder();
     return ladder;
@@ -122,16 +124,17 @@ export class UserController {
   }
 
   @Get('username/:id')
+  @UseGuards(JwtAuthGuard)
   async getUsernameById(@Param('id') id: number) {
     const user = await this.userService.findUserById(id);
     return user.profile.username;
   }
 
-  @Get('userid/:username')
-  async getUserIdByUsername(@Param('username') username: string) {
-    const user = await this.userService.findUserByUsername(username);
-    return user.id;
-  }
+  //@Get('userid/:username')
+  //async getUserIdByUsername(@Param('username') username: string) {
+  //  const user = await this.userService.findUserByUsername(username);
+  //  return user.id;
+  //}
 
   @Put('update/username')
   @UseGuards(JwtAuthGuard)
@@ -162,11 +165,11 @@ export class UserController {
   // public async updateUserProfile( @Param() param, @Body() body) {
   //     const users = await this.usersServices.update(param.ID, body);
   // }
-  @Get('noguard/:id')
-  public async getUserByIdNoGuard(@Param('id') id: number) {
-    const user = await this.userService.findUserById(id);
-    return user;
-  }
+  //@Get('noguard/:id')
+  //public async getUserByIdNoGuard(@Param('id') id: number) {
+  //  const user = await this.userService.findUserById(id);
+  //  return user;
+  //}
 
   // @Get('profile/blocked/list')
   // @UseGuards(JwtAuthGuard)
