@@ -8,33 +8,18 @@ import Loading from '../utils/Loading';
 import { ISocketContextState } from '../../context/Socket';
 
 type Props = {
-  room:ChatRoomInterface | undefined;
+  profileId: number;
   roomId: number;
   socket: Socket | undefined;
   token: string | undefined;
   statusocket: ISocketContextState;
 };
 
-const ChatRoom = ({ room, roomId, socket, token, statusocket }: Props) => {
+const ChatRoom = ({ profileId, roomId, socket, token, statusocket }: Props) => {
 
-  const [profileId, setProfileId] = useState(0);
   const [isBanned, setIsBanned] = useState(false);
   const [users, setUsers] = useState<ProfileInterface[]>([]);
 
-
-  const fetchProfileId = async () => {
-    const auth = 'Bearer ' + token;
-    const url = 'http://localhost:3001/user/profile';
-       await fetch(url, { method: 'GET', headers: { Authorization: auth } }
-       ).then(res => res.json()
-       ).then(response => {
-           if (response.statusCode >= 400) {
-            console.log("error")
-          }
-          else
-            setProfileId(response.id);  
-        })
-  };
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -68,7 +53,6 @@ const ChatRoom = ({ room, roomId, socket, token, statusocket }: Props) => {
 
 
   useEffect(() => {
-    fetchProfileId();
     fetchIsBan();
   }, []);
 

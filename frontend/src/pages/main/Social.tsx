@@ -3,6 +3,7 @@ import Navbar from '../../components/design/Navbar'
 import FriendList from '../../components/user/FriendList'
 import BlockedUsers from '../../components/user/BlockedUsers'
 import Loading from '../../components/utils/Loading'
+import SocketContext from '../../context/Socket'
 
 type Props = {
   token: string;
@@ -11,7 +12,9 @@ type Props = {
 const Social = ({token}: Props) => {
 
   const [currentTab, setCurrentTab] = useState('Friends');
+  const { SocketState, SocketDispatch } = React.useContext(SocketContext);
 
+  SocketState.socket?.emit('friend-visited');
   if (!token)
     return <Loading />
   else {

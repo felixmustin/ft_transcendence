@@ -114,7 +114,11 @@ function Matchmaking(props: props) {
     const onquithandler = () => {
       setMatch(null);
       setwaiting(0);
-      statusocket.socket?.emit('update_status', 1);
+      // const payload: statusgame = {
+      //   status: 1,
+      //   room: '',
+      // }
+      statusocket.socket?.emit('status quit game');
     }
     SocketState.socket?.on('quit', onquithandler);
     return () => {
@@ -122,7 +126,12 @@ function Matchmaking(props: props) {
       SocketState.socket?.off('room_created', onRoom_created);
       SocketState.socket?.off('match_found', onMatchFound);
       statusocket.socket?.off('notification', invite_handler);
-      statusocket.socket?.emit('update_status', 1);
+      // const payload: statusgame = {
+      //   status: 1,
+      //   room: '',
+      // }
+      // statusocket.socket?.emit('update_status', payload);
+      statusocket.socket?.emit('status quit game');
     };
   }, [SocketState.socket, SocketState.uid]);
 

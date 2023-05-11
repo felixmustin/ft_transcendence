@@ -6,10 +6,11 @@ import { Buffer } from 'buffer';
 
 type Props = {
     myRooms: ChatRoomInterface[];
-   token: string | undefined;
+    setRooms: (rooms: ChatRoomInterface[]) => void
+    token: string | undefined;
 };
 
-const ChatRoomList= ({ myRooms, token }: Props) => {
+const ChatRoomList= (props: Props) => {
 
     const [rooms, setRooms] = useState<ChatRoomInterface[]>([]);
     const [roomJoinId, setRoomJoinId] = useState(0);
@@ -17,7 +18,7 @@ const ChatRoomList= ({ myRooms, token }: Props) => {
     
     // Fetch rooms
     const fetchRooms = async () => {
-      const auth = 'Bearer ' + token;
+      const auth = 'Bearer ' + props.token;
       const url = 'http://localhost:3001/chatroom/all';
       try {
         const res = await fetch(url, { method: 'GET', headers: { Authorization: auth } });
@@ -39,7 +40,7 @@ const ChatRoomList= ({ myRooms, token }: Props) => {
 
 
     const handleJoinRoom = async (room: ChatRoomInterface) => {
-        const auth = 'Bearer ' + token;
+        const auth = 'Bearer ' + props.token;
 
         if (room.mode == 'private')
             return ;
@@ -52,7 +53,8 @@ const ChatRoomList= ({ myRooms, token }: Props) => {
           body: JSON.stringify({roomId: room.id, password:roomPassword})
           }).then(response => {
             if (response.ok) {
-              myRooms.push(room);
+              props.myRooms.push(room)
+              props.setRooms(props.myRooms)
               alert("Member added");
             } else {
               alert("Problem adding member");
@@ -63,7 +65,7 @@ const ChatRoomList= ({ myRooms, token }: Props) => {
     return (
         <div className="bg-violet-800 rounded-lg mx-1 overflow-y-auto max-h-[calc(6*5.5rem)]">
           {rooms.map((room) => {
-            if (myRooms.find((myRoom) => myRoom.id === room.id))
+            if (props.myRooms.find((myRoom) => myRoom.id === room.id))
                 return;
             const img = Buffer.from(room.image.data).toString('base64')
             return (

@@ -12,7 +12,6 @@ type Props = {
 
 const SettingRoomField = (props: Props) => {
 
-    const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(true);
     const [room, setRoom] = useState<ChatRoomInterface | undefined>(props.room);
     const [updatedRoom, setUpdatedRoom] = useState(null);

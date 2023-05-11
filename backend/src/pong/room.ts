@@ -102,8 +102,8 @@ export class Room {
 	}
 
 	post_score_db(){
-		const id1: number = this.PongService.identifiate(this.idp1).id;
-		const id2: number = this.PongService.identifiate(this.idp2).id;
+		const id1: number = this.PongService.identifiate(this.idp1)?.id;
+		const id2: number = this.PongService.identifiate(this.idp2)?.id;
 		const game: gameResume = {
 			player1_id: id1,
 			player2_id: id2,

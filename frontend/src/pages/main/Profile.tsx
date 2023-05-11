@@ -126,8 +126,15 @@ const Profile = ({ username, token }: Props) => {
       'Content-Type': 'application/json',
       },
       body:JSON.stringify({username})});
-      if (res.ok)
+      if (res.ok){
         alert("Friends request sent");
+        const payload: noti_payload = {
+          type: 'friend',
+          target: username,
+          data: '',
+        }
+        SocketState.socket?.emit('send-notif', payload);
+      }
       else if (res.status == 400)
         alert("You are already friends with this player, or already sent a request")
     } catch (error) {
