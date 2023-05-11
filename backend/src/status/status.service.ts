@@ -174,7 +174,7 @@ export class StatusService {
 	}
 	async emitNotifications(server: Server){
 		for (const [key, value] of this.notification) {
-			if (!value.length){
+			if (!value?.length){
 				this.notification.delete(key);
 			}
 			else{
