@@ -123,11 +123,8 @@ export class FriendsService {
         const friendships = await this.friendsRepository.createQueryBuilder("friends")
         .select("friends")
         .where("(friends.fromUserId = :id OR friends.toUserId = :id)", { id })
-        // .andWhere('friends.accepted = true')
         .getMany();
         
-        // if (!friendships)
-        //  throw new BadRequestException('No friendships exist');
         let i = friendships.length;
         while(i--) {
           await this.friendsRepository.remove(friendships[i]);

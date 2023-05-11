@@ -1,13 +1,11 @@
 import {
     Entity,
-    PrimaryColumn,
     ManyToOne,
     JoinColumn,
     Column,
     PrimaryGeneratedColumn,
   } from 'typeorm';
   import { ChatRoom } from './chatroom.entity';
-  import { Profile } from './profile.entity';
   
   @Entity('ban')
   export class Ban {

@@ -37,6 +37,12 @@ export class ChatRoomController {
     return await this.chatRoomService.joinChatRoom(roomId, password, req.user.id);
   }
 
+  @Post('leave')
+  @UseGuards(JwtAuthGuard)
+  async leaveChatRoom(@Request() req: any, @Body() { roomId }: { roomId: number }) {
+    return await this.chatRoomService.leaveChatRoom(roomId, req.user.id);
+  }
+
   @Post('addMember')
   @UseGuards(JwtAuthGuard)
   async addMemberToChatRoom(@Request() req: any, @Body() { roomId, username }: { roomId: number, username: string }) {
@@ -84,7 +90,7 @@ export class ChatRoomController {
     return chatRoom;
   }
 
-  @Get('admin/list')
+  @Post('admin/list')
   @UseGuards(JwtAuthGuard)
   async getAdminList(@Request() req: any,  @Body() { roomId}: { roomId: number}) {
     const usernameAdminList = await this.chatRoomService.getUsernameAdminList(roomId)
@@ -144,7 +150,8 @@ export class ChatRoomController {
   @Delete(':roomId')
   @UseGuards(JwtAuthGuard)
   async deleteChatRoomById(@Param('roomId') roomId: number, @Request() req: any) {
-    return await this.chatRoomService.deleteChatRoomById(roomId, req.user.id);
+    await this.chatRoomService.deleteChatRoomById(roomId, req.user.id);
+    return ("room deleted")
   }
 
   @Get('last_message/:roomId')

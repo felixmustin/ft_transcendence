@@ -196,13 +196,6 @@ const SettingRoomField = (props: Props) => {
   </div>
 </div>
     )
-
-                  {/* { (roomMode === 'protected') &&
-        <div>
-          <label htmlFor="password">Room password:</label>
-          <input type="text" id="password" name="password" onChange={handlePassChange}/>
-        </div>
-        } */}
     }
 }
 

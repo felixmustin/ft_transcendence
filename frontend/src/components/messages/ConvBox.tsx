@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { ChatRoomInterface, MessageInterface, ProfileInterface } from './types';
 import { IoSettingsSharp } from 'react-icons/io5';
+import { TbDoorExit } from 'react-icons/tb';
 import { Buffer } from 'buffer';
 
 
@@ -32,6 +33,25 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
   const handleClickSetting = () => {
     onBoxClick(room.id, true);
   };
+
+  const handleClickLeaveRoom = async () => {
+    const auth = 'Bearer ' + token;
+
+      await fetch('http://localhost:3001/chatroom/leave', {
+        method: 'POST',
+        headers: {
+        'Authorization': auth,
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({roomId: room.id})
+        }).then(response => {
+          if (response.ok) {
+            window.location.reload(); 
+          } else {
+            alert("Problem leaving room");
+          }
+      });
+  }
 
   const fetchLastMessage = async () => {
     const auth = 'Bearer ' + token;
@@ -133,6 +153,13 @@ const ConvBox = ({ room, onBoxClick, socket, token, id }: Props) => {
         <p className="text-lg font-bold truncate">{groupName}</p>
         <p className="text-sm truncate">{truncateMessage(lastMessage?.content || '', 50)}</p>
       </div>
+
+      { <TbDoorExit
+      className=" justify-end text-center cursor-pointer mr-2"
+      size="1.5em"
+      onClick={() => handleClickLeaveRoom()}
+      />}
+
       { isAdmin && <IoSettingsSharp
       className=" justify-end text-center cursor-pointer"
       size="1.5em"

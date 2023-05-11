@@ -1,4 +1,4 @@
-import { Body, Request, Controller, Get, Post, Param,Delete,Patch,HttpStatus, UseGuards, Put, Req, UploadedFile, UseInterceptors, UploadedFiles, ParseIntPipe } from '@nestjs/common';
+import { Body, Request, Controller, Get, Post, Param,Delete,Patch,HttpStatus, UseGuards, Put, Req, UploadedFile, UseInterceptors, UploadedFiles, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -45,6 +45,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getUserFlexProfileByUsername(@Request() req, @Param('username') username: string) {
     const user = await this.userService.findUserByUsername(username);
+    if (!user)
+      throw new BadRequestException('User doesnt exist');
     const {played, won, stomp, rank} = await this.userService.findUserFlexProfileById(user.id);
     return {played, won, stomp, rank};
   }
@@ -61,7 +63,6 @@ export class UserController {
   async blockUser(@Request() req: any, @Param('userId', ParseIntPipe) userId: number) {
     await this.userService.blockUser(req.user.id, userId);
     const user = await this.userService.findUserById(req.user.id);
-    console.log('Blocked user after the call to block:', user);
     return { status: HttpStatus.OK, message: 'User has been blocked successfully' };
   }
 
@@ -69,7 +70,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getBlockedUsers(@Request() req: any) {
     const blockedUsers = await this.userService.getBlockedUsers(req.user.id);
-    console.log('Blocked users from the service :', blockedUsers);
     return blockedUsers;
   }
 
@@ -77,7 +77,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async getBlockedUsersList(@Request() req: any) {
     const blockedUsersList = await this.userService.getBlockedUsersList(req.user.id);
-    console.log('Blocked users from the service :', blockedUsersList);
     return blockedUsersList;
   }
 
@@ -93,19 +92,6 @@ export class UserController {
   async getLadder() {
     const ladder = await this.userService.getLadder();
     return ladder;
-  }
-
-  @Delete('delete')
-  @UseGuards(JwtAuthGuard)
-  async deleteUser(@Request() req) {
-    return await this.userService.remove(req.user.id);
-  }
-
-  @Put('disconnect')
-  @UseGuards(JwtAuthGuard)
-  async disconnectUser(@Req() req) {
-    // const user = await this.userService.findUserProfileById(req.user.id)
-    // return await this.userService.changeStatus(user, 0);
   }
 
   @Post('profiles/avatar')

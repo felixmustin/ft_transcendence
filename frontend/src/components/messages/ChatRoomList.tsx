@@ -52,6 +52,7 @@ const ChatRoomList= ({ myRooms, token }: Props) => {
           body: JSON.stringify({roomId: room.id, password:roomPassword})
           }).then(response => {
             if (response.ok) {
+              myRooms.push(room);
               alert("Member added");
             } else {
               alert("Problem adding member");

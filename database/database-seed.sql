@@ -121,6 +121,7 @@ CREATE TABLE public.chatroom
     image BYTEA,
     admins INTEGER[] DEFAULT ARRAY[]::INTEGER[],
     mode chatroommode NOT NULL DEFAULT 'private',
+    owner_id INT,
     password_hash VARCHAR(255) NULL,
     last_message_id INT NULL,
     last_profile_id INT NULL,

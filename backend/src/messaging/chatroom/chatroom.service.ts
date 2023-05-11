@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChatRoom, ChatRoomMode } from '../../entities/chatroom.entity';
@@ -29,6 +29,7 @@ export class ChatRoomService {
 
   async createChatRoomFromUsers(userId: number, targetId: number): Promise<ChatRoom> {
     let chatRoom = await this.getChatRoomByUsers(userId, targetId);
+    console.log("find", chatRoom)
     if (!chatRoom) {
       // Fetch the User entities using the provided IDs
       const user1 = await this.userRepository.findOne({ where: { id: userId }, relations: ['profile'] });
@@ -40,13 +41,15 @@ export class ChatRoomService {
 
       const img = readFileSync("./assets/login.jpg");
       // Create a new ChatRoom entity with the fetched users as participants
-      const chatRoom = this.chatRoomRepository.create({
+      const newChatRoom = this.chatRoomRepository.create({
         image: img,
         participants: [user1.profile, user2.profile],
         admins: [user1.id, user2.id],
+        owner_id: user1.profile.id,
       });
-      await this.chatRoomRepository.save(chatRoom);
+      chatRoom = await this.chatRoomRepository.save(newChatRoom);
     }
+    console.log("okeyyy", chatRoom)
     return chatRoom;
   }
 
@@ -71,6 +74,7 @@ export class ChatRoomService {
       password_hash: (mode === ChatRoomMode.PROTECTED) ? password : null,
       participants: [user.profile],
       admins: [user.id],
+      owner_id: user.profile.id,
     });
     await this.chatRoomRepository.save(chatRoom);
     return chatRoom;
@@ -93,7 +97,22 @@ export class ChatRoomService {
       else
         throw new UnauthorizedException('Wrong password');
     }
+  }
 
+  async leaveChatRoom(roomId: number, userId: number) {
+    const chatRoom = await this.getChatRoomById(roomId)
+    const userToLeave = await this.userService.findUserProfileById(userId)
+
+    if (!userToLeave) {
+      throw new BadRequestException(`User does not exist`);
+    }
+    if (userToLeave.id === chatRoom.owner_id) {
+      throw new BadRequestException(`Cannot leave your own chatroom`);
+    }
+    if (chatRoom.participants.find(participant => participant.id === userToLeave.id)) {
+      chatRoom.participants = chatRoom.participants.filter((participant) => participant.id !== userToLeave.id);
+      await this.updateChatRoom(chatRoom);
+    }    
   }
 
   async addMemberToChatRoom(roomId: number, username: string, userId: number) {
@@ -124,10 +143,16 @@ export class ChatRoomService {
       const userToRemove = await this.userService.findUserProfileByUsername(username)
       const you = await this.userService.findUserProfileById(userId)
       if (username == you.username)
-        throw new UnauthorizedException('Cannot remove yousrelf of this group chat');
-    if (!userToRemove) {
-      throw new Error(`User with username ${username} does not exist`);
-    }
+        throw new UnauthorizedException('Cannot remove yourself of this group chat');
+      if (!userToRemove) {
+        throw new Error(`User with username ${username} does not exist`);
+      }
+      const toRemoveIsAdmin = chatRoom.admins.find(id => id === userToRemove.id) !== undefined;  
+      if (toRemoveIsAdmin) {
+        if (you.id != chatRoom.owner_id) {
+          throw new UnauthorizedException('Cannot remove an admin if you are not the owner');}
+      }
+        
       if (chatRoom.participants.find(participant => participant.id === userToRemove.id)) {
         chatRoom.participants = chatRoom.participants.filter((participant) => participant.id !== userToRemove.id);
         await this.updateChatRoom(chatRoom);
@@ -169,6 +194,9 @@ export class ChatRoomService {
     }
     if (!chatRoom.admins.includes(userToRemove.id)) {
       throw new Error(`User with username ${username} is not an admin in this chat room`);
+    }
+    if (userToRemove.id === chatRoom.owner_id) {
+      throw new Error(`Cannot remove the owner from the admins`);
     }
     chatRoom.admins = chatRoom.admins.filter((id) => id !== userToRemove.id);
     await this.updateChatRoom(chatRoom);
@@ -281,6 +309,7 @@ export class ChatRoomService {
   }
 
   async getUsernameAdminList(roomId: number) {
+
     const chatRoom = await this.getChatRoomById(roomId)
     const adminIds = chatRoom.admins;
     const adminProfiles = chatRoom.participants.filter(profile => adminIds.includes(profile.id));
@@ -288,18 +317,17 @@ export class ChatRoomService {
     return adminUsernames;
   }
 
-
-  // This function looks for a chatroom that has the two users as participants and only those 2
   async getChatRoomByUsers(userId: number, targetId: number): Promise<ChatRoom> {
-    const chatRoom = await this.chatRoomRepository
-    .createQueryBuilder('chatroom')
-    .innerJoin('chatroom.participants', 'participants')
-    .where('participants.id IN (:...userIds)', { userIds: [userId, targetId] })
-    .groupBy('chatroom.id')
-    .having('COUNT(chatroom.id) = 2')
-    .getOne();
+    const chatRooms = await this.chatRoomRepository.find({ relations: ['participants'] });
 
-    return chatRoom;
+    for (const chatroom of chatRooms) {
+      if (chatroom.participants.length === 2) {
+        if (chatroom.participants[0].id == targetId || chatroom.participants[1].id == targetId) {
+          return chatroom;          
+        }
+      }
+    }
+    return null
   }
 
   async createGroupChatRoom(userId: number): Promise<ChatRoom> {
@@ -314,6 +342,7 @@ export class ChatRoomService {
       name: name,
       image: img,
       admins: [user.id],
+      owner_id: user.profile.id,
     });
     await this.chatRoomRepository.save(chatRoom);
     return chatRoom;

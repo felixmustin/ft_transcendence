@@ -25,29 +25,13 @@ const ChatRoomSettings= ({ room, token }: Props) => {
   const [selectedAdminOptions, setSelectedAdminOptions] = useState('');
 
 
-  const isMuteSelected = () => {
-    if(selectedOption == 'mute')
-      return true;
-    return false
-  }
-  const isBanSelected = () => {
-    if(selectedOption == 'ban')
-      return true;
-    return false
-  }
-  const isAdminSelected = () => {
-    if(selectedOption == 'admin')
-      return true;
-    return false
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       const auth = 'Bearer ' + token;
       const url = `http://localhost:3001/chatroom/admin/list`
 
       try {
-        const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
+        const res = await fetch(url, { method: 'POST', headers: { 'Authorization': auth, 'Content-Type': 'application/json' }, body: JSON.stringify({roomId: room.id}) });
         const result = await res.json();
         if (result.statusCode >=400)
           alert(result.message)
@@ -64,14 +48,9 @@ const ChatRoomSettings= ({ room, token }: Props) => {
     const deleteRoom = async () => {
      const auth = 'Bearer ' + token;
      const url = 'http://localhost:3001/chatroom/' + room?.id;
-     try {
-       const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth } });
-       const result = await res.json();
-       console.log('deleteRoom result:', result);
-       navigate('/chatpage');
-     } catch (error) {
-       console.error('Error deleting room:', error);
-     }
+       const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth }});
+       console.log('deleteRoom result:', res);
+       window.location.reload(); 
    };
 
   const isAdminFct = (member: ProfileInterface) => {
@@ -166,6 +145,8 @@ const ChatRoomSettings= ({ room, token }: Props) => {
           else if (selectedAdminOptions == "remove")
             url = 'http://localhost:3001/chatroom/removeAdmin'
         }
+        else 
+          return;
       
         await fetch(url, {
             method: 'POST',

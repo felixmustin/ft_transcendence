@@ -149,7 +149,7 @@ const Profile = ({ username, token }: Props) => {
   
       if (res.ok) {
         const chatRoom = await res.json();
-        navigate(`/chatpage/`);
+        navigate(`/chatpage`);
       } else {
         console.error("Error creating chat room:", res.statusText);
       }

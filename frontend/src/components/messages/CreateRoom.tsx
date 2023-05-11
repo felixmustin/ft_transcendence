@@ -43,7 +43,7 @@ const CreateRoom = ({ token, id, setCreateRoom }: Props) => {
       const res = await fetch(url, { method: 'POST', headers: { Authorization: auth, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const result = await res.json();
       setCreateRoom(false);
-      navigate('http://localhost:3000/chatpage');
+      window.location.reload(); 
     } catch (error) {
       console.error('Error creating room:', error);
     }

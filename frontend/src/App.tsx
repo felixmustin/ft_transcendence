@@ -48,6 +48,7 @@ function App() {
   const [token, setToken] = useState<tokenForm>();
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     async function getToken() {
       const sessionToken = await getSessionsToken();

@@ -49,6 +49,9 @@ export class ChatRoom {
   @Column({ nullable: true })
   password_hash: string;
 
+  @Column({ })
+  owner_id: number;
+
   @Column({ nullable: true })
   last_message_id: number;
 
