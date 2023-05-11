@@ -385,6 +385,9 @@ export class ChatRoomService {
     if (!chatRoom) {
       throw new NotFoundException('Chatroom not found');
     }
+    if (chatRoom.messages.length === 0) {
+      return new Message();
+    }
     return chatRoom.messages[chatRoom.messages.length - 1];
   }
 
@@ -404,7 +407,6 @@ export class ChatRoomService {
     return chatRoom.participants.map((profile) => profile);
   }
 
- 
 
   async updateChatRoom(chatRoom: ChatRoom): Promise<ChatRoom> {
     return await this.chatRoomRepository.save(chatRoom);

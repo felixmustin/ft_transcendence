@@ -8,6 +8,8 @@ import Error from '../../components/utils/Error'
 import DisplayAvatar from '../../components/utils/DisplayAvatar'
 import { ProfileInterface } from '../../components/messages/types'
 import MatchHistory from '../../components/user/MatchHistory'
+import SocketContext from '../../context/Socket'
+import { noti_payload } from '../../App'
 
 interface FlexData {
   played: number;
@@ -79,8 +81,17 @@ const Profile = ({ username, token }: Props) => {
 
   // This needs to be updated to use the API.
   // Handle the launching of a game
-  const handleLaunchGame = async () => {
-    navigate
+  const { SocketState, SocketDispatch } = React.useContext(SocketContext);
+  const handleLaunchGame = () => {
+    const payload: noti_payload = {
+      type: 'game',
+      target: undefined, //myself
+      data: username, //real target
+    };
+    SocketState.socket?.emit('send-notif', payload);
+    navigate('/play');
+    // history.push('/play');
+    // Matchmaking.handleCreateRoom();
   };
 
   const handleBlockUser = async () => {
@@ -129,7 +140,7 @@ const Profile = ({ username, token }: Props) => {
   const handleSendMessage = async () => {
     try {
       const auth = 'Bearer ' + token;
-      const res = await fetch(`http://localhost:3001/chatroom/create/${profile.id}`, {
+      const res = await fetch(`http://localhost:3001/chatroom/create/${profile?.id}`, {
         method: 'POST',
         headers: {
           'Authorization': auth,

@@ -113,10 +113,12 @@ const SocialDataFriends = (props: Props) => {
           Remove friends
           </button>
           <div className='flex items-center'>
-          <div className={`h-3 w-3 rounded-full m-2 ${props.profile.statusid === 1 ? 'bg-green-500' : 'bg-red-500'}`}></div>
-          {props.profile.statusid === 1 ? <p className='ml-2'>Online</p> : <p className='ml-2'>Offline</p> }
+            <div className={`h-3 w-3 rounded-full m-2 ${props.profile.statusid === 1 ? 'bg-green-500' : props.profile.statusid === 0 ? 'bg-gray-500' : 'bg-red-500'}`}></div>
+            <p className='ml-2'>
+              {props.profile.statusid === 1 ? 'Online' : props.profile.statusid === 0 ? 'Offline' : 'In Game'}
+            </p>
+          </div>
         </div>
-      </div>
       <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-violet-900'/>
     </div>
   )
