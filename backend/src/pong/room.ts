@@ -149,7 +149,7 @@ export class Room {
 			this.emit_score_reset_ball(index);
 		}
 		if (this.score1 >= 10 || this.score2 >= 10){
-			this.end_match();
+			this.finished = true;
 		}
 	}
 
