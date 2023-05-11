@@ -11,7 +11,8 @@ CREATE TABLE public.user_profiles
     avatar BYTEA,
     gameswon INT,
     statusid INT,
-    blocked INTEGER[] DEFAULT ARRAY[]::INTEGER[]
+    blocked INTEGER[] DEFAULT ARRAY[]::INTEGER[],
+    gameroom VARCHAR(255),
 
 );
 

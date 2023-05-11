@@ -1,6 +1,9 @@
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
 import { StatusService, noti_payload } from "./status.service";
+import { AuthGuard } from "@nestjs/passport";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
+import { UseGuards } from "@nestjs/common";
 
 @WebSocketGateway( { cors: true })
 export class statusGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -11,7 +14,7 @@ export class statusGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		setInterval(() => this.statusService.emitNotifications(this.server), 1000);
 	}
 	async handleConnection(client: any, ...args: any[]) {
-		this.statusService.login(client);
+		await this.statusService.login(client);
 	}
 	handleDisconnect(client: any) {
 		this.statusService.logout(client);

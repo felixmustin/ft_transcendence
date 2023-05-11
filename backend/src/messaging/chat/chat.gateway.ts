@@ -10,6 +10,8 @@ import { MessageService } from "../message/message.service";
 import { ChatRoomService } from "../chatroom/chatroom.service";
 import { Server, Socket } from "socket.io";
 import { handshake } from "src/pong/pong.service";
+import { UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 
 @WebSocketGateway({ namespace: "/chat", cors: true })
 export class ChatGateway

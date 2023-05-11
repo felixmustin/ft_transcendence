@@ -82,13 +82,13 @@ export class PongService {
 	) {}
 
 	async login(client: any, server: Server){
-		// try {
+		try {
 			const id = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
 			const user: Profile = await this.userservice.findUserProfileById(id.id);
 			this.identitymap.set(client.id, user);
-		//   } catch (error) {
-		// 	 throw new WsException('Unauthorized');
-		//   }
+		  } catch (error) {
+			 throw new WsException('Unauthorized');
+		  }
 	}
 
 	logout(client: any, server: Server){

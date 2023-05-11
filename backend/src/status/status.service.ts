@@ -32,6 +32,11 @@ export type status = {
 	status: number,
 }
 
+export type statusgame = {
+	status: number,
+	room: string,
+}
+
 @Injectable()
 export class StatusService {
 	private id_to_profile: Map < string, Profile > = new Map();
@@ -46,15 +51,23 @@ export class StatusService {
     	private userProfileRepository: Repository<Profile>,
 	) {}
 	async login(client: any){
-		const payload = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
-		const profile = await this.userservice.findUserProfileById(payload.id);
-		profile.statusid = 1;
-		await this.userProfileRepository.save(profile)
-		this.register_user(client.id, profile);
+		try {
+			const payload = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
+			const profile = await this.userservice.findUserProfileById(payload.id);
+			profile.statusid = 1;
+			await this.userProfileRepository.save(profile)
+			this.register_user(client.id, profile);
+		} catch (error) {
+			throw new WsException('Unauthorized');
+		}
 	}
 
 	async logout(client: any){
-		this.update_status(client, 0)
+		const payload: statusgame = {
+			status: 0,
+			room: '',
+		}
+		this.update_status(client, payload)
 		this.delete_id(client.id);
 	}
 	
@@ -145,8 +158,6 @@ export class StatusService {
 		const user = this.id_to_profile.get(id);
 		this.id_to_profile.delete(id);
 		this.profile_to_id.delete(user.username);
-		console.log('deleting notif because of disconect');
-		// this.notification.delete(user.username);
 	}
 	delete_user(user: Profile){
 		const id = this.profile_to_id.get(user.username);
@@ -174,10 +185,11 @@ export class StatusService {
 			}
 		}
 	}
-	async update_status(client: any, data: number){
+	async update_status(client: any, data: statusgame){
 		const user = this.id_to_profile.get(client.id);
 		const profile = await this.userservice.findUserProfileById(user.id);
-		profile.statusid = data;
+		profile.statusid = data.status;
+		profile.gameroom = data.room;
 		await this.userProfileRepository.save(profile);
 	}
 }
