@@ -187,7 +187,7 @@ export class StatusService {
 	}
 	async update_status(client: any, data: statusgame){
 		const user = this.id_to_profile.get(client.id);
-		const profile = await this.userservice.findUserProfileById(user.id);
+		const profile = await this.userservice.findUserProfileById(user?.id);
 		profile.statusid = data.status;
 		profile.gameroom = data.room;
 		await this.userProfileRepository.save(profile);

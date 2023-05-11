@@ -49,6 +49,6 @@ export class Profile {
   @Column({ type: 'integer', array: true, default: [] })
   blocked: number[];
 
-  @Column()
+  @Column({ nullable: true })
   gameroom: string;
 }
