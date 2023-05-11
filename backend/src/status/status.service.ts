@@ -157,7 +157,7 @@ export class StatusService {
 	delete_id(id: string){
 		const user = this.id_to_profile.get(id);
 		this.id_to_profile.delete(id);
-		this.profile_to_id.delete(user.username);
+		this.profile_to_id.delete(user?.username);
 	}
 	delete_user(user: Profile){
 		const id = this.profile_to_id.get(user.username);
@@ -188,8 +188,19 @@ export class StatusService {
 	async update_status(client: any, data: statusgame){
 		const user = this.id_to_profile.get(client.id);
 		const profile = await this.userservice.findUserProfileById(user?.id);
-		profile.statusid = data.status;
+		// if (profile.statusid != 0 && data.status != 2){
+			profile.statusid = data.status;
+		// }
 		profile.gameroom = data.room;
+		await this.userProfileRepository.save(profile);
+	}
+	async status_quit_game(client: any){
+		const user = this.id_to_profile.get(client.id);
+		const profile = await this.userservice.findUserProfileById(user?.id);
+		if (profile.statusid === 2 ){
+			profile.statusid = 1;
+		}
+		profile.gameroom = '';
 		await this.userProfileRepository.save(profile);
 	}
 }

@@ -119,7 +119,7 @@ export class PongService {
 	}
 
 	async find_match(client: any, data: boolean, server: Server){
-		const room = this.looking_room(data, server);
+		const room = this.looking_room(data, server, client.id);
 		client.join(room);
 		this.addClientToRoom(client.id, room);
 		this.maproom.get(room).connect(client.id);
@@ -207,9 +207,9 @@ export class PongService {
 		}
 		server.to(room.id).emit('match_found', datamatch);
 	}
-	looking_room(bonus: boolean, server: Server): string {
+	looking_room(bonus: boolean, server: Server, id: string): string {
 		for (const [key, value] of this.maproom.entries()) {
-		  if (value.players === 1 && value.bonus === bonus ) {
+		  if (value.players === 1 && value.bonus === bonus && this.identifiate(value.idp1).username !== this.identifiate(id).username ) {
 			return key;
 		  }
 		}
