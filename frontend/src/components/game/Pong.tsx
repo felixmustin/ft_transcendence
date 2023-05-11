@@ -168,12 +168,12 @@ class GamePong extends React.Component<GamePongProps, GameState> {
 							<Game_Board {...this.state}/>
 						</div>
 					</div>
-					<div>press 'c' to play or 'v' to pause<br />press 'w' to go up and 's' to go down<br />press'a' to go left and 'd' to go right</div>
+					<div>press 'c' to play or 'v' to pause<br />press 'w' to go up and 's' to go down<br />press 'a' to go left and 'd' to go right</div>
 			</div>
 			{(this.score.score1 >= 10 || this.score.score2 >= 10) && (
 			<>
-				<button onClick={this.rematch_handler}>Restart Game</button>
-				<button onClick={this.quit_handler}>End Game</button>
+				<button className='w-[200px] m-2 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={this.rematch_handler}>Restart Game</button>
+				<button className='w-[200px] m-2 py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg' onClick={this.quit_handler}>End Game</button>
 			</>
 		)}
 		</div>

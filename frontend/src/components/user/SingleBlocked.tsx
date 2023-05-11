@@ -18,7 +18,7 @@ const SingleBlocked = (props: Props) => {
       const auth = 'Bearer ' + props.token;
       const res = await fetch(url, { method: 'DELETE', headers: { 'Authorization': auth } });
       if (res.ok) {
-        navigate('/social');
+        window.location.reload();
       }
     }
     catch (error : any) {

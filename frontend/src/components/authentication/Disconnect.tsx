@@ -15,7 +15,7 @@ const Disconnect = (props: Props) => {
   const disconnect = () => {
     removeSessionsToken()
     navigate('/');
-    window.location.reload(); 
+    window.location.reload();
   };
 
     return (

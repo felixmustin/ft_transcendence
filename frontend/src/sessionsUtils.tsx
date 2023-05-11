@@ -1,4 +1,5 @@
 import jwtDecode from 'jwt-decode';
+import { TokenInterface } from './components/messages/types';
 import { tokenForm } from './interfaceUtils';
 
 export function setSessionToken(tokenObj: any) {
@@ -10,7 +11,7 @@ export async function getSessionsToken() {
   const tokenObj = JSON.parse(tokenStr!)
   if (!tokenObj)
     return null;
-  const tokenDecoded = jwtDecode(tokenObj.accessToken)
+  const tokenDecoded = jwtDecode(tokenObj.accessToken) as TokenInterface
   if (!tokenDecoded)
     return null;
   const accessTokenExp = tokenDecoded.exp;

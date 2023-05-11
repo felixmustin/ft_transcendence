@@ -206,6 +206,9 @@ const Profile = ({ username, token }: Props) => {
                     </button>
                   </div>
                 )}
+                <div className='flex bg-gray-900 rounded-lg content-center text-white text-center mx-5 my-3'>
+                  {profile?.statusid === 2 && <p>Player currently in game : {profile.gameroom}</p>}
+                </div>
               </div>
             </div>
             <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>

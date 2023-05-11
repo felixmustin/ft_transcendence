@@ -1,22 +1,20 @@
 import React from 'react'
 import { Buffer } from 'buffer';
+import { BufferInterface } from '../messages/types';
 
 
 type Props = {
-    avatar: {
-      type: string,
-      data: []
-      };
+    avatar: BufferInterface | undefined;
 }
 
-const DisplayAvatar = (props: Props) => {
+const DisplayAvatar = ({avatar}: Props) => {
   
-    const img = Buffer.from(props.avatar.data).toString('base64')
+    const img = Buffer.from(avatar?.data).toString('base64')
 
   return (
     <div> 
         <p className='relative'>
-            {props.avatar && (
+            {avatar && (
             <img
                 src={`data:image/png;base64,${img}`}
                 alt="User Avatar"
