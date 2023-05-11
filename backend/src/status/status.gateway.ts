@@ -1,6 +1,6 @@
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
-import { StatusService, noti_payload } from "./status.service";
+import { StatusService, noti_payload, statusgame } from "./status.service";
 import { AuthGuard } from "@nestjs/passport";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { UseGuards } from "@nestjs/common";
@@ -46,7 +46,7 @@ export class statusGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.statusService.delete_self_notif(client);
 	}
 	@SubscribeMessage('update_status')
-	async update_status(client: any, data: number){
+	async update_status(client: any, data: statusgame){
 		this.statusService.update_status(client, data);
 	}
 }
