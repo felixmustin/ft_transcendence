@@ -11,7 +11,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	constructor(private readonly pongService: PongService) {}
 	async handleConnection(client: any, ...args: any[]) {
-		this.pongService.login(client, this.server);
+		await this.pongService.login(client, this.server);
 	}
 	handleDisconnect(client: any) {
 		this.pongService.logout(client, this.server);

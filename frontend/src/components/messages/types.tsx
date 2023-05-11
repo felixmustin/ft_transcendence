@@ -23,6 +23,7 @@ export interface ProfileInterface {
   avatar: Buffer;
   games: GameInterface[];
   statusid: number;
+  gameroom: string;
   // profile: ProfileInterface;
   // blocklist: UserInterface[];
 }

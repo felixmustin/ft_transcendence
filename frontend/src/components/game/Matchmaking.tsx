@@ -5,6 +5,11 @@ import FormJoinRoom from "./FormJoinRoom";
 import { noti_payload, notifications } from "../../App";
 import { Invitebuttons } from "./InvitationButtons";
 
+export type statusgame = {
+	status: number,
+	room: string,
+}
+
 type matchdata = {
 	roomID: string,
 	score: ScoreProps,
@@ -44,12 +49,12 @@ function Matchmaking(props: props) {
             origin: notif.notifs[i].origin,
             room: notif.notifs[i].data,
           }
-          // if (!invite.includes(inv)){
+          if (!invite.some(item => item.origin === inv.origin && item.room === inv.room)){
             invite.push(inv);
             setinvitations([...invite]);
             console.log('invites ' + invitations);
             statusocket?.socket?.emit('game-visited');
-          // }
+          }
         }
       }
     };
@@ -69,7 +74,11 @@ function Matchmaking(props: props) {
 		    }
 		    setMatch(pongprops);
         setwaiting(0);
-        statusocket.socket?.emit('update_status', 2);
+        const payload: statusgame = {
+          status: 2,
+          room: data.roomID,
+        }
+        statusocket.socket?.emit('update_status', payload);
       }
     };
     SocketState.socket?.on('match_found', onMatchFound);
