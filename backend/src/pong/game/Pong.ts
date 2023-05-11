@@ -46,6 +46,12 @@ export class Pong{
 	reset(){
 		this.ballspeedx = [this.or_speed];
 		this.ballspeedy = [this.or_speed];
+		if (Math.random() < 0.5){
+			this.ballspeedx[0] *= -1;
+		}
+		if (Math.random() < 0.5){
+			this.ballspeedy[0] *= -1;
+		}
 		this.paddleleft.reset();
 		this.paddleright.reset();
 		this.ball[0].reset();

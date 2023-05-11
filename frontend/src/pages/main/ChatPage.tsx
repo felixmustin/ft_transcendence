@@ -5,6 +5,7 @@ import Chat from '../../components/messages/Chat';
 import { useNavigate } from 'react-router-dom'
 import Loading from '../../components/utils/Loading';
 import SocketContextComponent from '../../context/ComponentSocket';
+import SocketContext from '../../context/Socket';
 
 type Props = {
   token: string;
@@ -12,6 +13,7 @@ type Props = {
 
 const ChatPage = ({token}: Props) => {
 
+  const { SocketState, SocketDispatch } = React.useContext(SocketContext);
   if (!token)
     return <Loading />
   else
@@ -25,7 +27,7 @@ const ChatPage = ({token}: Props) => {
         </div>
         {token ? (
           <SocketContextComponent token={token} adress="http://localhost:3001/chat">
-          <Chat accessToken={token} />
+          <Chat accessToken={token} statusocket={SocketState} />
           </SocketContextComponent>
             ) : (
               <p>Loading...</p>

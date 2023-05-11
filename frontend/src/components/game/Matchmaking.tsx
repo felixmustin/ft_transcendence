@@ -31,14 +31,14 @@ function Matchmaking(props: props) {
   useEffect(() => {
     const invite_handler = (notif: notifications) => {
       noti = (notif);
-      console.log(JSON.stringify(notif));
+      // console.log(JSON.stringify(notif));
       for (let i = 0; i < notif?.notifs?.length; i++){
-        if (notif.notifs[i].origin === notif.name){
+        if (notif.notifs[i].origin === notif.name && notif.notifs[i].type === 'game'){
           handleCreateRoom();
           statusocket.socket?.off('notification');
           return ;
         }
-        else if (notif.notifs[i].origin !== notif.name){
+        else if (notif.notifs[i].origin !== notif.name && notif.notifs[i].type === 'game'){
           const invite: invitation[] = invitations;
           const inv: invitation = {
             origin: notif.notifs[i].origin,
@@ -135,6 +135,8 @@ function Matchmaking(props: props) {
 
   const handleJoinRoom = (room :string) => {
     // Emit a "join_room" event with the user's UID
+    console.log('joining room ' + room);
+    setinvitations([]);
     SocketState.socket?.emit('join_room', room);
   };
   const handleBonus = () => {

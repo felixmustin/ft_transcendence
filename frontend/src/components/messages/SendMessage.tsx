@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client';
+import { ISocketContextState } from '../../context/Socket';
+import { noti_payload } from '../../App';
+import { ProfileInterface } from './types';
+import ChatRoom from './ChatRoom';
 
 type Props = {
   roomId: number;
   socket: Socket | undefined;
   profileId: number;
+  statusocket: ISocketContextState;
+  users: ProfileInterface[];
 };
 
-const SendMessage = ({ roomId, socket, profileId }: Props) => {
+const SendMessage = ({ roomId, socket, profileId, statusocket, users }: Props) => {
   const [content, setContent] = useState('');
   const [isMuted, setIsMuted] = useState(false);
+  const usernamelist = users
+  .filter(user => user.id !== profileId)
+  .map(user => user.username);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setContent(event.target.value);
@@ -21,7 +30,16 @@ const SendMessage = ({ roomId, socket, profileId }: Props) => {
 
     if (socket) {
       socket.emit('send_message', { chatroomId: roomId, senderId: profileId, content })
+      console.log('emiting message ' + roomId);
       socket.on("is_muted", setIsMuted);
+      for (let i = 0; i < usernamelist.length; i++){
+        const payload: noti_payload = {
+          type: 'message',
+          target: usernamelist[i],
+          data: roomId.toString(),
+        }
+        statusocket.socket?.emit('send-notif', payload);
+      }
     }
   
     setContent('');

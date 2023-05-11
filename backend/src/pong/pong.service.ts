@@ -87,7 +87,7 @@ export class PongService {
 			const user: Profile = await this.userservice.findUserProfileById(id.id);
 			this.identitymap.set(client.id, user);
 		//   } catch (error) {
-		// 	// throw new WsException('Unauthorized');
+		// 	 throw new WsException('Unauthorized');
 		//   }
 	}
 

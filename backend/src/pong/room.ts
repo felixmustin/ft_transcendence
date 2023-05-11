@@ -70,13 +70,13 @@ export class Room {
 
 	disconnect(id: string){
 		if (id === this.idp1){
-			this.reset_game();
+			this.end_match();
 			this.idp1 = '';
 			this.players--;
 			this.server.to(this.id).emit('quit');
 		}
 		else if (id === this.idp2){
-			this.reset_game();
+			this.end_match();
 			this.idp2 = '';
 			this.players--;
 			this.server.to(this.id).emit('quit');
@@ -114,11 +114,9 @@ export class Room {
 	}
 
 	end_match(){
-		if (this.score1 >= 10 || this.score2 >= 10){
 			this.finished = true;
 			this.post_score_db();
-			// this.reset_game();
-		}
+			this.reset_game();
 	}
 	
 	reset_game(){
@@ -143,13 +141,14 @@ export class Room {
 			if (this.state.which_bonus === 5)
 				this.score2++;
 			this.emit_score_reset_ball(index);
-			this.end_match();
 		}
 		else if (this.state.ball[index].x + this.state.ball[index].width >= this.state.board.width){
 			this.score1++;
 			if (this.state.which_bonus === 5)
 				this.score1++;
 			this.emit_score_reset_ball(index);
+		}
+		if (this.score1 >= 10 || this.score2 >= 10){
 			this.end_match();
 		}
 	}

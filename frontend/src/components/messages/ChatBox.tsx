@@ -56,9 +56,10 @@ const ChatBox = ({ roomId, socket, token, profileId }: Props) => {
 
     if (!socket || !roomId) return;
 
-    socket.emit("join_room",{ chatroomId: roomId, senderId: profileId });
+    socket.emit("join_room", roomId);
 
     const handleUpdateConversation = (updatedMessages: MessageInterface[]) => {
+      console.log('message received');
       setMessages(updatedMessages);
     };
 

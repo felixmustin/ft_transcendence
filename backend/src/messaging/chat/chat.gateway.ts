@@ -11,7 +11,7 @@ import { ChatRoomService } from "../chatroom/chatroom.service";
 import { Server, Socket } from "socket.io";
 import { handshake } from "src/pong/pong.service";
 
-@WebSocketGateway({ namespace: "/chat" })
+@WebSocketGateway({ namespace: "/chat", cors: true })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

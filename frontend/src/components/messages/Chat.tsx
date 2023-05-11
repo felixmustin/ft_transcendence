@@ -6,8 +6,9 @@ import jwtDecode from 'jwt-decode';
 import { Socket, io } from 'socket.io-client';
 import CreateRoom from './CreateRoom';
 import ChatRoomSettings from './ChatRoomSettings';
-import SocketContext from '../../context/Socket';
+import SocketContext, { ISocketContextState } from '../../context/Socket';
 import ChatRoomList from './ChatRoomList';
+import { notifications } from '../../App';
 
 interface DecodedToken {
   id: number;
@@ -15,11 +16,13 @@ interface DecodedToken {
 
 type Props = {
   accessToken: string;
+  statusocket: ISocketContextState;
 };
 
 const Chat = (props: Props) => {
   // Socket Connection
   const { SocketState, SocketDispatch } = React.useContext(SocketContext);
+  const { statusocket } = props;
   const socket = SocketState.socket;
 
   // Rooms
@@ -62,10 +65,22 @@ const Chat = (props: Props) => {
       fetchRooms();
     };
 
+    const notif_handler = (notif: notifications) => {
+      for (let i = 0; i < notif.notifs?.length; i++){
+        if (!selectedRoomId && notif.notifs[i].type === 'message'){
+          onConvBoxClick(Number(notif.notifs[i].data), false);
+          break ;
+        }
+      }
+      statusocket.socket?.emit('message-visited');
+    }
+    statusocket.socket?.on('notification', notif_handler);
+
     socket.on('new_chatroom', handleNewChatroom);
 
     return () => {
       socket.off('new_chatroom', handleNewChatroom);
+      statusocket.socket?.off('notification', notif_handler);
     };
   }, [socket]);
 
@@ -125,6 +140,7 @@ const Chat = (props: Props) => {
           roomId={selectedRoomId}
           socket={socket}
           token={props.accessToken}
+          statusocket={statusocket}
         />
       :
       null)}
