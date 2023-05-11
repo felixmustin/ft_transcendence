@@ -3,6 +3,7 @@ import SocialDataFriends from './SocialDataFriends';
 import SocialDataRequest from './SocialDataRequest';
 import Error from '../../components/utils/Error'
 import { ProfileInterface } from '../messages/types';
+import SocketContext from '../../context/Socket';
 
 type Props = {
     accessToken: string | undefined;
@@ -11,11 +12,39 @@ type Props = {
 const FriendList = ({accessToken}: Props) => {
 
     const [error, setError] = useState<Error>();
-    const [friends, setFriends] = useState([]);
+    const [friends, setFriends] = useState<ProfileInterface[]>([]);
     const [requestList, setRequestList] = useState([]);
     const [change, onChange] = useState(false);
 
     const auth = 'Bearer ' + accessToken;
+
+    
+    const { SocketState, SocketDispatch } = React.useContext(SocketContext);
+  useEffect(() => {
+    const status_handler = (stat: number[]) => {
+      setFriends(prevFriends => prevFriends.map((friend, index) => {
+        return {
+          ...friend,
+          statusid: stat[index]
+        };
+      }));
+    }
+    SocketState.socket?.on('status', status_handler);
+
+    const intervalId = setInterval(() => {
+      let user:string[] = [];
+      for (let i = 0; i < friends.length; i++){
+        user.push(friends[i].username);
+      }
+      SocketState.socket?.emit('get status', user);
+    }, 2000);
+
+    // Cleanup function to remove the 'status' event listener
+    return () => {
+      SocketState.socket?.off('status', status_handler);
+      clearInterval(intervalId);
+    }
+  }, [friends, SocketState.socket]);
 
     useEffect(() => {
             const fetchFriends = async () => {

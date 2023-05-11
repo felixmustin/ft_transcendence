@@ -42,7 +42,7 @@ export class StatusService {
 	private id_to_profile: Map < string, Profile > = new Map();
 	private profile_to_id: Map < string, string > = new Map();
 	private notification: Map < string, notification[]> = new Map();
-	// private connected: Set<Profile> = new Set();
+	private connected: Map<string, number> = new Map();
 
 	constructor(
 		private readonly jwtStrategy: JwtStrategy, 
@@ -54,8 +54,8 @@ export class StatusService {
 		try {
 			const payload = await this.jwtStrategy.validateWebSocket(client.handshake.headers);
 			const profile = await this.userservice.findUserProfileById(payload.id);
-			profile.statusid = 1;
-			await this.userProfileRepository.save(profile)
+			// profile.statusid = 1;
+			// await this.userProfileRepository.save(profile)
 			this.register_user(client.id, profile);
 		} catch (error) {
 			throw new WsException('Unauthorized');
@@ -63,11 +63,11 @@ export class StatusService {
 	}
 
 	async logout(client: any){
-		const payload: statusgame = {
-			status: 0,
-			room: '',
-		}
-		this.update_status(client, payload)
+		// const payload: statusgame = {
+		// 	status: 'disconnected',
+		// 	room: '',
+		// }
+		// this.update_status(client, payload)
 		this.delete_id(client.id);
 	}
 	
@@ -153,11 +153,13 @@ export class StatusService {
 	register_user(id : string, user: Profile){
 		this.id_to_profile.set(id, user);
 		this.profile_to_id.set(user.username, id);
+		this.connected.set(user.username, 1);
 	}
 	delete_id(id: string){
 		const user = this.id_to_profile.get(id);
 		this.id_to_profile.delete(id);
 		this.profile_to_id.delete(user?.username);
+		this.connected.delete(user?.username);
 	}
 	delete_user(user: Profile){
 		const id = this.profile_to_id.get(user.username);
@@ -174,7 +176,7 @@ export class StatusService {
 	}
 	async emitNotifications(server: Server){
 		for (const [key, value] of this.notification) {
-			if (!value.length){
+			if (!value?.length){
 				this.notification.delete(key);
 			}
 			else{
@@ -187,20 +189,35 @@ export class StatusService {
 	}
 	async update_status(client: any, data: statusgame){
 		const user = this.id_to_profile.get(client.id);
-		const profile = await this.userservice.findUserProfileById(user?.id);
+		this.connected.set(user?.username, data.status);
+		// const profile = await this.userservice.findUserProfileById(user?.id);
 		// if (profile.statusid != 0 && data.status != 2){
-			profile.statusid = data.status;
+			// profile.statusid = data.status;
 		// }
-		profile.gameroom = data.room;
-		await this.userProfileRepository.save(profile);
+		// profile.gameroom = data.room;
+		// await this.userProfileRepository.save(profile);
 	}
 	async status_quit_game(client: any){
 		const user = this.id_to_profile.get(client.id);
-		const profile = await this.userservice.findUserProfileById(user?.id);
-		if (profile.statusid === 2 ){
-			profile.statusid = 1;
+		// const profile = await this.userservice.findUserProfileById(user?.id);
+		// if (profile.statusid === 2 ){
+		// 	profile.statusid = 1;
+		// }
+		// profile.gameroom = '';
+		// await this.userProfileRepository.save(profile);
+		this.connected.set(user?.username, 1);
+	}
+	get_status(client: any, user: string[]){
+		let resp: number[] = [];
+		for (let i = 0; i < user.length; i++){
+			const stat = this.connected.get(user[i]);
+			if (stat){
+				resp.push(stat);
+			}
+			else{
+				resp.push(0);
+			}
 		}
-		profile.gameroom = '';
-		await this.userProfileRepository.save(profile);
+		client.emit('status', resp);
 	}
 }

@@ -21,6 +21,31 @@ const ChatRoom = ({ profileId, roomId, socket, token, statusocket }: Props) => {
   const [users, setUsers] = useState<ProfileInterface[]>([]);
 
   useEffect(() => {
+    const status_handler = (stat: number[]) => {
+      setUsers(prevFriends => prevFriends.map((friend, index) => {
+        return {
+          ...friend,
+          statusid: stat[index]
+        };
+      }));
+    }
+    statusocket.socket?.on('status', status_handler);
+
+    const intervalId = setInterval(() => {
+      let user:string[] = [];
+      for (let i = 0; i < users.length; i++){
+        user.push(users[i].username);
+      }
+      statusocket.socket?.emit('get status', user);
+    }, 2000);
+
+    // Cleanup function to remove the 'status' event listener
+    return () => {
+      statusocket.socket?.off('status', status_handler);
+      clearInterval(intervalId);
+    }
+  }, [users, statusocket.socket]);
+  useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await fetch(`http://localhost:3001/chatroom/${roomId}/users`);

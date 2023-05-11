@@ -53,4 +53,8 @@ export class statusGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	async status_quit_game(client: any){
 		this.statusService.status_quit_game(client);
 	}
+	@SubscribeMessage('get status')
+	async get_status(client: any, users: string[]){
+		this.statusService.get_status(client, users);
+	}
 }

@@ -6,7 +6,7 @@ import { noti_payload, notifications } from "../../App";
 import { Invitebuttons } from "./InvitationButtons";
 
 export type statusgame = {
-	status: number,
+	status: string,
 	room: string,
 }
 
@@ -75,7 +75,7 @@ function Matchmaking(props: props) {
 		    setMatch(pongprops);
         setwaiting(0);
         const payload: statusgame = {
-          status: 2,
+          status: 'in game',
           room: data.roomID,
         }
         statusocket.socket?.emit('update_status', payload);
