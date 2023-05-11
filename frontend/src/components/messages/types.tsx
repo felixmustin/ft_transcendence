@@ -13,6 +13,16 @@ export interface GameInterface {
 //   username: string;
 // }
 
+export interface TokenInterface {
+  id: number;
+  exp: any;
+}
+
+export interface BufferInterface {
+  data: any;
+  type: string;
+}
+
 export interface ProfileInterface {
   id: number;
   username: string;
@@ -20,7 +30,7 @@ export interface ProfileInterface {
   firstname: string;
   lastname: string;
   age: number;
-  avatar: Buffer;
+  avatar: BufferInterface;
   games: GameInterface[];
   statusid: number;
   gameroom: string;

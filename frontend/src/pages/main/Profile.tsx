@@ -171,10 +171,10 @@ const Profile = ({ username, token }: Props) => {
     return <Loading />;
   else {
     return (
-      <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full overflow-hidden">
+      <div className="app bg-gradient-to-tl from-violet-900 via-black to-black w-full">
         <div className="bg-black flex justify-center items-center px-6 sm:px-16 border-b-2 border-violet-900">
           <div className="xl:max-w-[1280px] w-full">
-            <Navbar accessToken={token}/>
+            <Navbar />
           </div>
         </div>
 
@@ -213,6 +213,9 @@ const Profile = ({ username, token }: Props) => {
                     </button>
                   </div>
                 )}
+                <div className='flex bg-gray-900 rounded-lg content-center text-white text-center mx-5 my-3'>
+                  {profile?.statusid === 2 && <p>Player currently in game : {profile.gameroom}</p>}
+                </div>
               </div>
             </div>
             <hr className='w-auto h-1 mx-5 my-2 border-0 rounded dark:bg-gray-900'/>

@@ -37,7 +37,7 @@ const ConvBox = ({profileId,  room, onBoxClick, socket, token, id }: Props) => {
 
   const handleClickLeaveRoom = async () => {
     const auth = 'Bearer ' + token;
-
+    try {
       await fetch('http://localhost:3001/chatroom/leave', {
         method: 'POST',
         headers: {
@@ -45,13 +45,11 @@ const ConvBox = ({profileId,  room, onBoxClick, socket, token, id }: Props) => {
         'Content-Type': 'application/json',
         },
         body: JSON.stringify({roomId: room.id})
-        }).then(response => {
-          if (response.ok) {
-            window.location.reload(); 
-          } else {
-            alert("Problem leaving room");
-          }
-      });
+        });
+        window.location.reload();
+      } catch (error) {
+        console.error('Error leaving room:', error);
+    }
   }
 
   const fetchLastMessage = async () => {

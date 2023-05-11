@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import Logo from '../../assets/Logo.png'
-import Disconnect from '../authentication/Disconnect';
 import { useNavigate } from 'react-router-dom'
 import { tokenForm } from '../../interfaceUtils';
 import { noti_payload, notifications } from '../../App';
 import SocketContext from '../../context/Socket';
+import { removeSessionsToken } from '../../sessionsUtils';
 
 
-type Props = {
-  accessToken: string;
-}
+const Navbar = () => {
 
-const Navbar = (props: Props) => {
-
-  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
@@ -57,11 +52,10 @@ const Navbar = (props: Props) => {
     }
   };
 
-  function displayDisconnectBox() {
-    if (open)
-      setOpen(false)
-    else
-      setOpen(true)
+  function Disconnect() {
+    removeSessionsToken()
+    navigate('/');
+    window.location.reload(); 
   }
 
   return (
@@ -83,8 +77,7 @@ const Navbar = (props: Props) => {
       {/*<li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/chat">Chat</a></li>*/}
       <li className="font-poppins font-normal cursor-pointer text-gray-200 text-xl hover:text-violet-800 mr-5"><a href="/settings">Settings</a></li>
       <div className="relative">
-        <button onClick={displayDisconnectBox} className='w-[100px] py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg'>Log Out</button>
-        {open ? <Disconnect accessToken={props.accessToken} /> : null}
+        <button onClick={Disconnect} className='w-[100px] py-2 bg-gradient-to-tl from-violet-900 via-slate-900 to-violet-900 shadow-lg shadow-slate-900/30 hover:shadow-violet-900/40 text-white font-semibold rounded-lg'>Log Out</button>
       </div>
     </ul>
   </nav>
