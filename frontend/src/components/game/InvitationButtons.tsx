@@ -4,8 +4,6 @@ import { invitation } from "./Matchmaking";
 export class Invitebuttons extends Component<{invite: invitation[]} & {handleJoinRoom: Function}>{
 	render(): ReactNode {
 		const { invite, handleJoinRoom } = this.props;
-		for (let i = 0; i < invite.length; i++){
-			console.log(JSON.stringify(invite[i]))}
 		if (!invite.length){
 			return null;
 		}

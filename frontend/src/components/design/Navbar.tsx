@@ -19,7 +19,6 @@ const Navbar = () => {
 	const { SocketState, SocketDispatch } = React.useContext(SocketContext);
   useEffect(() => {
 	const notif_handler = (notif: notifications) => {
-    console.log('receive notif ' + JSON.stringify(notif));
     let game: boolean = false;
     let message: boolean = false;
     let friend: boolean = false;

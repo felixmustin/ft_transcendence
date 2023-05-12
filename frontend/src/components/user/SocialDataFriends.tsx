@@ -34,29 +34,7 @@ const SocialDataFriends = (props: Props) => {
   // This needs to be updated to use the API.
   // Handle the launching of a game
   const { SocketState, SocketDispatch } = React.useContext(SocketContext);
-  // useEffect(() => {
-  //   const status_handler = (stat: number) => {
-  //     console.log('get status response ' + stat);
-  //     if (props.profile.statusid !== stat){
-  //     props.profile.statusid = stat;
-  //     setstatus(stat);
-  //     // window.location.reload();
-  //   }
-  //   } 
 
-  //   SocketState.socket?.on('status', status_handler);
-
-  //   const intervalId = setInterval(() => {
-  //     console.log('emit get status ' +  props.profile.username);
-  //     SocketState.socket?.emit('get status', props.profile.username);
-  //   }, 2000);
-
-  //   // Cleanup function to remove the 'status' event listener
-  //   return () => {
-  //     SocketState.socket?.off('status', status_handler);
-  //     clearInterval(intervalId);
-  //   }
-  // }, [props.profile.username, SocketState.socket]);
   const handleLaunchGame = () => {
     const payload: noti_payload = {
       type: 'game',

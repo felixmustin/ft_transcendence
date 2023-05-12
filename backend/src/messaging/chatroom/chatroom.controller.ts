@@ -52,7 +52,6 @@ export class ChatRoomController {
   @Post('removeMember')
   @UseGuards(JwtAuthGuard)
   async removeMemberFromChatRoom(@Request() req: any, @Body() { roomId, username }: { roomId: number, username: string }) {
-    console.log({ roomId, username })
     return await this.chatRoomService.removeMemberFromChatRoom(roomId, username, req.user.id)
   }
 
@@ -64,7 +63,6 @@ export class ChatRoomController {
   @Post('removeAdmin')
   @UseGuards(JwtAuthGuard)
   async removeAdminFromChatRoom(@Request() req: any, @Body() { roomId, username }: { roomId: number, username: string }) {
-    console.log({ roomId })
     return await this.chatRoomService.removeAdminFromChatRoom(roomId, username, req.user.id)
   }
 

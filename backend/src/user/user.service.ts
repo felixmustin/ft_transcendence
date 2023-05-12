@@ -125,7 +125,6 @@ export class UserService {
     if (!currentUserProfile) {
       throw new NotFoundException('Current user not found');
     }
-    console.log(currentUserProfile);
     if (!currentUserProfile.blocked) {
       return [];
     }
@@ -148,7 +147,6 @@ export class UserService {
     if (!currentUserProfile || !toUnblockUserProfile) {
       throw new NotFoundException('User not found');
     }
-    console.log('Blocked list: ', currentUserProfile.blocked);
     if (!currentUserProfile.blocked.includes(toUnblockProfileId)) {
       throw new BadRequestException('User not blocked');
     }

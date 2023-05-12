@@ -30,7 +30,6 @@ const SendMessage = ({ roomId, socket, profileId, statusocket, users }: Props) =
 
     if (socket) {
       socket.emit('send_message', { chatroomId: roomId, senderId: profileId, content })
-      console.log('emiting message ' + roomId);
       socket.on("is_muted", setIsMuted);
       for (let i = 0; i < usernamelist.length; i++){
         const payload: noti_payload = {

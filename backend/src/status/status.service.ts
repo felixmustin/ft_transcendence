@@ -82,7 +82,6 @@ export class StatusService {
 			}
 		}
 		this.notification.set(user.username, notif);
-		console.log('delete self ' + JSON.stringify(notif));
 		client.emit('notification', this.build_noti(user.username));
 	}
 	delete_game_notif(client: any){
@@ -96,7 +95,6 @@ export class StatusService {
 			}
 		}
 		this.notification.set(user.username, notif);
-		console.log('deleting game notif ' + notif);
 		client.emit('notification', this.build_noti(user.username));
 	}
 	delete_message_notif(client:any){
@@ -183,28 +181,15 @@ export class StatusService {
 				const id = this.profile_to_id.get(key);
 				const noti = this.build_noti(key);
 				server.to(id).emit('notification', noti);
-				// console.log('emiting notif to ' + key);
 			}
 		}
 	}
 	async update_status(client: any, data: statusgame){
 		const user = this.id_to_profile.get(client.id);
 		this.connected.set(user?.username, data.status);
-		// const profile = await this.userservice.findUserProfileById(user?.id);
-		// if (profile.statusid != 0 && data.status != 2){
-			// profile.statusid = data.status;
-		// }
-		// profile.gameroom = data.room;
-		// await this.userProfileRepository.save(profile);
 	}
 	async status_quit_game(client: any){
 		const user = this.id_to_profile.get(client.id);
-		// const profile = await this.userservice.findUserProfileById(user?.id);
-		// if (profile.statusid === 2 ){
-		// 	profile.statusid = 1;
-		// }
-		// profile.gameroom = '';
-		// await this.userProfileRepository.save(profile);
 		this.connected.set(user?.username, 1);
 	}
 	get_status(client: any, user: string[]){

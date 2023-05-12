@@ -36,7 +36,6 @@ function Matchmaking(props: props) {
   useEffect(() => {
     const invite_handler = (notif: notifications) => {
       noti = (notif);
-      // console.log(JSON.stringify(notif));
       for (let i = 0; i < notif?.notifs?.length; i++){
         if (notif.notifs[i].origin === notif.name && notif.notifs[i].type === 'game'){
           handleCreateRoom();
@@ -52,7 +51,6 @@ function Matchmaking(props: props) {
           if (!invite.some(item => item.origin === inv.origin && item.room === inv.room)){
             invite.push(inv);
             setinvitations([...invite]);
-            console.log('invites ' + invitations);
             statusocket?.socket?.emit('game-visited');
           }
         }
@@ -147,13 +145,11 @@ function Matchmaking(props: props) {
   const handleCreateRoom = () => {
     setwaiting(2);
     // Emit a "create_room" event with the user's UID
-    console.log('emiting create room');
     SocketState.socket?.emit('create_room', bonus);
   };
 
   const handleJoinRoom = (room :string) => {
     // Emit a "join_room" event with the user's UID
-    console.log('joining room ' + room);
     setinvitations([]);
     SocketState.socket?.emit('join_room', room);
   };

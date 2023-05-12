@@ -18,7 +18,6 @@ const BlockedUsers = (props: Props) => {
       try {
         const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
         const result = await res.json();
-        console.log(result);
         if (res.ok)
           setBlocked(result);
       } catch (error : any) {

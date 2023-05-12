@@ -17,8 +17,6 @@ export async function getSessionsToken() {
   const accessTokenExp = tokenDecoded.exp;
   const now = Math.floor(Date.now() / 1000);
   const timeLeft = accessTokenExp - now;
-  console.log("Timeleft")
-  console.log(timeLeft)
 
   if (timeLeft < 30) {
     const res = await fetch('http://localhost:3001/auth/refresh-token', {
@@ -32,7 +30,7 @@ export async function getSessionsToken() {
           return result
       }
       else
-        console.log("Couldnt refresh token")
+        window.location.reload();
   }
   return tokenObj;
 }

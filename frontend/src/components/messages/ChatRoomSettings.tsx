@@ -49,7 +49,6 @@ const ChatRoomSettings= ({ room, token }: Props) => {
      const auth = 'Bearer ' + token;
      const url = 'http://localhost:3001/chatroom/' + room?.id;
        const res = await fetch(url, { method: 'DELETE', headers: { Authorization: auth }});
-       console.log('deleteRoom result:', res);
        window.location.reload(); 
    };
 

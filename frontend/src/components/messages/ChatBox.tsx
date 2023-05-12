@@ -27,7 +27,6 @@ const ChatBox = ({ roomId, socket, token, profileId }: Props) => {
       try {
         const res = await fetch(url, { method: 'GET', headers: { 'Authorization': auth } });
         const result = await res.json();
-        console.log(result);
         if (res.ok)
           setBlocked(result);
       } catch (error : any) {
@@ -59,7 +58,6 @@ const ChatBox = ({ roomId, socket, token, profileId }: Props) => {
     socket.emit("join_room", roomId);
 
     const handleUpdateConversation = (updatedMessages: MessageInterface[]) => {
-      console.log('message received');
       setMessages(updatedMessages);
     };
 

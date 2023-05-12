@@ -82,7 +82,6 @@ const ChatRoom = ({ profileId, roomId, socket, token, statusocket }: Props) => {
   }, []);
 
 
-  console.log(isBanned)
   if (profileId == 0) {
     return (<Loading />)
     }

@@ -29,7 +29,6 @@ export class ChatRoomService {
 
   async createChatRoomFromUsers(userId: number, targetId: number): Promise<ChatRoom> {
     let chatRoom = await this.getChatRoomByUsers(userId, targetId);
-    console.log("find", chatRoom)
     if (!chatRoom) {
       // Fetch the User entities using the provided IDs
       const user1 = await this.userRepository.findOne({ where: { id: userId }, relations: ['profile'] });
@@ -49,7 +48,6 @@ export class ChatRoomService {
       });
       chatRoom = await this.chatRoomRepository.save(newChatRoom);
     }
-    console.log("okeyyy", chatRoom)
     return chatRoom;
   }
 
