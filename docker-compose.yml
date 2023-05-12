@@ -9,9 +9,6 @@ services:
       - "3001:3001"
     env_file:
       - .env
-    # volumes:
-    #   - ./backend:/app
-    #   - /app/node_modules
     networks:
       - network
     restart: on-failure
@@ -24,16 +21,12 @@ services:
     build: ./frontend/
     ports:
       - "3000:3000"
-    # volumes:
-    #   - ./frontend:/app
-    #   - /app/node_modules
     networks:
       - network
     restart: on-failure
     
     
   pg:
-    # image: postgres:14.1-alpine
     container_name: "postgres"
     build: ./database/
     restart: always
@@ -43,22 +36,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB_NAME}
     ports:
       - "5432:5432"
+    env_file:
+      - .env
     volumes:
       - pg-db:/var/lib/postgresql/data
     networks:
       - network
 
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin
-  #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-  #   ports:
-  #     - "8080:80"
-  #   networks:
-  #     - network
 
 networks:
   network:

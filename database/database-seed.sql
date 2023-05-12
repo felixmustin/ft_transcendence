@@ -1,4 +1,4 @@
-CREATE USER myUsername WITH PASSWORD 'myPassword';
+CREATE USER ${POSTGRES_USERNAME} WITH PASSWORD '${POSTGRES_PASSWORD}';
 
 CREATE TABLE public.user_profiles
 (
@@ -16,12 +16,6 @@ CREATE TABLE public.user_profiles
 
 );
 
--- CREATE TABLE public.game
--- (
---     id SERIAL PRIMARY KEY,
---     score1 INT,
---     score2 INT
--- );
 
 CREATE TABLE public.profile_games
 (
@@ -46,7 +40,6 @@ CREATE TABLE public.Users
     user42id INT,
     refreshtoken VARCHAR(255),
     profileId INT,
-    -- blocked INT[],
     CONSTRAINT fk_profile
     FOREIGN KEY (profileId)
     REFERENCES public.user_profiles(id)
@@ -204,17 +197,17 @@ CREATE TABLE public.ban
     --     ON DELETE CASCADE
 );
 
-ALTER TABLE public.Users OWNER TO myUsername;
-ALTER TABLE public.user_profiles OWNER TO myUsername;
-ALTER TABLE public.friends OWNER TO myUsername;
-ALTER TABLE public.game OWNER TO myUsername;
-ALTER TABLE public.user_profiles_games OWNER TO myUsername;
-ALTER TABLE public.chatroom OWNER TO myUsername;
-ALTER TABLE public.message OWNER TO myUsername;
-ALTER TABLE public.chatroom_participants OWNER TO myUsername;
-ALTER TABLE public.chatroom_admins OWNER TO myUsername;
-ALTER TABLE public.chatroom_blocked_users OWNER TO myUsername;
-ALTER TABLE public.mute OWNER TO myUsername;
-ALTER TABLE public.ban OWNER TO myUsername;
+ALTER TABLE public.Users OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.user_profiles OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.friends OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.game OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.user_profiles_games OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.chatroom OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.message OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.chatroom_participants OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.chatroom_admins OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.chatroom_blocked_users OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.mute OWNER TO ${POSTGRES_USERNAME};
+ALTER TABLE public.ban OWNER TO ${POSTGRES_USERNAME};
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO myUsername;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ${POSTGRES_USERNAME};
